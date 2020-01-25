@@ -1,0 +1,12 @@
+include LICENSE
+include MANIFEST.in
+include README.rst
+include setup.py
+include setup.cfg
+include requirements.txt
+include tox.ini
+
+recursive-include xmlschema_generator *
+recursive-include tests *
+
+global-exclude *.py[cod]

@@ -1,0 +1,11 @@
+*~
+*.o
+*.mod
+*.x
+*.a
+*.inc
+.idea/
+tests/output/
+tmp/
+__pycache__
+*.egg-info/
