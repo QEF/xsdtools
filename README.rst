@@ -9,6 +9,10 @@ The generator requires Python 3.5+ for working and is based on the libraries
 `xmlschema <https://github.com/brunato/xmlschema>`_ for processing XSD schemas
 and `Jinja2 <https://github.com/pallets/jinja>`_ for processing templates.
 
+The package can be used as a library in your Python code or by a console command
+in generic shell scripts. Thought as experimental code for generating Fortan
+interfaces for the XML schema-based data of Quantum ESPRESSO simulation suite,
+it's opened to contributions on developing other languages or other template set.
 
 Installation
 ------------

@@ -5,7 +5,6 @@
 *.a
 *.inc
 .idea/
-tests/output/
-tmp/
 __pycache__
 *.egg-info/
+tests/output/

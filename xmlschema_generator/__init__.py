@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2020, SISSA (Scuola Internazionale Superiore di Studi Avanzati).
 # All rights reserved.
@@ -7,4 +6,9 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .engine import generate
+from .generators import AbstractGenerator, CGenerator, FortranGenerator, \
+    PythonGenerator, JSONSchemaGenerator, generate
+
+
+__all__ = ['AbstractGenerator', 'CGenerator', 'FortranGenerator', 'PythonGenerator',
+           'JSONSchemaGenerator', 'generate']
