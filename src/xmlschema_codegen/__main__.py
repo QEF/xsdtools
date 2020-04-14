@@ -25,10 +25,10 @@ if not locals()['__package__']:
     pkg_search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if pkg_search_path not in sys.path:
         sys.path.append(pkg_search_path)
-    import xmlschema_generator
-    __package__ = xmlschema_generator.__name__
+    import xmlschema_codegen
+    __package__ = xmlschema_codegen.__name__
 else:
-    import xmlschema_generator as xg
+    import xmlschema_codegen as xg
 
 
 PACKAGE_PATH = os.path.dirname(__file__)

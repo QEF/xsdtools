@@ -10,7 +10,7 @@ import unittest
 import jinja2
 import xmlschema
 
-from xmlschema_generator import *
+from xmlschema_codegen import *
 
 
 XSD_TEST = """

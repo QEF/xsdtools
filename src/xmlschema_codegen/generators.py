@@ -51,6 +51,7 @@ class AbstractGenerator(ABC):
             return
         return os.path.relpath(loaders[0].searchpath[0])
 
+
 class CGenerator(AbstractGenerator):
     """An C code generator for XSD schemas."""
     templates_dir = os.path.join(os.path.dirname(__file__), 'templates/c/')

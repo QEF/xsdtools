@@ -7,45 +7,42 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-try:
-    from setuptools import setup
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    from distutils.core import setup
+from setuptools import setup
 
 with open("README.rst") as readme:
     long_description = readme.read()
 
 setup(
-    name='xmlschema-generator',
+    name='xmlschema-codegen',
     version='0.1',
-    install_requires=['xmlschema>=1.1.0', 'jinja2'],
-    packages=['xmlschema_generator'],
-    package_data={'xmlschema_generator': ['templates/*/*.j2']},
+    packages=['xmlschema_codegen'],
+    package_data={'xmlschema_codegen': ['templates/*/*.j2']},
+    package_dir={'': 'src'},
     entry_points={
         'console_scripts': [
-            'xmlschema-generate=xmlschema_generator.__main__:main',
+            'xmlschema-codegen=xmlschema_codegen.__main__:main',
         ]
     },
+    install_requires=['xmlschema>=1.1.0', 'jinja2'],
     author='Davide Brunato et al.',
-    url='https://github.com/sissaschool/xmlschema-generator',
+    url='https://github.com/sissaschool/xmlschema-codegen',
     license='BSD 3-Clause',
-    description='A code generator based on XSD schemas and Jinja2 templates',
+    license_file='LICENSE',
+    description='A code generator for XSD schemas based on xmlschema and Jinja2 libraries',
     long_description=long_description,
+    long_description_content_type='text/x-rst',
     classifiers=[
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: Software Development :: Code Generators'
+        'Topic :: Software Development :: Code Generators',
+        'Topic :: Text Processing :: Markup :: XML',
         'Intended Audience :: Developers',
         'Intended Audience :: Information Technology',
         'Intended Audience :: Science/Research',

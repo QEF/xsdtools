@@ -10,7 +10,7 @@ import unittest
 import os
 import xmlschema
 
-from xmlschema_generator import FortranGenerator
+from xmlschema_codegen import FortranGenerator
 
 
 def resource_path(rel_path):

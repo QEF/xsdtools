@@ -1,16 +1,16 @@
-###################
-xmlschema-generator
-###################
+#################
+xmlschema-codegen
+#################
 
-This package is a code generator from XSD schemas. The generator engine
+This is a code generator software from XSD schemas. The generator engine
 uses XSD schemas and Jinja2 templates to produce code and structures.
 
-The generator requires Python 3.5+ for working and is based on the libraries
+The generator requires Python 3.7+ for working and is based on the libraries
 `xmlschema <https://github.com/brunato/xmlschema>`_ for processing XSD schemas
 and `Jinja2 <https://github.com/pallets/jinja>`_ for processing templates.
 
 The package can be used as a library in your Python code or by a console command
-in generic shell scripts. Thought as experimental code for generating Fortan
+in generic shell scripts. Thought as experimental code for generating Fortran
 interfaces for the XML schema-based data of Quantum ESPRESSO simulation suite,
 it's opened to contributions on developing other languages or other template set.
 
@@ -19,23 +19,21 @@ Installation
 
 Within a virtual environment simply type::
 
-  pip install xmlschema-generator
+  pip install xmlschema-codegen
 
-otherwise avoid root installations, so use::
+otherwise install the package in user space, avoiding root installations::
 
-  pip install --user xmlschema-generator
+  pip install --user xmlschema-codegen
 
 For installing from source within a virtual environment execute::
 
-  python setup install
-
-or otherwise for user space installations::
-
-  python setup install --user
+  git clone https://github.com/sissaschool/xmlschema-codegen.git
+  cd xmlschema-codegen/
+  python setup.py install
 
 .. note::
     For source installations the `setuptools <https://github.com/pypa/setuptools>`_
-    package is recommended.
+    package is required.
 
 
 Usage
@@ -43,15 +41,16 @@ Usage
 
 From command line::
 
-  xmlschema-generator --help
+  xmlschema-codegen --help
 
 From Python console or module::
 
-  import xmlschema_generator as xg
+  import xmlschema_codegen as xcg
 
 or::
 
-  from xmlschema_generator import generate
+  from xmlschema_codegen import generate
+
 
 License
 -------
