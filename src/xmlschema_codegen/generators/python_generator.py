@@ -11,7 +11,7 @@ from .base import AbstractGenerator
 
 class PythonGenerator(AbstractGenerator):
     """A Python code generator for XSD schemas."""
-    templates_dir = 'templates/python/'
+    default_path = 'templates/python/'
 
     builtin_types = {
         'string': 'str',

@@ -35,7 +35,7 @@ class TestGenerators(unittest.TestCase):
         for cls in self.generators_classes:
             generator = cls(self.schema)
             self.assertIsInstance(generator, cls)
-            self.assertIs(generator._schema, self.schema)
+            self.assertIs(generator.schema, self.schema)
             self.assertIsInstance(generator._env, jinja2.Environment)
 
     def test_get_template(self):

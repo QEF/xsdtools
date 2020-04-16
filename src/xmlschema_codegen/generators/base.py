@@ -7,7 +7,8 @@
 # or https://opensource.org/licenses/BSD-3-Clause
 #
 import os
-from abc import ABC
+import inspect
+from abc import ABC, ABCMeta
 from pathlib import Path
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader
 
@@ -26,55 +27,86 @@ def filter_function(func):
     return func
 
 
-class AbstractGenerator(ABC):
+class GeneratorMeta(ABCMeta):
+    """Metaclass for creating code generators."""
+
+    def __new__(mcs, name, bases, attrs):
+        filters = {}
+        builtins_map = {}
+        for base in bases:
+            if hasattr(base, 'default_filters'):
+                filters.update(base.default_filters)
+            if getattr(base, 'builtins_map', None):
+                builtins_map.update(base.builtins_map)
+
+        try:
+            path = Path(__file__).absolute().parent.parent.joinpath(attrs['default_path'])
+        except (KeyError, TypeError):
+            pass
+        else:
+            if not path.is_dir():
+                raise ValueError("Path {!r} is not a directory!".format(str(path)))
+            attrs['default_path'] = path
+
+        try:
+            for k, v in attrs['builtins_map'].items():
+                builtins_map[xsd_qname(k)] = v
+        except (KeyError, AttributeError):
+            pass
+        finally:
+            attrs['builtins_map'] = builtins_map
+
+        for k, v in attrs.items():
+            if inspect.isfunction(v) and getattr(v, 'is_filter', False):
+                filters[k] = v
+        attrs['default_filters'] = filters
+
+        return type.__new__(mcs, name, bases, attrs)
+
+
+class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     """
     Abstract base class for code generators. A generator works using the
     Jinja2 template engine by an Environment instance.
 
     :param schema: the XSD schema instance.
-    :param searchpath: directory path for custom templates.
-    :param filters: a dictionary with custom filter functions.
+    :param searchpath: additional search path for custom templates.
+    :param filters: additional custom filter functions.
     :param types_map: a dictionary with custom mapping for XSD types.
     """
-    templates_dir = None
-    """Generator default template directory."""
 
-    filters = None
-    """Generator default filter functions."""
+    default_path = None
+    """Default path for templates."""
+
+    default_filters = None
+    """Default filter functions."""
 
     builtins_map = None
     """Translation map for XSD builtin types."""
 
     def __init__(self, schema, searchpath=None, filters=None, types_map=None):
         assert isinstance(schema, xmlschema.XMLSchemaBase)
-        self._schema = schema
+        self.schema = schema
 
-        default_path = Path(__file__).absolute().parent.parent.joinpath(self.templates_dir)
-        if not default_path.is_dir():
-            raise ValueError("Invalid path {!r} for templates!".format(str(default_path)))
-
+        self.searchpath = searchpath
         if searchpath is None:
-            loader = FileSystemLoader(str(default_path))
+            loader = FileSystemLoader(str(self.default_path))
         else:
             assert isinstance(searchpath, str)
             loader = ChoiceLoader([
                 FileSystemLoader(searchpath),
-                FileSystemLoader(str(default_path)),
+                FileSystemLoader(str(self.default_path)),
             ])
 
-        filters = dict(filters) if filters else {}
-        if self.filters:
-            filters.update((k, v) for k, v in self.filters.items() if k not in filters)
-
-        if self.builtins_map:
-            self.types_map = {xsd_qname(k): v for k, v in self.builtins_map.items()}
-        else:
-            self.types_map = {}
+        self.types_map = self.builtins_map.copy()
         if types_map:
             self.types_map.update(types_map)
 
         self._env = Environment(loader=loader)
-        self._env.filters.update(filters)
+        self._env.filters.update(self.default_filters)
+        self.filters = filters
+        if filters:
+            self._env.filters.update(filters)
 
     def __repr__(self):
         return '%s(xsd_file=%r, searchpath=%r)' % (
@@ -83,15 +115,8 @@ class AbstractGenerator(ABC):
 
     @property
     def xsd_file(self):
-        url = self._schema.url
+        url = self.schema.url
         return os.path.basename(url) if url else None
-
-    @property
-    def searchpath(self):
-        loaders = self._env.loader.loaders
-        if len(loaders) <= 1:
-            return
-        return os.path.relpath(loaders[0].searchpath[0])
 
     def get_template(self, name):
         return self._env.get_template(name)

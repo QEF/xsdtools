@@ -11,7 +11,7 @@ from .base import AbstractGenerator
 
 class JSONSchemaGenerator(AbstractGenerator):
     """A JSON Schema generator for XSD schemas."""
-    templates_dir = 'templates/json-schema/'
+    default_path = 'templates/json-schema/'
 
     builtin_types = {
         'string': 'string',

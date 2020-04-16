@@ -34,7 +34,7 @@ def get_fortran_type(xsd_type):
 
 class FortranGenerator(AbstractGenerator):
     """A FORTRAN code generator for XSD schemas."""
-    templates_dir = 'templates/fortran/'
+    default_path = 'templates/fortran/'
 
     builtins_map = {
         'string': 'CHARACTER(len=256)',

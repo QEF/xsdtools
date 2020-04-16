@@ -11,7 +11,7 @@ from .base import AbstractGenerator
 
 class CGenerator(AbstractGenerator):
     """A C code generator for XSD schemas."""
-    templates_dir = 'templates/c/'
+    default_path = 'templates/c/'
 
     builtin_types = {
         'string': 'str',

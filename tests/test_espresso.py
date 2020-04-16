@@ -58,6 +58,7 @@ def reset_function_name(xsd_type):
        return 'qes_reset_' + xsd_type.local_name.replace('Type','')
 
 
+@unittest.skip
 class TestEspressoPw(unittest.TestCase):
 
     @classmethod
@@ -74,7 +75,7 @@ class TestEspressoPw(unittest.TestCase):
         self.assertIn('espresso', self.schema.elements)
 
     def test_generator_object(self):
-        searchpath = os.path.relpath(self.templates_dir)
+        searchpath = os.path.abspath(self.templates_dir)
         self.assertEqual(
             repr(self.generator),
             "FortranGenerator(xsd_file='qes.xsd', searchpath='%s')" % searchpath
