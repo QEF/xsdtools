@@ -7,6 +7,7 @@
 # or https://opensource.org/licenses/BSD-3-Clause
 #
 import unittest
+from pathlib import Path
 import jinja2
 import xmlschema
 
@@ -36,3 +37,30 @@ class TestGenerators(unittest.TestCase):
             self.assertIsInstance(generator, cls)
             self.assertIs(generator._schema, self.schema)
             self.assertIsInstance(generator._env, jinja2.Environment)
+
+    def test_get_template(self):
+        codegen = FortranGenerator(self.schema)
+        template = codegen.get_template('base.f90.jinja')
+        with open(template.filename) as fp:
+            self.assertNotIn("{# Override base90.f90 template #}", fp.read())
+
+        searchpath = Path(__file__).absolute().parent.joinpath('resources/templates/fortran/')
+        self.assertTrue(searchpath.is_dir())
+
+        codegen = FortranGenerator(self.schema, str(searchpath))
+        template = codegen.get_template('base.f90.jinja')
+        with open(template.filename) as fp:
+            self.assertIn("{# Override base90.f90 template #}", fp.read())
+
+    def test_list_templates(self):
+        codegen = FortranGenerator(self.schema)
+        self.assertListEqual(codegen.list_templates(),
+                             ['base.f90.jinja', 'types_module.f90.jinja'])
+
+        searchpath = Path(__file__).absolute().parent.joinpath('resources/templates/fortran/')
+        self.assertTrue(searchpath.is_dir())
+        codegen = FortranGenerator(self.schema, str(searchpath))
+        self.assertListEqual(
+            codegen.list_templates(),
+            ['base.f90.jinja', 'qes_types_module.f90.jinja', 'types_module.f90.jinja']
+        )

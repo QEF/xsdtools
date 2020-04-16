@@ -7,7 +7,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from setuptools import setup
+from setuptools import find_packages, setup
 
 with open("README.rst") as readme:
     long_description = readme.read()
@@ -15,9 +15,9 @@ with open("README.rst") as readme:
 setup(
     name='xmlschema-codegen',
     version='0.1',
-    packages=['xmlschema_codegen'],
-    package_data={'xmlschema_codegen': ['templates/*/*.j2']},
+    packages=find_packages('src'),
     package_dir={'': 'src'},
+    include_package_data=True,
     entry_points={
         'console_scripts': [
             'xmlschema-codegen=xmlschema_codegen.__main__:main',

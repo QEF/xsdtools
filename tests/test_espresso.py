@@ -6,6 +6,10 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
+"""
+Temporary test script for Quantum ESPRESSO suite. Will be moved to QE's xmltool when completed.
+"""
+
 import unittest
 import os
 import xmlschema
@@ -16,6 +20,42 @@ from xmlschema_codegen import FortranGenerator
 def resource_path(rel_path):
     resource_dir = os.path.join(os.path.dirname(__file__), 'resources')
     return os.path.join(resource_dir, rel_path)
+
+
+##
+# Filter functions for QES templates
+#
+def read_function_name(xsd_type):
+    if xsd_type.is_simple():
+        return 'extractDataContent'
+    return 'qes_read_' + xsd_type.local_name.replace('Type', '')
+
+
+def bcast_function_name(xsd_type):
+    return 'qes_bcast_' + xsd_type.local_name.replace('Type', '')
+
+
+def init_function_name(xsd_type):
+    name = xsd_type.local_name
+    if name in ['matrixType', 'integerMatrixType']:
+       return ', '.join(
+           'qes_init_' + name.replace('Type','_%d' % k) for k in (1, 2, 3)
+       )
+    elif xsd_type.is_complex():
+       return 'qes_init_' + name.replace('Type','')
+    else:
+       return None
+
+
+def write_function_name(xsd_type):
+    if xsd_type.is_simple():
+        return "xml_addCharacters"
+    return 'qes_write_' + xsd_type.local_name.replace('Type', '')
+
+
+def reset_function_name(xsd_type):
+    if xsd_type.is_complex():
+       return 'qes_reset_' + xsd_type.local_name.replace('Type','')
 
 
 class TestEspressoPw(unittest.TestCase):
