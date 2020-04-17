@@ -15,7 +15,7 @@
 .project/
 .ipynb_checkpoints/
 .tox/
-doc/_*
+docs/_*
 __pycache__/
 dist/
 build/
