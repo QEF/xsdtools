@@ -1,0 +1,6 @@
+# Requirements for setup a develop environment
+setuptools
+wheel
+tox
+Sphinx
+-e .
