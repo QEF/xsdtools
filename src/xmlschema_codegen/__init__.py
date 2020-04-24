@@ -6,9 +6,11 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .generators import AbstractGenerator, CGenerator, \
-    FortranGenerator, PythonGenerator, JSONSchemaGenerator
-
+from .base import AbstractGenerator
+from .c_generator import CGenerator
+from .fortran_generator import FortranGenerator
+from .jsonschema_generator import JSONSchemaGenerator
+from .python_generator import PythonGenerator
 
 _environments = {
 

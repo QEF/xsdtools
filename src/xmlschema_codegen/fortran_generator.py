@@ -45,16 +45,3 @@ class FortranGenerator(AbstractGenerator):
         'nonNegativeInteger': 'INTEGER',
         'positiveInteger': 'INTEGER',
     }
-
-    @filter_function
-    def fortran_type(self, xsd_type):
-        if xsd_type.target_namespace == XSD_NAMESPACE:
-            return self.types_map[local_name(xsd_type.name)]
-        elif xsd_type.is_simple():
-            print(xsd_type)
-            breakpoint()
-        return xsd_type.name
-
-    filters = {
-        'fortran_type': fortran_type,
-    }

@@ -40,7 +40,7 @@ class GeneratorMeta(ABCMeta):
                 builtins_map.update(base.builtins_map)
 
         try:
-            path = Path(__file__).absolute().parent.parent.joinpath(attrs['default_path'])
+            path = Path(__file__).absolute().parent.joinpath(attrs['default_path'])
         except (KeyError, TypeError):
             pass
         else:
@@ -123,6 +123,13 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
     def list_templates(self):
         return self._env.list_templates()
+
+    @filter_function
+    def to_type(self, xsd_type):
+        try:
+            return self.types_map[xsd_type.name]
+        except KeyError:
+            return xsd_type.name or ''
 
 
 def generate(args):
