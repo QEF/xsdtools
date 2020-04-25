@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 #
-# Copyright (c) 2020, SISSA (Scuola Internazionale Superiore di Studi Avanzati).
-# All rights reserved.
+# Copyright (c) 2020, Quantum Espresso Foundation and SISSA.
+# Internazionale Superiore di Studi Avanzati). All rights reserved.
 # This file is distributed under the terms of the BSD 3-Clause license.
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
@@ -44,7 +43,7 @@ class TestGenerators(unittest.TestCase):
         with open(template.filename) as fp:
             self.assertNotIn("{# Override base90.f90 template #}", fp.read())
 
-        searchpath = Path(__file__).absolute().parent.joinpath('resources/templates/fortran/')
+        searchpath = Path(__file__).absolute().parent.joinpath('templates/fortran/')
         self.assertTrue(searchpath.is_dir())
 
         codegen = FortranGenerator(self.schema, str(searchpath))
@@ -57,7 +56,7 @@ class TestGenerators(unittest.TestCase):
         self.assertListEqual(codegen.list_templates(),
                              ['base.f90.jinja', 'types_module.f90.jinja'])
 
-        searchpath = Path(__file__).absolute().parent.joinpath('resources/templates/fortran/')
+        searchpath = Path(__file__).absolute().parent.joinpath('templates/fortran/')
         self.assertTrue(searchpath.is_dir())
         codegen = FortranGenerator(self.schema, str(searchpath))
         self.assertListEqual(

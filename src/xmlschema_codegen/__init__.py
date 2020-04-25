@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 #
-# Copyright (c) 2020, SISSA (Scuola Internazionale Superiore di Studi Avanzati).
-# All rights reserved.
+# Copyright (c) 2020, Quantum Espresso Foundation and SISSA.
+# Internazionale Superiore di Studi Avanzati). All rights reserved.
 # This file is distributed under the terms of the BSD 3-Clause license.
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
@@ -11,6 +10,7 @@ from .c_generator import CGenerator
 from .fortran_generator import FortranGenerator
 from .jsonschema_generator import JSONSchemaGenerator
 from .python_generator import PythonGenerator
+from .codes import *
 
 _environments = {
 

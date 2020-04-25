@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 #
-# Copyright (c) 2020, SISSA (Scuola Internazionale Superiore di Studi Avanzati).
-# All rights reserved.
+# Copyright (c) 2020, Quantum Espresso Foundation and SISSA.
+# Internazionale Superiore di Studi Avanzati). All rights reserved.
 # This file is distributed under the terms of the BSD 3-Clause license.
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +8,7 @@
 from xmlschema.qnames import local_name
 from xmlschema.namespaces import XSD_NAMESPACE
 
-from .base import filter_function, AbstractGenerator
+from .base import filter_method, AbstractGenerator
 
 
 XSD_BUILTINS_MAP = {
@@ -34,7 +33,7 @@ def get_fortran_type(xsd_type):
 
 class FortranGenerator(AbstractGenerator):
     """A FORTRAN code generator for XSD schemas."""
-    default_path = 'templates/fortran/'
+    default_paths = ['templates/fortran/']
 
     builtins_map = {
         'string': 'CHARACTER(len=256)',

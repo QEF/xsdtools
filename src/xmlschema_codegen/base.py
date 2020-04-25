@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
 #
-# Copyright (c) 2020, SISSA (Scuola Internazionale Superiore di Studi Avanzati).
-# All rights reserved.
+# Copyright (c) 2020, Quantum Espresso Foundation and SISSA.
+# Internazionale Superiore di Studi Avanzati). All rights reserved.
 # This file is distributed under the terms of the BSD 3-Clause license.
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
 import os
+import sys
 import inspect
 from abc import ABC, ABCMeta
 from pathlib import Path
@@ -21,8 +21,8 @@ def xsd_qname(name):
     return '{http://www.w3.org/2001/XMLSchema}%s' % name
 
 
-def filter_function(func):
-    """Mark the function for using as an additional filter."""
+def filter_method(func):
+    """Marks a method for registration as template filter."""
     func.is_filter = True
     return func
 
@@ -31,22 +31,46 @@ class GeneratorMeta(ABCMeta):
     """Metaclass for creating code generators."""
 
     def __new__(mcs, name, bases, attrs):
-        filters = {}
+        module = attrs['__module__']
+        module_path = sys.modules[module].__file__
+
+        default_paths = []
+        default_filters = {}
         builtins_map = {}
         for base in bases:
+            if getattr(base, 'default_paths', None):
+                default_paths.extend(base.default_paths)
             if hasattr(base, 'default_filters'):
-                filters.update(base.default_filters)
+                default_filters.update(base.default_filters)
             if getattr(base, 'builtins_map', None):
                 builtins_map.update(base.builtins_map)
 
         try:
-            path = Path(__file__).absolute().parent.joinpath(attrs['default_path'])
+            for path in attrs['default_paths']:
+                if Path(path).is_absolute():
+                    dirpath = Path(path)
+                else:
+                    dirpath = Path(module_path).parent.joinpath(path)
+
+                if not dirpath.is_dir():
+                    raise ValueError("Path {!r} is not a directory!".format(str(path)))
+                default_paths.append(dirpath)
+
         except (KeyError, TypeError):
             pass
         else:
-            if not path.is_dir():
-                raise ValueError("Path {!r} is not a directory!".format(str(path)))
-            attrs['default_path'] = path
+            attrs['default_paths'] = default_paths
+
+        for k, v in attrs.items():
+            if inspect.isfunction(v):
+                if getattr(v, 'is_filter', False):
+                    default_filters[k] = v
+            elif inspect.isroutine(v):
+                # static and class methods
+                if getattr(v.__func__, 'is_filter', False):
+                    default_filters[k] = v
+
+        attrs['default_filters'] = default_filters
 
         try:
             for k, v in attrs['builtins_map'].items():
@@ -55,11 +79,6 @@ class GeneratorMeta(ABCMeta):
             pass
         finally:
             attrs['builtins_map'] = builtins_map
-
-        for k, v in attrs.items():
-            if inspect.isfunction(v) and getattr(v, 'is_filter', False):
-                filters[k] = v
-        attrs['default_filters'] = filters
 
         return type.__new__(mcs, name, bases, attrs)
 
@@ -75,8 +94,8 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     :param types_map: a dictionary with custom mapping for XSD types.
     """
 
-    default_path = None
-    """Default path for templates."""
+    default_paths = None
+    """Default paths for templates."""
 
     default_filters = None
     """Default filter functions."""
@@ -85,22 +104,23 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     """Translation map for XSD builtin types."""
 
     def __init__(self, schema, searchpath=None, filters=None, types_map=None):
-        assert isinstance(schema, xmlschema.XMLSchemaBase)
-        self.schema = schema
+        if isinstance(schema, xmlschema.XMLSchemaBase):
+            self.schema = schema
+        else:
+            self.schema = xmlschema.XMLSchema(schema)
 
         self.searchpath = searchpath
-        if searchpath is None:
-            loader = FileSystemLoader(str(self.default_path))
-        else:
-            assert isinstance(searchpath, str)
-            loader = ChoiceLoader([
-                FileSystemLoader(searchpath),
-                FileSystemLoader(str(self.default_path)),
-            ])
+        file_loaders = []
+        if searchpath is not None:
+            file_loaders.append(FileSystemLoader(searchpath))
+        if isinstance(self.default_paths, list):
+            file_loaders.extend(
+                FileSystemLoader(str(path)) for path in reversed(self.default_paths)
+            )
 
-        self.types_map = self.builtins_map.copy()
-        if types_map:
-            self.types_map.update(types_map)
+        if not file_loaders:
+            raise ValueError("At least one search path required for generator instance!")
+        loader = ChoiceLoader(file_loaders) if len(file_loaders) > 1 else file_loaders[0]
 
         self._env = Environment(loader=loader)
         self._env.filters.update(self.default_filters)
@@ -108,10 +128,21 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         if filters:
             self._env.filters.update(filters)
 
+        self.types_map = self.builtins_map.copy()
+        if types_map:
+            self.types_map.update(types_map)
+
     def __repr__(self):
         return '%s(xsd_file=%r, searchpath=%r)' % (
             self.__class__.__name__, self.xsd_file, self.searchpath
         )
+
+    @classmethod
+    def register_filter(cls, func):
+        """Registers a function as default filter for the code generator."""
+        cls.default_filters[func.__name__] = func
+        func.is_filter = True
+        return func
 
     @property
     def xsd_file(self):
@@ -124,7 +155,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     def list_templates(self):
         return self._env.list_templates()
 
-    @filter_function
+    @filter_method
     def to_type(self, xsd_type):
         try:
             return self.types_map[xsd_type.name]
