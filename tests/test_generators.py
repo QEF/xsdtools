@@ -63,3 +63,7 @@ class TestGenerators(unittest.TestCase):
             codegen.list_templates(),
             ['base.f90.jinja', 'qes_types_module.f90.jinja', 'types_module.f90.jinja']
         )
+
+    def test_render_files(self):
+        codegen = FortranGenerator(self.schema)
+        codegen.render_files('output/')

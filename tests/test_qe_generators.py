@@ -31,14 +31,17 @@ class TestQEGenerators(unittest.TestCase):
         self.assertIsInstance(codegen.schema, xmlschema.XMLSchema)
         self.assertIsInstance(codegen._env, jinja2.Environment)
 
-    @unittest.skip
     def test_get_template(self):
         codegen = QEFortranGenerator(self.schema)
         template = codegen.get_template('base.f90.jinja')
         with open(template.filename) as fp:
             self.assertNotIn("{# Override base90.f90 template #}", fp.read())
 
-        searchpath = Path(__file__).absolute().parent.joinpath('resources/templates/fortran/')
+        template = codegen.get_template('read/qes_read_module.f90.jinja')
+        with open(template.filename) as fp:
+            self.assertIn("MODULE qes_read_module", fp.read())
+
+        searchpath = Path(__file__).absolute().parent.joinpath('templates/fortran/')
         self.assertTrue(searchpath.is_dir())
 
         codegen = QEFortranGenerator(self.schema, str(searchpath))
@@ -46,16 +49,20 @@ class TestQEGenerators(unittest.TestCase):
         with open(template.filename) as fp:
             self.assertIn("{# Override base90.f90 template #}", fp.read())
 
-    @unittest.skip
     def test_list_templates(self):
         codegen = QEFortranGenerator(self.schema)
-        self.assertListEqual(codegen.list_templates(),
-                             ['base.f90.jinja', 'types_module.f90.jinja'])
+        templates = codegen.list_templates()
 
-        searchpath = Path(__file__).absolute().parent.joinpath('resources/templates/fortran/')
+        self.assertIn('base.f90.jinja', templates)
+        self.assertNotIn('qes_read_module.f90.jinja', templates)
+        self.assertIn('read/qes_read_module.f90.jinja', templates)
+        self.assertIn('types/qes_types_module.f90.jinja', templates)
+
+        searchpath = Path(__file__).absolute().parent.joinpath('templates/fortran/')
         self.assertTrue(searchpath.is_dir())
         codegen = QEFortranGenerator(self.schema, str(searchpath))
-        self.assertListEqual(
-            codegen.list_templates(),
-            ['base.f90.jinja', 'qes_types_module.f90.jinja', 'types_module.f90.jinja']
-        )
+
+        templates = codegen.list_templates()
+        self.assertIn('base.f90.jinja', templates)
+        self.assertIn('qes_types_module.f90.jinja', templates)
+        self.assertIn('types/qes_types_module.f90.jinja', templates)

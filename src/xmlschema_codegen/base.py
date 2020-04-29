@@ -152,8 +152,18 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     def get_template(self, name):
         return self._env.get_template(name)
 
-    def list_templates(self):
-        return self._env.list_templates()
+    def list_templates(self, extensions=None, filter_func=None):
+        return self._env.list_templates(extensions, filter_func)
+
+    def render_files(self, output_dir, extensions=None, filter_func=None):
+        output_dir = Path(output_dir)
+        for template_name in self._env.list_templates(extensions, filter_func):
+            print(template_name)
+            template = self.get_template(template_name)
+            result = template.render(xsd_schema=self.schema)
+            continue
+            with open(output_file, 'w') as text_file:
+                text_file.write(result)
 
     @filter_method
     def to_type(self, xsd_type):

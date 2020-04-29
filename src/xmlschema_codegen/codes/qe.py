@@ -13,6 +13,14 @@ class QEFortranGenerator(FortranGenerator):
     """A FORTRAN code generator for Quantum ESPRESSO."""
     default_paths = ['templates/qe/']
 
+    def render_files(self, output_dir, extensions=None, filter_func=None):
+        if filter_func is None:
+            super(QEFortranGenerator, self).render_files(
+                output_dir, extensions, filter_func=lambda x: 'module' in x
+            )
+        else:
+            super(QEFortranGenerator, self).render_files(output_dir, extensions, filter_func)
+
     @staticmethod
     @filter_method
     def read_function_name(xsd_type):
