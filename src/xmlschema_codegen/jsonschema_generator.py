@@ -9,7 +9,11 @@ from .base import AbstractGenerator
 
 
 class JSONSchemaGenerator(AbstractGenerator):
-    """A JSON Schema generator for XSD schemas."""
+    """
+    JSON Schema generic generator for XSD schemas.
+    """
+    formal_language = 'JSON Schema'
+
     default_paths = ['templates/json-schema/']
 
     builtin_types = {

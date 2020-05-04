@@ -32,7 +32,11 @@ def get_fortran_type(xsd_type):
 
 
 class FortranGenerator(AbstractGenerator):
-    """A FORTRAN code generator for XSD schemas."""
+    """
+    Fortran code generic generator for XSD schemas.
+    """
+    formal_language = 'Fortran'
+
     default_paths = ['templates/fortran/']
 
     builtins_map = {

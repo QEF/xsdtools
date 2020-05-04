@@ -9,7 +9,11 @@ from .base import AbstractGenerator
 
 
 class PythonGenerator(AbstractGenerator):
-    """A Python code generator for XSD schemas."""
+    """
+    Python code generic generator for XSD schemas.
+    """
+    formal_language = 'Python'
+
     default_paths = ['templates/python/']
 
     builtin_types = {

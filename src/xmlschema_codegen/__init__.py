@@ -36,4 +36,4 @@ def generate(xsd_file, template_file, output_file):
 
 
 __all__ = ['AbstractGenerator', 'CGenerator', 'FortranGenerator', 'PythonGenerator',
-           'JSONSchemaGenerator', 'generate']
+           'JSONSchemaGenerator', 'QEFortranGenerator', 'generate']

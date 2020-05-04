@@ -9,7 +9,11 @@ from .base import filter_method, AbstractGenerator
 
 
 class CGenerator(AbstractGenerator):
-    """A C code generator for XSD schemas."""
+    """
+    C code generic generator for XSD schemas.
+    """
+    formal_language = 'C'
+
     default_paths = ['templates/c/']
 
     builtin_types = {

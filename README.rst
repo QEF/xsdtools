@@ -14,22 +14,23 @@ in generic shell scripts. Thought as experimental code for generating Fortran
 interfaces for the XML schema-based data of Quantum ESPRESSO simulation suite,
 it's opened to contributions on developing other languages or other template set.
 
+
 Installation
 ------------
 
-Within a virtual environment simply type::
+First clone the project and then switch into its directory::
 
-  pip install xmlschema-codegen
+  git clone https://github.com/QEF/xmltool_dev.git xmlschema-codegen/
+  cd xmlschema-codegen/
+
+If you can create a virtual environment for this project, activate it and then run the command::
+
+  pip install .
 
 otherwise install the package in user space, avoiding root installations::
 
-  pip install --user xmlschema-codegen
+  pip install --user .
 
-For installing from source within a virtual environment execute::
-
-  git clone https://github.com/sissaschool/xmlschema-codegen.git
-  cd xmlschema-codegen/
-  python setup.py install
 
 .. note::
     For source installations the `setuptools <https://github.com/pypa/setuptools>`_

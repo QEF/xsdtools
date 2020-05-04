@@ -8,13 +8,21 @@
 import os
 import sys
 import inspect
+import logging
 from abc import ABC, ABCMeta
 from pathlib import Path
-from jinja2 import Environment, ChoiceLoader, FileSystemLoader
+from jinja2 import Environment, ChoiceLoader, FileSystemLoader, \
+    TemplateNotFound, TemplateAssertionError
 
 import xmlschema
 
 XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema"
+
+logger = logging.getLogger('xmlschema-codegen')
+logging_formatter = logging.Formatter('[%(levelname)s] %(message)s')
+logging_handler = logging.StreamHandler(sys.stderr)
+logging_handler.setFormatter(logging_formatter)
+logger.addHandler(logging_handler)
 
 
 def xsd_qname(name):
@@ -34,16 +42,30 @@ class GeneratorMeta(ABCMeta):
         module = attrs['__module__']
         module_path = sys.modules[module].__file__
 
+        formal_language = None
         default_paths = []
         default_filters = {}
         builtins_map = {}
         for base in bases:
+            if getattr(base, 'formal_language', None):
+                if formal_language is None:
+                    formal_language = base.formal_language
+                elif formal_language != base.formal_language:
+                    msg = "Ambiguous formal_language from {!r} base classes"
+                    raise ValueError(msg.format(name))
+
             if getattr(base, 'default_paths', None):
                 default_paths.extend(base.default_paths)
             if hasattr(base, 'default_filters'):
                 default_filters.update(base.default_filters)
             if getattr(base, 'builtins_map', None):
                 builtins_map.update(base.builtins_map)
+
+        if 'formal_language' not in attrs:
+            attrs['formal_language'] = formal_language
+        elif formal_language:
+            msg = "formal_language can be defined only once for each generator class hierarchy"
+            raise ValueError(msg.format(name))
 
         try:
             for path in attrs['default_paths']:
@@ -93,6 +115,8 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     :param filters: additional custom filter functions.
     :param types_map: a dictionary with custom mapping for XSD types.
     """
+    formal_language = None
+    """The formal language associated to the code generator."""
 
     default_paths = None
     """Default paths for templates."""
@@ -149,21 +173,61 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         url = self.schema.url
         return os.path.basename(url) if url else None
 
-    def get_template(self, name):
-        return self._env.get_template(name)
-
     def list_templates(self, extensions=None, filter_func=None):
         return self._env.list_templates(extensions, filter_func)
 
-    def render_files(self, output_dir, extensions=None, filter_func=None):
+    def get_template(self, name, parent=None, globals=None):
+        return self._env.get_template(name, parent, globals)
+
+    def select_template(self, names, parent=None, globals=None):
+        return self._env.select_template(names, parent, globals)
+
+    def render(self, names, parent=None, globals=None):
+        if isinstance(names, str):
+            names = [names]
+        elif not all(isinstance(x, str) for x in names):
+            raise TypeError("'names' argument must contain only strings!")
+
+        results = []
+        for name in names:
+            try:
+                template = self._env.get_template(name, parent, globals)
+            except TemplateNotFound as err:
+                logger.debug("name %r: %s", name, str(err))
+            except TemplateAssertionError as err:
+                logger.warning("template %r: %s", name, str(err))
+            else:
+                results.append(template.render(xsd_schema=self.schema))
+        return results
+
+    def render_to_files(self, names, parent=None, globals=None, output_dir='.', force=False):
+        if isinstance(names, str):
+            names = [names]
+        elif not all(isinstance(x, str) for x in names):
+            raise TypeError("'names' argument must contain only strings!")
+
         output_dir = Path(output_dir)
-        for template_name in self._env.list_templates(extensions, filter_func):
-            print(template_name)
-            template = self.get_template(template_name)
-            result = template.render(xsd_schema=self.schema)
-            continue
-            with open(output_file, 'w') as text_file:
-                text_file.write(result)
+        total_rendered = 0
+
+        for name in names:
+            try:
+                template = self._env.get_template(name, parent, globals)
+            except TemplateNotFound as err:
+                logger.debug("name %r: %s", name, str(err))
+            except TemplateAssertionError as err:
+                logger.warning("template %r: %s", name, str(err))
+            else:
+                output_file = output_dir.joinpath(Path(name).name).with_suffix('')
+                if not force and output_file.exists():
+                    continue
+
+            # result = template.render(xsd_schema=self.schema)
+            print("Write file {!r}".format(str(output_file)))
+            # with open(output_file, 'w') as fp:
+            # fp.write(result)
+            total_rendered +=1
+
+        return total_rendered
 
     @filter_method
     def to_type(self, xsd_type):

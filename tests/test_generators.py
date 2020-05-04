@@ -67,3 +67,11 @@ class TestGenerators(unittest.TestCase):
     def test_render_files(self):
         codegen = FortranGenerator(self.schema)
         codegen.render_files('output/')
+
+    def test_formal_language(self):
+        self.assertEqual(CGenerator.formal_language, 'C')
+        self.assertEqual(FortranGenerator.formal_language, 'Fortran')
+        self.assertEqual(PythonGenerator.formal_language, 'Python')
+        self.assertEqual(JSONSchemaGenerator.formal_language, 'JSON Schema')
+
+
