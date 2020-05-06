@@ -26,8 +26,8 @@ MODULE qes_write_module
   !
   CONTAINS
   !
-  {% for type in xsd_schema.complex_types %}
-{% include "qes_write_subroutines.f90.j2" %}
+  {% for type in xsd_schema.types.values() %}
+{% include "write/qes_write_subroutines.f90.jinja" %}
   {%- endfor %}
   !
 END MODULE qes_write_module

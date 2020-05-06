@@ -7,14 +7,18 @@
 #
 import os
 import sys
+import re
 import inspect
 import logging
 from abc import ABC, ABCMeta
+from fnmatch import fnmatch
 from pathlib import Path
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, \
     TemplateNotFound, TemplateAssertionError
 
 import xmlschema
+
+from xmlschema.validators import XsdComponent, XsdType, XsdElement, XsdAttribute
 
 XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema"
 
@@ -23,6 +27,29 @@ logging_formatter = logging.Formatter('[%(levelname)s] %(message)s')
 logging_handler = logging.StreamHandler(sys.stderr)
 logging_handler.setFormatter(logging_formatter)
 logger.addHandler(logging_handler)
+
+
+NAMESPACE_PATTERN = re.compile(r'{([^}]*)}')
+NAME_PATTERN = re.compile(r'^(?:[^\d\W]|:)[\w.\-:]*$')
+NCNAME_PATTERN = re.compile(r'^[^\d\W][\w.\-]*$')
+QNAME_PATTERN = re.compile(
+    r'^(?:(?P<prefix>[^\d\W][\w\-.\xb7\u0387\u06DD\u06DE]*):)?'
+    r'(?P<local>[^\d\W][\w\-.\xb7\u0387\u06DD\u06DE]*)$',
+)
+
+
+def get_namespace(qname):
+    if not qname or qname[0] != '{':
+        return ''
+
+    try:
+        return NAMESPACE_PATTERN.match(qname).group(1)
+    except (AttributeError, TypeError):
+        return ''
+
+
+def is_shell_wildcard(name):
+    return '*' in name or '?' in name or '[' in name
 
 
 def xsd_qname(name):
@@ -147,7 +174,8 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         loader = ChoiceLoader(file_loaders) if len(file_loaders) > 1 else file_loaders[0]
 
         self._env = Environment(loader=loader)
-        self._env.filters.update(self.default_filters)
+        self._env.filters.update((k, lambda x: getattr(self, k, v)(x))
+                                 for k,v in self.default_filters.items())
         self.filters = filters
         if filters:
             self._env.filters.update(filters)
@@ -176,6 +204,9 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     def list_templates(self, extensions=None, filter_func=None):
         return self._env.list_templates(extensions, filter_func)
 
+    def matching_templates(self, name):
+        return self._env.list_templates(filter_func=lambda x: fnmatch(x, name))
+
     def get_template(self, name, parent=None, globals=None):
         return self._env.get_template(name, parent, globals)
 
@@ -197,7 +228,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
             except TemplateAssertionError as err:
                 logger.warning("template %r: %s", name, str(err))
             else:
-                results.append(template.render(xsd_schema=self.schema))
+                results.append(template.render(schema=self.schema))
         return results
 
     def render_to_files(self, names, parent=None, globals=None, output_dir='.', force=False):
@@ -206,10 +237,17 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         elif not all(isinstance(x, str) for x in names):
             raise TypeError("'names' argument must contain only strings!")
 
-        output_dir = Path(output_dir)
-        total_rendered = 0
-
+        template_names = []
         for name in names:
+            if is_shell_wildcard(name):
+                template_names.extend(self.matching_templates(name))
+            else:
+                template_names.append(name)
+
+        output_dir = Path(output_dir)
+        rendered = []
+
+        for name in template_names:
             try:
                 template = self._env.get_template(name, parent, globals)
             except TemplateNotFound as err:
@@ -221,20 +259,143 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 if not force and output_file.exists():
                     continue
 
-            # result = template.render(xsd_schema=self.schema)
-            print("Write file {!r}".format(str(output_file)))
-            # with open(output_file, 'w') as fp:
-            # fp.write(result)
-            total_rendered +=1
+                result = template.render(schema=self.schema)
+                logger.info("write file %r", str(output_file))
+                # with open(output_file, 'w') as fp:
+                # fp.write(result)
+                rendered.append(template.filename)
 
-        return total_rendered
+        return rendered
 
     @filter_method
-    def to_type(self, xsd_type):
+    def fortran_type(self, obj):
+        if isinstance(obj, XsdType):
+            xsd_type = obj
+        elif isinstance(obj, (XsdAttribute, XsdElement)):
+            xsd_type = obj.type
+        else:
+            return ''
+
         try:
-            return self.types_map[xsd_type.name]
+            return self.types_map[xsd_type.local_name]
         except KeyError:
-            return xsd_type.name or ''
+            return xsd_type.local_name or ''
+
+
+@AbstractGenerator.register_filter
+def local_name(obj):
+    try:
+        local_name = obj.local_name
+    except AttributeError:
+        try:
+            obj = obj.name
+        except AttributeError:
+            pass
+
+        if not isinstance(obj, str):
+            return ''
+
+        try:
+            if obj[0] == '{':
+                _, local_name = obj.split('}')
+            elif ':' in obj:
+                prefix, local_name = obj.split(':')
+                if NCNAME_PATTERN.match(prefix) is None:
+                    return ''
+            else:
+                local_name = obj
+        except (IndexError, ValueError):
+            return ''
+    else:
+        if not isinstance(local_name, str):
+            return ''
+
+    if NCNAME_PATTERN.match(local_name) is None:
+        return ''
+    return local_name
+
+
+@AbstractGenerator.register_filter
+def qname(obj):
+    try:
+        qname = obj.prefixed_name
+    except AttributeError:
+        try:
+            obj = obj.name
+        except AttributeError:
+            pass
+
+        if not isinstance(obj, str):
+            return ''
+
+        try:
+            if obj[0] == '{':
+                _, local_name = obj.split('}')
+                return obj
+            else:
+                qname = obj
+        except (IndexError, ValueError):
+            return ''
+
+    if QNAME_PATTERN.match(qname) is None:
+        return ''
+    return qname
+
+
+@AbstractGenerator.register_filter
+def tag_name(obj):
+    try:
+        tag = obj.tag
+    except AttributeError:
+        return ''
+
+    if not isinstance(tag, str):
+        return ''
+
+    try:
+        if tag[0] == '{':
+            _, local_name = obj.split('}')
+        else:
+            local_name = tag
+    except (IndexError, ValueError):
+        return ''
+
+    if NCNAME_PATTERN.match(local_name) is None:
+        return ''
+    return local_name
+
+
+@AbstractGenerator.register_filter
+def type_name(obj):
+    if isinstance(obj, XsdType):
+        return obj.local_name or ''
+    elif isinstance(obj, (XsdAttribute, XsdElement)):
+        return obj.type.local_name or ''
+    else:
+        return ''
+
+
+@AbstractGenerator.register_filter
+def namespace(obj):
+    try:
+        namespace = obj.target_namespace
+    except AttributeError:
+        try:
+            obj = obj.name
+        except AttributeError:
+            pass
+
+        try:
+            if not isinstance(obj, str) or obj[0] != '{':
+                return ''
+            namespace, _ = obj.split('}')
+        except (IndexError, ValueError):
+            return ''
+    else:
+        if not isinstance(namespace, str):
+            return ''
+    return namespace
+
 
 
 def generate(args):

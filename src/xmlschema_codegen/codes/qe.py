@@ -47,8 +47,8 @@ class QEFortranGenerator(FortranGenerator):
             return "xml_addCharacters"
         return 'qes_write_' + xsd_type.local_name.replace('Type', '')
 
-
-@QEFortranGenerator.register_filter
-def reset_function_name(xsd_type):
-    if xsd_type.is_complex():
-        return 'qes_reset_' + xsd_type.local_name.replace('Type', '')
+    @staticmethod
+    @filter_method
+    def reset_function_name(xsd_type):
+        if xsd_type.is_complex():
+            return 'qes_reset_' + xsd_type.local_name.replace('Type', '')

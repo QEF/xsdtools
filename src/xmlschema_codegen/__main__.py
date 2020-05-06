@@ -10,6 +10,7 @@
 import sys
 import os
 import argparse
+import logging
 import pathlib
 
 from xmlschema import XMLSchema, XMLSchema11
@@ -18,6 +19,8 @@ from xmlschema.exceptions import XMLSchemaValueError
 
 from xmlschema_codegen import CGenerator, FortranGenerator, \
     PythonGenerator, JSONSchemaGenerator, QEFortranGenerator
+from xmlschema_codegen.base import is_shell_wildcard
+
 
 PROGRAM_NAME = os.path.basename(sys.argv[0])
 
@@ -64,6 +67,9 @@ def main():
     args = parser.parse_args()
 
     loglevel = get_loglevel(args.verbosity)
+    logger = logging.getLogger('xmlschema-codegen')
+    logger.setLevel(loglevel)
+
     schema_class = XMLSchema if args.version == '1.0' else XMLSchema11
     if args.schema is not None:
         schema = schema_class(args.schema, locations=args.locations, loglevel=loglevel)
@@ -79,8 +85,10 @@ def main():
 
     template_files = {None: []}
     for path in map(pathlib.Path, args.files):
-        if path.suffix not in ('.jinja', '.j2', '.jinja2'):
-            continue
+        if is_shell_wildcard(str(path)):
+            template_files[None].append(str(path))
+        elif path.suffix not in ('.jinja', '.j2', '.jinja2'):
+            pass
         elif path.is_file():
             try:
                 template_files[str(path.parent)].append(path.name)
@@ -89,15 +97,15 @@ def main():
         else:
             template_files[None].append(str(path))
 
-    print(template_files)
-    total_rendered = 0
+    rendered_templates = []
     for searchpath, names in template_files.items():
         generator = generator_class(schema, searchpath)
-        total_rendered += generator.render_to_files(
-            names, output_dir=args.output, force=args.force)
+        rendered_templates.extend(generator.render_to_files(
+            names, output_dir=args.output, force=args.force
+        ))
 
-    print("Rendered n.{} files ...".format(total_rendered))
-    sys.exit(not total_rendered)
+    print("Rendered n.{} files ...".format(len(rendered_templates)))
+    sys.exit(not rendered_templates)
 
 
 if __name__ == '__main__':
