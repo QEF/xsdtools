@@ -5,7 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .base import AbstractGenerator
+from .abstract_generator import AbstractGenerator
 
 
 class JSONSchemaGenerator(AbstractGenerator):
@@ -19,6 +19,7 @@ class JSONSchemaGenerator(AbstractGenerator):
     builtin_types = {
         'string': 'string',
         'boolean': 'boolean',
+        'float': 'number',
         'double': 'number',
         'integer': 'integer',
         'unsignedByte': 'integer',

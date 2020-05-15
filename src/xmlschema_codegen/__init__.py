@@ -6,7 +6,7 @@
 # or https://opensource.org/licenses/BSD-3-Clause
 #
 from .helpers import filter_method
-from .base import AbstractGenerator
+from .abstract_generator import AbstractGenerator
 from .c_generator import CGenerator
 from .fortran_generator import FortranGenerator
 from .jsonschema_generator import JSONSchemaGenerator

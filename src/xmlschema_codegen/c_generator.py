@@ -5,7 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .base import filter_method, AbstractGenerator
+from .abstract_generator import AbstractGenerator
 
 
 class CGenerator(AbstractGenerator):

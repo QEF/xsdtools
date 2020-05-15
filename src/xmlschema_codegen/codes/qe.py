@@ -5,8 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from xmlschema.validators import XsdType
-from ..base import filter_method
+from ..helpers import filter_method
 from ..fortran_generator import FortranGenerator
 
 

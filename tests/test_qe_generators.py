@@ -13,7 +13,8 @@ import xmlschema
 from xmlschema_codegen import QEFortranGenerator
 
 
-class TestQEGenerators(unittest.TestCase):
+@unittest.skip("FIXME")
+class TestQEFortranGenerator(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

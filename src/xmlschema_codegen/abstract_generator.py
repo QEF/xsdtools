@@ -119,7 +119,10 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     default_filters = None
     """Default filter functions."""
 
-    builtin_types = None
+    builtin_types = {
+        'anyType': '',
+        'anySimpleType': '',
+    }
     """Translation map for XSD builtin types."""
 
     def __init__(self, schema, searchpath=None, filters=None, types_map=None):
