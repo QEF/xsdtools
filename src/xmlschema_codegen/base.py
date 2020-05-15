@@ -7,7 +7,6 @@
 #
 import os
 import sys
-import re
 import inspect
 import logging
 from abc import ABC, ABCMeta
@@ -17,49 +16,16 @@ from jinja2 import Environment, ChoiceLoader, FileSystemLoader, \
     TemplateNotFound, TemplateAssertionError
 
 import xmlschema
+from xmlschema.validators import XsdType, XsdElement, XsdAttribute
 
-from xmlschema.validators import XsdComponent, XsdType, XsdElement, XsdAttribute
-
-XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema"
+from .helpers import NCNAME_PATTERN, QNAME_PATTERN, is_shell_wildcard, xsd_qname, \
+    filter_method
 
 logger = logging.getLogger('xmlschema-codegen')
 logging_formatter = logging.Formatter('[%(levelname)s] %(message)s')
 logging_handler = logging.StreamHandler(sys.stderr)
 logging_handler.setFormatter(logging_formatter)
 logger.addHandler(logging_handler)
-
-
-NAMESPACE_PATTERN = re.compile(r'{([^}]*)}')
-NAME_PATTERN = re.compile(r'^(?:[^\d\W]|:)[\w.\-:]*$')
-NCNAME_PATTERN = re.compile(r'^[^\d\W][\w.\-]*$')
-QNAME_PATTERN = re.compile(
-    r'^(?:(?P<prefix>[^\d\W][\w\-.\xb7\u0387\u06DD\u06DE]*):)?'
-    r'(?P<local>[^\d\W][\w\-.\xb7\u0387\u06DD\u06DE]*)$',
-)
-
-
-def get_namespace(qname):
-    if not qname or qname[0] != '{':
-        return ''
-
-    try:
-        return NAMESPACE_PATTERN.match(qname).group(1)
-    except (AttributeError, TypeError):
-        return ''
-
-
-def is_shell_wildcard(name):
-    return '*' in name or '?' in name or '[' in name
-
-
-def xsd_qname(name):
-    return '{http://www.w3.org/2001/XMLSchema}%s' % name
-
-
-def filter_method(func):
-    """Marks a method for registration as template filter."""
-    func.is_filter = True
-    return func
 
 
 class GeneratorMeta(ABCMeta):
@@ -72,7 +38,7 @@ class GeneratorMeta(ABCMeta):
         formal_language = None
         default_paths = []
         default_filters = {}
-        builtins_map = {}
+        builtin_types = {}
         for base in bases:
             if getattr(base, 'formal_language', None):
                 if formal_language is None:
@@ -85,14 +51,14 @@ class GeneratorMeta(ABCMeta):
                 default_paths.extend(base.default_paths)
             if hasattr(base, 'default_filters'):
                 default_filters.update(base.default_filters)
-            if getattr(base, 'builtins_map', None):
-                builtins_map.update(base.builtins_map)
+            if getattr(base, 'builtin_types', None):
+                builtin_types.update(base.builtin_types)
 
         if 'formal_language' not in attrs:
             attrs['formal_language'] = formal_language
         elif formal_language:
             msg = "formal_language can be defined only once for each generator class hierarchy"
-            raise ValueError(msg.format(name))
+            raise ValueError(msg)
 
         try:
             for path in attrs['default_paths']:
@@ -122,12 +88,14 @@ class GeneratorMeta(ABCMeta):
         attrs['default_filters'] = default_filters
 
         try:
-            for k, v in attrs['builtins_map'].items():
-                builtins_map[xsd_qname(k)] = v
+            for k, v in attrs['builtin_types'].items():
+                builtin_types[xsd_qname(k)] = v
         except (KeyError, AttributeError):
             pass
         finally:
-            attrs['builtins_map'] = builtins_map
+            if not builtin_types and not name.startswith('Abstract'):
+                raise ValueError("Empty builtin_types for {}".format(name))
+            attrs['builtin_types'] = builtin_types
 
         return type.__new__(mcs, name, bases, attrs)
 
@@ -151,7 +119,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     default_filters = None
     """Default filter functions."""
 
-    builtins_map = None
+    builtin_types = None
     """Translation map for XSD builtin types."""
 
     def __init__(self, schema, searchpath=None, filters=None, types_map=None):
@@ -173,16 +141,27 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
             raise ValueError("At least one search path required for generator instance!")
         loader = ChoiceLoader(file_loaders) if len(file_loaders) > 1 else file_loaders[0]
 
-        self._env = Environment(loader=loader)
-        self._env.filters.update((k, lambda x: getattr(self, k, v)(x))
-                                 for k,v in self.default_filters.items())
-        self.filters = filters
+        self.filters = dict(self.default_filters)
+        for name, func in self.default_filters.items():
+            if isinstance(func, (staticmethod, classmethod)) or \
+                    func.__name__ != func.__qualname__:
+                # Replace unbound method with instance bound one
+                self.filters[name] = getattr(self, name)
+            else:
+                self.filters[name] = func
         if filters:
-            self._env.filters.update(filters)
+            self.filters.update(filters)
 
-        self.types_map = self.builtins_map.copy()
+        xsd_type_filter = '{}_type'.format(self.formal_language).lower().replace(' ', '_')
+        if xsd_type_filter not in self.filters:
+            self.filters[xsd_type_filter] = self.map_type
+
+        self.types_map = self.builtin_types.copy()
         if types_map:
             self.types_map.update(types_map)
+
+        self._env = Environment(loader=loader)
+        self._env.filters.update(self.filters)
 
     def __repr__(self):
         return '%s(xsd_file=%r, searchpath=%r)' % (
@@ -259,7 +238,8 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 if not force and output_file.exists():
                     continue
 
-                result = template.render(schema=self.schema)
+                result = template.render(schema=self.schema, sorted_complex_types=sorted_complex_types(self.schema.types))
+                print(result)
                 logger.info("write file %r", str(output_file))
                 # with open(output_file, 'w') as fp:
                 # fp.write(result)
@@ -267,8 +247,14 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
         return rendered
 
-    @filter_method
-    def fortran_type(self, obj):
+    def map_type(self, obj):
+        """
+        Maps an XSD type to a type declaration of the target language.
+
+        :param obj: an XSD type or another type-related declaration as \
+        an attribute or an element.
+        :return: an empty string for non-XSD objects.
+        """
         if isinstance(obj, XsdType):
             xsd_type = obj
         elif isinstance(obj, (XsdAttribute, XsdElement)):
@@ -277,127 +263,184 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
             return ''
 
         try:
-            return self.types_map[xsd_type.local_name]
+            return self.types_map[xsd_type.name]
         except KeyError:
-            return xsd_type.local_name or ''
+            try:
+                return self.types_map[xsd_type.root_type.name]
+            except KeyError:
+                if xsd_type.is_complex():
+                    return self.types_map[xsd_qname('anyType')]
+                else:
+                    return self.types_map[xsd_qname('anySimpleType')]
 
-
-@AbstractGenerator.register_filter
-def local_name(obj):
-    try:
-        local_name = obj.local_name
-    except AttributeError:
+    @staticmethod
+    @filter_method
+    def local_name(obj):
         try:
-            obj = obj.name
+            local_name = obj.local_name
         except AttributeError:
-            pass
+            try:
+                obj = obj.name
+            except AttributeError:
+                pass
 
-        if not isinstance(obj, str):
-            return ''
-
-        try:
-            if obj[0] == '{':
-                _, local_name = obj.split('}')
-            elif ':' in obj:
-                prefix, local_name = obj.split(':')
-                if NCNAME_PATTERN.match(prefix) is None:
-                    return ''
-            else:
-                local_name = obj
-        except (IndexError, ValueError):
-            return ''
-    else:
-        if not isinstance(local_name, str):
-            return ''
-
-    if NCNAME_PATTERN.match(local_name) is None:
-        return ''
-    return local_name
-
-
-@AbstractGenerator.register_filter
-def qname(obj):
-    try:
-        qname = obj.prefixed_name
-    except AttributeError:
-        try:
-            obj = obj.name
-        except AttributeError:
-            pass
-
-        if not isinstance(obj, str):
-            return ''
-
-        try:
-            if obj[0] == '{':
-                _, local_name = obj.split('}')
-                return obj
-            else:
-                qname = obj
-        except (IndexError, ValueError):
-            return ''
-
-    if QNAME_PATTERN.match(qname) is None:
-        return ''
-    return qname
-
-
-@AbstractGenerator.register_filter
-def tag_name(obj):
-    try:
-        tag = obj.tag
-    except AttributeError:
-        return ''
-
-    if not isinstance(tag, str):
-        return ''
-
-    try:
-        if tag[0] == '{':
-            _, local_name = obj.split('}')
-        else:
-            local_name = tag
-    except (IndexError, ValueError):
-        return ''
-
-    if NCNAME_PATTERN.match(local_name) is None:
-        return ''
-    return local_name
-
-
-@AbstractGenerator.register_filter
-def type_name(obj):
-    if isinstance(obj, XsdType):
-        return obj.local_name or ''
-    elif isinstance(obj, (XsdAttribute, XsdElement)):
-        return obj.type.local_name or ''
-    else:
-        return ''
-
-
-@AbstractGenerator.register_filter
-def namespace(obj):
-    try:
-        namespace = obj.target_namespace
-    except AttributeError:
-        try:
-            obj = obj.name
-        except AttributeError:
-            pass
-
-        try:
-            if not isinstance(obj, str) or obj[0] != '{':
+            if not isinstance(obj, str):
                 return ''
-            namespace, _ = obj.split('}')
+
+            try:
+                if obj[0] == '{':
+                    _, local_name = obj.split('}')
+                elif ':' in obj:
+                    prefix, local_name = obj.split(':')
+                    if NCNAME_PATTERN.match(prefix) is None:
+                        return ''
+                else:
+                    local_name = obj
+            except (IndexError, ValueError):
+                return ''
+        else:
+            if not isinstance(local_name, str):
+                return ''
+
+        if NCNAME_PATTERN.match(local_name) is None:
+            return ''
+        return local_name
+
+    @staticmethod
+    @filter_method
+    def qname(obj):
+        try:
+            qname = obj.prefixed_name
+        except AttributeError:
+            try:
+                obj = obj.name
+            except AttributeError:
+                pass
+
+            if not isinstance(obj, str):
+                return ''
+
+            try:
+                if obj[0] == '{':
+                    _, local_name = obj.split('}')
+                    return obj
+                else:
+                    qname = obj
+            except (IndexError, ValueError):
+                return ''
+
+        if QNAME_PATTERN.match(qname) is None:
+            return ''
+        return qname
+
+
+    @staticmethod
+    @filter_method
+    def tag_name(obj):
+        try:
+            tag = obj.tag
+        except AttributeError:
+            return ''
+
+        if not isinstance(tag, str):
+            return ''
+
+        try:
+            if tag[0] == '{':
+                _, local_name = obj.split('}')
+            else:
+                local_name = tag
         except (IndexError, ValueError):
             return ''
-    else:
-        if not isinstance(namespace, str):
+
+        if NCNAME_PATTERN.match(local_name) is None:
             return ''
-    return namespace
+        return local_name
+
+    @staticmethod
+    @filter_method
+    def type_name(obj):
+        if isinstance(obj, XsdType):
+            return obj.local_name or ''
+        elif isinstance(obj, (XsdAttribute, XsdElement)):
+            return obj.type.local_name or ''
+        else:
+            return ''
+
+    @staticmethod
+    @filter_method
+    def namespace(obj):
+        try:
+            namespace = obj.target_namespace
+        except AttributeError:
+            try:
+                obj = obj.name
+            except AttributeError:
+                pass
+
+            try:
+                if not isinstance(obj, str) or obj[0] != '{':
+                    return ''
+                namespace, _ = obj.split('}')
+            except (IndexError, ValueError):
+                return ''
+        else:
+            if not isinstance(namespace, str):
+                return ''
+        return namespace
 
 
+def sorted_types(xsd_types, accept_circularity=False):
+    """
+    Returns a sorted sequence of XSD types. Sorted types can be used to build code declarations.
 
-def generate(args):
-    """Generate code for an XSD schema."""
-    print(args)
+    :param xsd_types: a sequence with XSD types.
+    :param accept_circularity: if set to `True` circularities are accepted. Defaults to `False`.
+    :return: a list with ordered types.
+    """
+    try:
+        xsd_types = list(xsd_types.values())
+    except AttributeError:
+        pass
+
+    assert all(isinstance(x, XsdType) for x in xsd_types)
+    ordered_types = [x for x in xsd_types if x.is_simple()]
+    ordered_types.extend(x for x in xsd_types if x.is_complex() and x.has_simple_content())
+    unordered = {x: [] for x in xsd_types if x.is_complex() and not x.has_simple_content()}
+
+    for xsd_type in unordered:
+        for e in xsd_type.content_type.iter_elements():
+            if e.type in unordered:
+                unordered[xsd_type].append(e.type)
+
+    while unordered:
+        deleted = 0
+        for xsd_type in xsd_types:
+            if xsd_type in unordered:
+                if not unordered[xsd_type]:
+                    del unordered[xsd_type]
+                    ordered_types.append(xsd_type)
+                    deleted += 1
+
+        for xsd_type in unordered:
+            unordered[xsd_type] = [x for x in unordered[xsd_type] if x in unordered]
+
+        if not deleted:
+            if not accept_circularity:
+                raise ValueError("Circularity found between {!r}".format(list(unordered)))
+            ordered_types.extend(list(unordered))
+            break
+
+    assert len(xsd_types) == len(ordered_types)
+    return ordered_types
+
+
+@AbstractGenerator.register_filter
+def sorted_complex_types(xsd_types, accept_circularity=False):
+    """Like `sorted_types` but remove simple types."""
+    try:
+        xsd_types = [x for x in xsd_types.values() if not x.is_simple()]
+    except AttributeError:
+        xsd_types = [x for x in xsd_types if not x.is_simple()]
+
+    return sorted_types(xsd_types, accept_circularity)

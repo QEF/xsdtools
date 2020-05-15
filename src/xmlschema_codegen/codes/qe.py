@@ -5,6 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
+from xmlschema.validators import XsdType
 from ..base import filter_method
 from ..fortran_generator import FortranGenerator
 
@@ -50,5 +51,8 @@ class QEFortranGenerator(FortranGenerator):
     @staticmethod
     @filter_method
     def reset_function_name(xsd_type):
-        if xsd_type.is_complex():
-            return 'qes_reset_' + xsd_type.local_name.replace('Type', '')
+        try:
+            if xsd_type.is_complex():
+                return 'qes_reset_' + xsd_type.local_name.replace('Type', '')
+        except AttributeError:
+            return

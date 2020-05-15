@@ -5,6 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
+from .helpers import filter_method
 from .base import AbstractGenerator
 from .c_generator import CGenerator
 from .fortran_generator import FortranGenerator
@@ -12,28 +13,5 @@ from .jsonschema_generator import JSONSchemaGenerator
 from .python_generator import PythonGenerator
 from .codes import *
 
-_environments = {
-
-}
-
-def generate(xsd_file, template_file, output_file):
-    """
-    namespaces={"s":"http://www.w3.org/2001/XMLSchema"}
-    xsd_schema = XSDSchema( input_xsd_file, namespaces )
-
-    template_dir = os.path.dirname(template_file)
-    template_filename = os.path.basename(template_file)
-    template = Environment(
-        loader=FileSystemLoader(template_dir)
-    ).get_template(template_filename)
-
-
-    result = template.render(xsd_schema=xsd_schema)
-
-    with open(output_file, "w") as text_file:
-        text_file.write(result)
-    """
-
-
-__all__ = ['AbstractGenerator', 'CGenerator', 'FortranGenerator', 'PythonGenerator',
-           'JSONSchemaGenerator', 'QEFortranGenerator', 'generate']
+__all__ = ['filter_method', 'AbstractGenerator', 'CGenerator', 'FortranGenerator',
+           'PythonGenerator', 'JSONSchemaGenerator', 'QEFortranGenerator']

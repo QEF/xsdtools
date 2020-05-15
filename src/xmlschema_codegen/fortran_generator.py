@@ -39,7 +39,9 @@ class FortranGenerator(AbstractGenerator):
 
     default_paths = ['templates/fortran/']
 
-    builtins_map = {
+    builtin_types = {
+        'anyType': '',
+        'anySimpleType': '',
         'string': 'CHARACTER(len=256)',
         'boolean': 'LOGICAL',
         'double': 'REAL(DP)',
@@ -48,11 +50,3 @@ class FortranGenerator(AbstractGenerator):
         'nonNegativeInteger': 'INTEGER',
         'positiveInteger': 'INTEGER',
     }
-
-
-@FortranGenerator.register_filter
-def sorted_complex_types(xsd_types):
-    try:
-        return sorted((x for x in xsd_types.values() if x.is_complex()), key=lambda x: x.name)
-    except AttributeError:
-        return sorted((x for x in xsd_types if x.is_complex()), key=lambda x: x.name)
