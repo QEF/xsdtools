@@ -19,6 +19,22 @@ XSD_TEST = """
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:tns="http://codegen.test/0" targetNamespace="http://codegen.test/0">
   <xs:element name="root" type="xs:string" />
+  <xs:complexType name="type3">
+    <xs:sequence>
+      <xs:element name="elem1" type="tns:type1" />
+      <xs:element name="elem2" type="tns:type2" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="type2">
+    <xs:sequence>
+      <xs:element name="elem1" type="tns:type1" />
+      <xs:element name="elem4" type="tns:type4" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="type4">
+    <xs:restriction base="xs:string" />
+  </xs:simpleType>
+  <xs:complexType name="type1" />
 </xs:schema>
 """
 
@@ -85,19 +101,67 @@ class TestAbstractGenerator(unittest.TestCase):
         self.assertIsNot(generator.builtin_types, generator.types_map)
         self.assertEqual(generator.builtin_types, generator.types_map)
 
-    def test_language_default_filters(self):
-        demo_gen = DemoGenerator(self.schema)
-
-        dt = datetime.datetime(1999, 12, 31, 23, 59, 59)
-        self.assertEqual(demo_gen.filters['instance_filter'](dt), '1999-12-31 23:59:59')
-        self.assertEqual(demo_gen.filters['static_filter'](dt), '1999-12-31 23:59:59')
-        self.assertEqual(demo_gen.filters['class_filter'](dt), '1999-12-31 23:59:59')
-        self.assertEqual(demo_gen.filters['function_filter'](dt), '1999-12-31 23:59:59')
-
+    def test_language_type_filter(self):
         self.assertListEqual(self.generator.render('demo_type_filter_test.jinja'), ['str'])
 
-    def test_generic_default_filters(self):
+    def test_filter_decorators(self):
+        dt = datetime.datetime(1999, 12, 31, 23, 59, 59)
+
+        if self.generator_class is DemoGenerator:
+            demo_gen = DemoGenerator(self.schema)
+            self.assertEqual(demo_gen.filters['instance_filter'](dt), '1999-12-31 23:59:59')
+            self.assertEqual(demo_gen.filters['static_filter'](dt), '1999-12-31 23:59:59')
+            self.assertEqual(demo_gen.filters['class_filter'](dt), '1999-12-31 23:59:59')
+            self.assertEqual(demo_gen.filters['function_filter'](dt), '1999-12-31 23:59:59')
+        else:
+            with self.assertRaises(KeyError):
+                self.generator.filters['instance_filter'](dt)
+
+    def test_local_name_filter(self):
+        xsd_element = self.schema.elements['root']
+        self.assertEqual(self.generator.filters['local_name'](xsd_element), 'root')
         self.assertListEqual(self.generator.render('local_name_filter_test.jinja'), ['root'])
+
+    def test_qname_filter(self):
+        xsd_element = self.schema.elements['root']
+        self.assertEqual(self.generator.filters['qname'](xsd_element), 'tns:root')
+        self.assertListEqual(self.generator.render('qname_filter_test.jinja'), ['tns:root'])
+
+    def test_tag_name_filter(self):
+        xsd_element = self.schema.elements['root']
+        self.assertEqual(self.generator.filters['tag_name'](xsd_element), 'root')
+        self.assertListEqual(self.generator.render('tag_name_filter_test.jinja'), ['root'])
+
+    def test_type_name_filter(self):
+        xsd_element = self.schema.elements['root']
+        self.assertEqual(self.generator.filters['type_name'](xsd_element), 'string')
+        self.assertListEqual(self.generator.render('type_name_filter_test.jinja'), ['string'])
+
+    def test_namespace_filter(self):
+        xsd_element = self.schema.elements['root']
+        tns = 'http://codegen.test/0'
+        self.assertEqual(self.generator.filters['namespace'](xsd_element), tns)
+        self.assertListEqual(self.generator.render('namespace_filter_test.jinja'), [tns])
+
+    def test_sorted_types_filter(self):
+        xsd_types = self.schema.types
+        self.assertListEqual(
+            self.generator.filters['sorted_types'](xsd_types),
+            [xsd_types['type4'], xsd_types['type1'], xsd_types['type2'], xsd_types['type3']]
+        )
+        self.assertListEqual(
+            self.generator.render('sorted_types_filter_test.jinja'), ['type4type1type2type3']
+        )
+
+    def test_sorted_complex_types_filter(self):
+        xsd_types = self.schema.types
+        self.assertListEqual(
+            self.generator.filters['sorted_complex_types'](xsd_types),
+            [xsd_types['type1'], xsd_types['type2'], xsd_types['type3']]
+        )
+        self.assertListEqual(
+            self.generator.render('sorted_complex_types_filter_test.jinja'), ['type1type2type3']
+        )
 
 
 class TestCGenerator(TestAbstractGenerator):
@@ -107,7 +171,7 @@ class TestCGenerator(TestAbstractGenerator):
     def test_formal_language(self):
         self.assertEqual(self.generator_class.formal_language, 'C')
 
-    def test_language_default_filters(self):
+    def test_language_type_filter(self):
         self.assertListEqual(self.generator.render('c_type_filter_test.jinja'), ['str'])
 
 
@@ -118,7 +182,7 @@ class TestFortranGenerator(TestAbstractGenerator):
     def test_formal_language(self):
         self.assertEqual(self.generator_class.formal_language, 'Fortran')
 
-    def test_language_default_filters(self):
+    def test_language_type_filter(self):
         self.assertListEqual(
             self.generator.render('fortran_type_filter_test.jinja'), ['CHARACTER(len=256)']
         )
@@ -163,7 +227,7 @@ class TestPythonGenerator(TestAbstractGenerator):
     def test_formal_language(self):
         self.assertEqual(self.generator_class.formal_language, 'Python')
 
-    def test_language_default_filters(self):
+    def test_language_type_filter(self):
         self.assertListEqual(
             self.generator.render('python_type_filter_test.jinja'), ['str']
         )
@@ -176,7 +240,7 @@ class TestJSONSchemaGenerator(TestAbstractGenerator):
     def test_formal_language(self):
         self.assertEqual(self.generator_class.formal_language, 'JSON Schema')
 
-    def test_language_default_filters(self):
+    def test_language_type_filter(self):
         self.assertListEqual(
             self.generator.render('json_schema_type_filter_test.jinja'), ['string']
         )

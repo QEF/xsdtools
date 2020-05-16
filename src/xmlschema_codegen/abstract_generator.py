@@ -241,7 +241,8 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 if not force and output_file.exists():
                     continue
 
-                result = template.render(schema=self.schema, sorted_complex_types=sorted_complex_types(self.schema.types))
+                result = template.render(schema=self.schema,
+                                         sorted_complex_types=self.sorted_complex_types(self.schema.types))
                 print(result)
                 logger.info("write file %r", str(output_file))
                 # with open(output_file, 'w') as fp:
@@ -336,7 +337,6 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
             return ''
         return qname
 
-
     @staticmethod
     @filter_method
     def tag_name(obj):
@@ -350,7 +350,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
         try:
             if tag[0] == '{':
-                _, local_name = obj.split('}')
+                _, local_name = tag.split('}')
             else:
                 local_name = tag
         except (IndexError, ValueError):
@@ -392,58 +392,59 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 return ''
         return namespace
 
+    @staticmethod
+    @filter_method
+    def sorted_types(xsd_types, accept_circularity=False):
+        """
+        Returns a sorted sequence of XSD types. Sorted types can be used to build code declarations.
 
-def sorted_types(xsd_types, accept_circularity=False):
-    """
-    Returns a sorted sequence of XSD types. Sorted types can be used to build code declarations.
+        :param xsd_types: a sequence with XSD types.
+        :param accept_circularity: if set to `True` circularities are accepted. Defaults to `False`.
+        :return: a list with ordered types.
+        """
+        try:
+            xsd_types = list(xsd_types.values())
+        except AttributeError:
+            pass
 
-    :param xsd_types: a sequence with XSD types.
-    :param accept_circularity: if set to `True` circularities are accepted. Defaults to `False`.
-    :return: a list with ordered types.
-    """
-    try:
-        xsd_types = list(xsd_types.values())
-    except AttributeError:
-        pass
-
-    assert all(isinstance(x, XsdType) for x in xsd_types)
-    ordered_types = [x for x in xsd_types if x.is_simple()]
-    ordered_types.extend(x for x in xsd_types if x.is_complex() and x.has_simple_content())
-    unordered = {x: [] for x in xsd_types if x.is_complex() and not x.has_simple_content()}
-
-    for xsd_type in unordered:
-        for e in xsd_type.content_type.iter_elements():
-            if e.type in unordered:
-                unordered[xsd_type].append(e.type)
-
-    while unordered:
-        deleted = 0
-        for xsd_type in xsd_types:
-            if xsd_type in unordered:
-                if not unordered[xsd_type]:
-                    del unordered[xsd_type]
-                    ordered_types.append(xsd_type)
-                    deleted += 1
+        assert all(isinstance(x, XsdType) for x in xsd_types)
+        ordered_types = [x for x in xsd_types if x.is_simple()]
+        ordered_types.extend(x for x in xsd_types if x.is_complex() and x.has_simple_content())
+        unordered = {x: [] for x in xsd_types if x.is_complex() and not x.has_simple_content()}
 
         for xsd_type in unordered:
-            unordered[xsd_type] = [x for x in unordered[xsd_type] if x in unordered]
+            for e in xsd_type.content_type.iter_elements():
+                if e.type in unordered:
+                    unordered[xsd_type].append(e.type)
 
-        if not deleted:
-            if not accept_circularity:
-                raise ValueError("Circularity found between {!r}".format(list(unordered)))
-            ordered_types.extend(list(unordered))
-            break
+        while unordered:
+            deleted = 0
+            for xsd_type in xsd_types:
+                if xsd_type in unordered:
+                    if not unordered[xsd_type]:
+                        del unordered[xsd_type]
+                        ordered_types.append(xsd_type)
+                        deleted += 1
 
-    assert len(xsd_types) == len(ordered_types)
-    return ordered_types
+            for xsd_type in unordered:
+                unordered[xsd_type] = [x for x in unordered[xsd_type] if x in unordered]
 
+            if not deleted:
+                if not accept_circularity:
+                    raise ValueError("Circularity found between {!r}".format(list(unordered)))
+                ordered_types.extend(list(unordered))
+                break
 
-@AbstractGenerator.register_filter
-def sorted_complex_types(xsd_types, accept_circularity=False):
-    """Like `sorted_types` but remove simple types."""
-    try:
-        xsd_types = [x for x in xsd_types.values() if not x.is_simple()]
-    except AttributeError:
-        xsd_types = [x for x in xsd_types if not x.is_simple()]
+        assert len(xsd_types) == len(ordered_types)
+        return ordered_types
 
-    return sorted_types(xsd_types, accept_circularity)
+    @classmethod
+    @filter_method
+    def sorted_complex_types(cls, xsd_types, accept_circularity=False):
+        """Like `sorted_types` but remove simple types."""
+        try:
+            xsd_types = [x for x in xsd_types.values() if not x.is_simple()]
+        except AttributeError:
+            xsd_types = [x for x in xsd_types if not x.is_simple()]
+
+        return cls.sorted_types(xsd_types, accept_circularity)
