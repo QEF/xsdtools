@@ -16,7 +16,7 @@ MODULE qes_types_module
   !
   IMPLICIT NONE
   !
-  {% for type in sorted_complex_types %}
+  {%- for type in ( schema.types|sorted_complex_types ) %}
   TYPE :: {{type | type_name}}
     !
     CHARACTER(len=100) :: tagname
@@ -25,42 +25,34 @@ MODULE qes_types_module
     !
 {%- for attr in type.attributes.values() %}
     {{ attr|fortran_type }} :: {{attr.local_name}}
-  {%- if not attr %}
+  {%- if attr.is_optional() %}
     LOGICAL :: {{attr.local_name}}_ispresent = .FALSE.
   {%- endif %}
 {%- endfor %}
 
 {%- if type.is_extension() %}
-    {%- if type.base_type != None and type.base_type.is_complex() %}
-       {%- for attr in type.base_type.attributes.values() %}
-    {{ attr|fortran_type }} :: {{attr.local_name}}
-           {%- if not attr.is_required() %}
-    LOGICAL :: {{attr.local_name}}_ispresent = .FALSE.
-           {%- endif %}
-       {%- endfor %}
-    {%- endif %}
     !
-    {{ type.base_type|fortran_type }} :: {{type.name.replace('Type', '')}}
+    {{ type.base_type|fortran_type }} :: {{type.local_name.replace('Type', '')}}
 {%- endif %}
 {%- if not type.has_simple_content() %}
-{%- for element in type.content_type %}
-{%- if (element.min_occurs==0) %}
+{%- for element in type.content_type.iter_elements() %}
+{%- if element.min_occurs == 0 %}
     LOGICAL  :: {{element.local_name}}_ispresent = .FALSE.
 {%- endif %}
-{%- if (element.max_occurs==1) %}
-    {%- if (element.is_qes_type) and (not element.xsd_type.is_simple() )%}
-    TYPE({{ element|fortran_type }}) :: {{ element.local_name }}
+{%- if (element.max_occurs == 1) %}
+    {%- if (element.type.target_namespace == schema.target_namespace) and (not element.type.is_simple() )%}
+    TYPE({{ element|type_name }}) :: {{ element.local_name }}
     {%- else %}
     {{ element|fortran_type }} :: {{ element.local_name }}
     {%- endif %}
 {%- else %}
-    TYPE({{ element|fortran_type }}), DIMENSION(:), ALLOCATABLE :: {{ element|tag_name }}
+    TYPE({{ element|type_name }}), DIMENSION(:), ALLOCATABLE :: {{ element|tag_name }}
     INTEGER   :: ndim_{{ element|tag_name }}
 {%- endif %}
 {%- endfor %}
 {%- endif %}
     !
-  END TYPE {{ type|fortran_type }}
+  END TYPE {{ type|type_name }}
   !
 {%- endfor %}
   !

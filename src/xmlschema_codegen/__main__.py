@@ -19,7 +19,7 @@ from xmlschema.exceptions import XMLSchemaValueError
 
 from xmlschema_codegen import CGenerator, FortranGenerator, \
     PythonGenerator, JSONSchemaGenerator, QEFortranGenerator
-from xmlschema_codegen.base import is_shell_wildcard
+from xmlschema_codegen.helpers import is_shell_wildcard
 
 
 PROGRAM_NAME = os.path.basename(sys.argv[0])

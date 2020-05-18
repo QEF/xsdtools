@@ -13,18 +13,19 @@ import xmlschema
 from xmlschema_codegen import QEFortranGenerator
 
 
-@unittest.skip("FIXME")
 class TestQEFortranGenerator(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.xsd_file = Path(__file__).absolute().parent.joinpath('schemas/qe/qes.xsd')
+        cls.xsd_file = Path(__file__).absolute().parent.joinpath('schemas/qe/qes-refactored.xsd')
         cls.schema = xmlschema.XMLSchema(str(cls.xsd_file))
 
     def test_codegen_class(self):
-        default_filters = ['to_type', 'read_function_name', 'bcast_function_name',
-                           'init_function_name', 'write_function_name', 'reset_function_name']
-
+        default_filters = [
+            'local_name', 'qname', 'tag_name', 'type_name', 'namespace', 'sorted_types',
+            'sorted_complex_types', 'read_function_name', 'bcast_function_name',
+            'init_function_name', 'write_function_name', 'reset_function_name'
+        ]
         self.assertListEqual(list(QEFortranGenerator.default_filters), default_filters)
 
     def test_initialization(self):
@@ -67,3 +68,21 @@ class TestQEFortranGenerator(unittest.TestCase):
         self.assertIn('base.f90.jinja', templates)
         self.assertIn('qes_types_module.f90.jinja', templates)
         self.assertIn('types/qes_types_module.f90.jinja', templates)
+
+    def test_render_types_module(self):
+        qe_generator = QEFortranGenerator(self.schema)
+        result = qe_generator.render('types/qes_types_module.f90.jinja')[0]
+        self.assertIsInstance(result, str)
+        result_lines = result.split('\n')
+
+        type_module = Path(__file__).absolute().parent.joinpath('samples/qe/qes_types_module.f90')
+        with type_module.open() as fp:
+            type_module_lines = fp.read().split('\n')
+
+        for k in range(min(len(result_lines), len(type_module_lines))):
+            line1 = result_lines[k]
+            line2 = type_module_lines[k]
+            self.assertEqual(
+                line1, line2, msg="Line {}-{}: {!r}".format(
+                    k + 1, k + 6, '\n'.join(result_lines[k:k + 5])
+                ))

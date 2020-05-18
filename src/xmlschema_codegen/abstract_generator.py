@@ -161,7 +161,11 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
         self.types_map = self.builtin_types.copy()
         if types_map:
-            self.types_map.update(types_map)
+            if not self.schema.target_namespace:
+                self.types_map.update(types_map)
+            else:
+                ns_part = '{%s}' % self.schema.target_namespace
+                self.types_map.update((ns_part + k, v) for k, v in types_map.items())
 
         self._env = Environment(loader=loader)
         self._env.filters.update(self.filters)
@@ -270,7 +274,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
             return self.types_map[xsd_type.name]
         except KeyError:
             try:
-                return self.types_map[xsd_type.root_type.name]
+                return self.types_map[xsd_type.base_type.name]
             except KeyError:
                 if xsd_type.is_complex():
                     return self.types_map[xsd_qname('anyType')]

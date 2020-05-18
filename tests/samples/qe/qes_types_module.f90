@@ -10,7 +10,7 @@ MODULE qes_types_module
   !
   ! Auto-generated code: don't edit this file
   !
-  ! Quantum Espresso XSD namespace: http://www.quantum-espresso.org/ns/qes/qes-1.0 
+  ! Quantum Espresso XSD namespace: http://www.quantum-espresso.org/ns/qes/qes-1.0
   !
   USE kinds, only: DP
   !
@@ -118,10 +118,10 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
+    INTEGER :: size
     CHARACTER(len=256) :: specie
     CHARACTER(len=256) :: label
     INTEGER :: spin
-    INTEGER :: size
     !
     REAL(DP), DIMENSION(:), ALLOCATABLE :: starting_ns
     !
@@ -133,13 +133,13 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
+    INTEGER :: rank
+    INTEGER, DIMENSION(:), ALLOCATABLE :: dims
+    CHARACTER(len=256) :: order
     CHARACTER(len=256) :: specie
     CHARACTER(len=256) :: label
     INTEGER :: spin
     INTEGER :: index
-    INTEGER :: rank
-    INTEGER, DIMENSION(:), ALLOCATABLE :: dims
-    CHARACTER(len=256) :: order
     !
     REAL(DP), DIMENSION(:), ALLOCATABLE :: Hubbard_ns
     !
@@ -222,9 +222,9 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
+    INTEGER :: size
     INTEGER :: ispin
     REAL(DP) :: spin_factor
-    INTEGER :: size
     !
     REAL(DP), DIMENSION(:), ALLOCATABLE :: inputOccupations
     !
@@ -253,8 +253,8 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
-    INTEGER :: nat
     INTEGER :: size
+    INTEGER :: nat
     !
     INTEGER, DIMENSION(:), ALLOCATABLE :: equivalent_atoms
     !
@@ -382,20 +382,6 @@ MODULE qes_types_module
     !
   END TYPE parallel_info_type
   !
-  TYPE :: clock_type
-    !
-    CHARACTER(len=100) :: tagname
-    LOGICAL  :: lwrite = .FALSE.
-    LOGICAL  :: lread  = .FALSE.
-    !
-    CHARACTER(len=256) :: label
-    INTEGER :: calls
-    LOGICAL :: calls_ispresent = .FALSE.
-    REAL(DP) :: cpu
-    REAL(DP) :: wall
-    !
-  END TYPE clock_type
-  !
   TYPE :: control_variables_type
     !
     CHARACTER(len=100) :: tagname
@@ -485,22 +471,13 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
-    LOGICAL  :: qpoint_grid_ispresent = .FALSE.
     TYPE(qpoint_grid_type) :: qpoint_grid
-    LOGICAL  :: ecutfock_ispresent = .FALSE.
     REAL(DP) :: ecutfock
-    LOGICAL  :: exx_fraction_ispresent = .FALSE.
     REAL(DP) :: exx_fraction
-    LOGICAL  :: screening_parameter_ispresent = .FALSE.
     REAL(DP) :: screening_parameter
-    LOGICAL  :: exxdiv_treatment_ispresent = .FALSE.
     CHARACTER(len=256) :: exxdiv_treatment
-    LOGICAL  :: x_gamma_extrapolation_ispresent = .FALSE.
     LOGICAL :: x_gamma_extrapolation
-    LOGICAL  :: ecutvcut_ispresent = .FALSE.
     REAL(DP) :: ecutvcut
-    LOGICAL  :: localization_threshold_ispresent = .FALSE.
-    REAL(DP) :: localization_threshold
     !
   END TYPE hybrid_type
   !
@@ -544,18 +521,9 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
-    LOGICAL  :: vdw_corr_ispresent = .FALSE.
     CHARACTER(len=256) :: vdw_corr
-    LOGICAL  :: dftd3_version_ispresent = .FALSE.
-    INTEGER :: dftd3_version
-    LOGICAL  :: dftd3_threebody_ispresent = .FALSE.
-    LOGICAL :: dftd3_threebody
     LOGICAL  :: non_local_term_ispresent = .FALSE.
     CHARACTER(len=256) :: non_local_term
-    LOGICAL  :: functional_ispresent = .FALSE.
-    CHARACTER(len=256) :: functional
-    LOGICAL  :: total_energy_term_ispresent = .FALSE.
-    REAL(DP) :: total_energy_term
     LOGICAL  :: london_s6_ispresent = .FALSE.
     REAL(DP) :: london_s6
     LOGICAL  :: ts_vdw_econv_thr_ispresent = .FALSE.
@@ -651,18 +619,13 @@ MODULE qes_types_module
     REAL(DP) :: conv_thr
     INTEGER :: mixing_ndim
     INTEGER :: max_nstep
-    LOGICAL  :: real_space_q_ispresent = .FALSE.
     LOGICAL :: real_space_q
-    LOGICAL  :: real_space_beta_ispresent = .FALSE.
-    LOGICAL :: real_space_beta
     LOGICAL :: tq_smoothing
     LOGICAL :: tbeta_smoothing
     REAL(DP) :: diago_thr_init
     LOGICAL :: diago_full_acc
     LOGICAL  :: diago_cg_maxiter_ispresent = .FALSE.
     INTEGER :: diago_cg_maxiter
-    LOGICAL  :: diago_ppcg_maxiter_ispresent = .FALSE.
-    INTEGER :: diago_ppcg_maxiter
     LOGICAL  :: diago_david_ndim_ispresent = .FALSE.
     INTEGER :: diago_david_ndim
     !
@@ -909,7 +872,6 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
-    LOGICAL :: convergence_achieved
     INTEGER :: n_scf_steps
     REAL(DP) :: scf_error
     !
@@ -921,7 +883,6 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
-    LOGICAL :: convergence_achieved
     INTEGER :: n_opt_steps
     REAL(DP) :: grad_norm
     !
@@ -934,8 +895,6 @@ MODULE qes_types_module
     LOGICAL  :: lread  = .FALSE.
     !
     LOGICAL :: real_space_q
-    LOGICAL  :: real_space_beta_ispresent = .FALSE.
-    LOGICAL :: real_space_beta
     LOGICAL :: uspp
     LOGICAL :: paw
     !
@@ -1006,8 +965,6 @@ MODULE qes_types_module
     REAL(DP) :: potentiostat_contr
     LOGICAL  :: gatefield_contr_ispresent = .FALSE.
     REAL(DP) :: gatefield_contr
-    LOGICAL  :: vdW_term_ispresent = .FALSE.
-    REAL(DP) :: vdW_term
     !
   END TYPE total_energy_type
   !
@@ -1023,19 +980,6 @@ MODULE qes_types_module
     TYPE(vector_type) :: occupations
     !
   END TYPE ks_energies_type
-  !
-  TYPE :: timing_type
-    !
-    CHARACTER(len=100) :: tagname
-    LOGICAL  :: lwrite = .FALSE.
-    LOGICAL  :: lread  = .FALSE.
-    !
-    TYPE(clock_type) :: total
-    LOGICAL  :: partial_ispresent = .FALSE.
-    TYPE(clock_type), DIMENSION(:), ALLOCATABLE :: partial
-    INTEGER   :: ndim_partial
-    !
-  END TYPE timing_type
   !
   TYPE :: atomic_species_type
     !
@@ -1062,8 +1006,6 @@ MODULE qes_types_module
     LOGICAL :: alat_ispresent = .FALSE.
     INTEGER :: bravais_index
     LOGICAL :: bravais_index_ispresent = .FALSE.
-    LOGICAL :: use_alternative_axes
-    LOGICAL :: use_alternative_axes_ispresent = .FALSE.
     LOGICAL  :: atomic_positions_ispresent = .FALSE.
     TYPE(atomic_positions_type) :: atomic_positions
     LOGICAL  :: wyckoff_positions_ispresent = .FALSE.
@@ -1241,7 +1183,6 @@ MODULE qes_types_module
     LOGICAL :: lsda
     LOGICAL :: noncolin
     LOGICAL :: spinorbit
-    LOGICAL  :: nbnd_ispresent = .FALSE.
     INTEGER :: nbnd
     LOGICAL  :: nbnd_up_ispresent = .FALSE.
     INTEGER :: nbnd_up
@@ -1255,8 +1196,6 @@ MODULE qes_types_module
     REAL(DP) :: fermi_energy
     LOGICAL  :: highestOccupiedLevel_ispresent = .FALSE.
     REAL(DP) :: highestOccupiedLevel
-    LOGICAL  :: lowestUnoccupiedLevel_ispresent = .FALSE.
-    REAL(DP) :: lowestUnoccupiedLevel
     LOGICAL  :: two_fermi_energies_ispresent = .FALSE.
     REAL(DP), DIMENSION(2) :: two_fermi_energies
     TYPE(k_points_IBZ_type) :: starting_k_points
@@ -1350,7 +1289,6 @@ MODULE qes_types_module
     LOGICAL  :: lwrite = .FALSE.
     LOGICAL  :: lread  = .FALSE.
     !
-    LOGICAL  :: convergence_info_ispresent = .FALSE.
     TYPE(convergence_info_type) :: convergence_info
     TYPE(algorithmic_info_type) :: algorithmic_info
     TYPE(atomic_species_type) :: atomic_species
@@ -1399,8 +1337,6 @@ MODULE qes_types_module
     INTEGER :: status
     LOGICAL  :: cputime_ispresent = .FALSE.
     INTEGER :: cputime
-    LOGICAL  :: timing_info_ispresent = .FALSE.
-    TYPE(timing_type) :: timing_info
     LOGICAL  :: closed_ispresent = .FALSE.
     TYPE(closed_type) :: closed
     !

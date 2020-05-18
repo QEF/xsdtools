@@ -201,7 +201,6 @@ class TestFortranGenerator(TestAbstractGenerator):
         with open(template.filename) as fp:
             self.assertIn("{# Override base90.f90 template #}", fp.read())
 
-    @unittest.skip('FIXME')
     def test_list_templates(self):
         codegen = FortranGenerator(self.schema)
         self.assertListEqual(codegen.list_templates(),

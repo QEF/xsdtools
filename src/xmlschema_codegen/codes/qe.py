@@ -5,6 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
+from xmlschema.validators import XsdType, XsdElement, XsdAttribute
 from ..helpers import filter_method
 from ..fortran_generator import FortranGenerator
 
@@ -14,6 +15,41 @@ class QEFortranGenerator(FortranGenerator):
     A Fortran code generator for Quantum ESPRESSO.
     """
     default_paths = ['templates/qe/']
+
+    schema_types = {
+        "d2vectorType": "REAL(DP), DIMENSION(2)",
+        "d3vectorType": "REAL(DP), DIMENSION(3)",
+        "vectorType": "REAL(DP), DIMENSION(:), ALLOCATABLE",
+        "doubleListType": "REAL(DP), DIMENSION(:), ALLOCATABLE",
+        "matrixType": "REAL(DP), DIMENSION(:), ALLOCATABLE",
+        "smearingChoiceType": "CHARACTER(len=256)",
+        "integerListType": "INTEGER, DIMENSION(:), ALLOCATABLE",
+        "integerVectorType": "INTEGER, DIMENSION(:), ALLOCATABLE",
+        "constr_parms_listType": "REAL(DP), DIMENSION(4)",
+        "d3complexDType": "REAL(DP), DIMENSION(6)",
+        "disp_x_y_zType": "REAL(DP), DIMENSION(2)",
+        "cell_dimensionsType": "REAL(DP), DIMENSION(6)",
+    }
+
+    def __init__(self, schema, searchpath=None, filters=None, types_map=None):
+        if types_map is None:
+            types_map = self.schema_types
+        else:
+            types_map = self.schema_types.copy().update(**types_map)
+        
+        super(QEFortranGenerator, self).__init__(schema, searchpath, filters, types_map)
+
+    @staticmethod
+    @filter_method
+    def type_name(obj):
+        if isinstance(obj, XsdType):
+            name = obj.local_name or ''
+        elif isinstance(obj, (XsdAttribute, XsdElement)):
+            name = obj.type.local_name or ''
+        else:
+            return ''
+
+        return name[:-4] + '_type' if name.endswith('Type') else name
 
     @staticmethod
     @filter_method
