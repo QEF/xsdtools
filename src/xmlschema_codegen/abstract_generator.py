@@ -444,6 +444,15 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
     @classmethod
     @filter_method
+    def complex_types(cls, xsd_types):
+        """Returns a list of complex types from a sequence of XSD types."""
+        try:
+            return [x for x in xsd_types.values() if x.is_complex()]
+        except AttributeError:
+            return [x for x in xsd_types if x.is_complex()]
+
+    @classmethod
+    @filter_method
     def sorted_complex_types(cls, xsd_types, accept_circularity=False):
         """Like `sorted_types` but remove simple types."""
         try:

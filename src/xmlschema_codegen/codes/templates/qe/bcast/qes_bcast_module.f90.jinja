@@ -28,7 +28,7 @@ MODULE qes_bcast_module
   CONTAINS
   !
   {%- for type in xsd_schema.complex_types %}
-{% include "bcast_subroutine.f90.j2" %}
+{% include "bcast/bcast_subroutine.f90.jinja" %}
   {%- endfor %}
   !
 END MODULE qes_bcast_module

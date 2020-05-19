@@ -29,8 +29,6 @@ MODULE qes_init_module
     MODULE PROCEDURE qes_init_input
     MODULE PROCEDURE qes_init_step
     MODULE PROCEDURE qes_init_output
-    MODULE PROCEDURE qes_init_timing
-    MODULE PROCEDURE qes_init_clock
     MODULE PROCEDURE qes_init_control_variables
     MODULE PROCEDURE qes_init_xml_format
     MODULE PROCEDURE qes_init_creator
@@ -102,8 +100,12 @@ MODULE qes_init_module
     MODULE PROCEDURE qes_init_closed
     MODULE PROCEDURE qes_init_vector
     MODULE PROCEDURE qes_init_integerVector
-    MODULE PROCEDURE qes_init_matrix_1, qes_init_matrix_2, qes_init_matrix_3
-    MODULE PROCEDURE qes_init_integerMatrix_1, qes_init_integerMatrix_2, qes_init_integerMatrix_3
+    MODULE PROCEDURE qes_init_matrix_1
+    MODULE PROCEDURE qes_init_matrix_2
+    MODULE PROCEDURE qes_init_matrix_3
+    MODULE PROCEDURE qes_init_integerMatrix_1
+    MODULE PROCEDURE qes_init_integerMatrix_2
+    MODULE PROCEDURE qes_init_integerMatrix_3
     MODULE PROCEDURE qes_init_scalarQuantity
     !
   END INTERFACE qes_init
@@ -111,8 +113,8 @@ MODULE qes_init_module
   CONTAINS
   !
   !
-  SUBROUTINE qes_init_espresso(obj, tagname, input, Units, general_info, parallel_info, step,&
-                              output, status, cputime, timing_info, closed)
+  SUBROUTINE qes_init_espresso(obj, tagname, Units, input, general_info, parallel_info, step,&
+                              output, status, cputime, closed)
     !
     IMPLICIT NONE
     !

@@ -27,8 +27,6 @@ MODULE qes_reset_module
     MODULE PROCEDURE qes_reset_input
     MODULE PROCEDURE qes_reset_step
     MODULE PROCEDURE qes_reset_output
-    MODULE PROCEDURE qes_reset_timing
-    MODULE PROCEDURE qes_reset_clock
     MODULE PROCEDURE qes_reset_control_variables
     MODULE PROCEDURE qes_reset_xml_format
     MODULE PROCEDURE qes_reset_creator
@@ -140,9 +138,6 @@ MODULE qes_reset_module
     obj%output_ispresent = .FALSE.
     obj%status_ispresent = .FALSE.
     obj%cputime_ispresent = .FALSE.
-    IF (obj%timing_info_ispresent) &
-      CALL qes_reset_timing(obj%timing_info)
-    obj%timing_info_ispresent = .FALSE.
     IF (obj%closed_ispresent) &
       CALL qes_reset_closed(obj%closed)
     obj%closed_ispresent = .FALSE.
@@ -292,45 +287,6 @@ MODULE qes_reset_module
     obj%FCP_tot_charge_ispresent = .FALSE.
     !
   END SUBROUTINE qes_reset_output
-  !
-  !
-  SUBROUTINE qes_reset_timing(obj)
-    !
-    IMPLICIT NONE
-    TYPE(timing_type),INTENT(INOUT)    :: obj
-    INTEGER :: i
-    !
-    obj%tagname = ""
-    obj%lwrite  = .FALSE.
-    obj%lread  = .FALSE.
-    !
-    CALL qes_reset_clock(obj%total)
-    IF (obj%partial_ispresent) THEN
-      IF (ALLOCATED(obj%partial)) THEN
-        DO i=1, SIZE(obj%partial)
-          CALL qes_reset_clock(obj%partial(i))
-        ENDDO
-        DEALLOCATE(obj%partial)
-      ENDIF
-      obj%ndim_partial = 0
-      obj%partial_ispresent = .FALSE.
-    ENDIF
-    !
-  END SUBROUTINE qes_reset_timing
-  !
-  !
-  SUBROUTINE qes_reset_clock(obj)
-    !
-    IMPLICIT NONE
-    TYPE(clock_type),INTENT(INOUT)    :: obj
-    !
-    obj%tagname = ""
-    obj%lwrite  = .FALSE.
-    obj%lread  = .FALSE.
-    !
-    obj%calls_ispresent = .FALSE.
-    !
-  END SUBROUTINE qes_reset_clock
   !
   !
   SUBROUTINE qes_reset_control_variables(obj)

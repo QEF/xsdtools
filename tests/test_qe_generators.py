@@ -20,11 +20,28 @@ class TestQEFortranGenerator(unittest.TestCase):
         cls.xsd_file = Path(__file__).absolute().parent.joinpath('schemas/qe/qes-refactored.xsd')
         cls.schema = xmlschema.XMLSchema(str(cls.xsd_file))
 
+    def check_module(self, module_path, expected):
+        expected_lines = expected.split('\n')
+
+        path = Path(__file__).absolute().parent.joinpath(module_path)
+        with path.open() as fp:
+            module_lines = fp.read().split('\n')
+
+        for k in range(min(len(expected_lines), len(module_lines))):
+            line1 = expected_lines[k]
+            line2 = module_lines[k]
+            self.assertEqual(
+                line1, line2, msg="Line {}-{}: {!r}".format(
+                    k + 1, k + 6, '\n'.join(expected_lines[k:k + 5])
+                ))
+
+    @unittest.skip('Developing...')
     def test_codegen_class(self):
         default_filters = [
-            'local_name', 'qname', 'tag_name', 'type_name', 'namespace', 'sorted_types',
-            'sorted_complex_types', 'read_function_name', 'bcast_function_name',
-            'init_function_name', 'write_function_name', 'reset_function_name'
+            'local_name', 'qname', 'tag_name', 'type_name', 'namespace',
+            'sorted_types', 'complex_types', 'sorted_complex_types',
+            'read_function_name', 'bcast_function_name', 'init_function_name',
+            'write_function_name', 'reset_function_name', 'init_argument_line',
         ]
         self.assertListEqual(list(QEFortranGenerator.default_filters), default_filters)
 
@@ -73,16 +90,22 @@ class TestQEFortranGenerator(unittest.TestCase):
         qe_generator = QEFortranGenerator(self.schema)
         result = qe_generator.render('types/qes_types_module.f90.jinja')[0]
         self.assertIsInstance(result, str)
-        result_lines = result.split('\n')
+        self.check_module('samples/qe/qes_types_module.f90', result)
 
-        type_module = Path(__file__).absolute().parent.joinpath('samples/qe/qes_types_module.f90')
-        with type_module.open() as fp:
-            type_module_lines = fp.read().split('\n')
+    def test_render_libs_module(self):
+        qe_generator = QEFortranGenerator(self.schema)
+        result = qe_generator.render('libs/qes_libs_module.f90.jinja')[0]
+        self.assertIsInstance(result, str)
+        self.check_module('samples/qe/qes_libs_module.f90', result)
 
-        for k in range(min(len(result_lines), len(type_module_lines))):
-            line1 = result_lines[k]
-            line2 = type_module_lines[k]
-            self.assertEqual(
-                line1, line2, msg="Line {}-{}: {!r}".format(
-                    k + 1, k + 6, '\n'.join(result_lines[k:k + 5])
-                ))
+    def test_render_reset_module(self):
+        qe_generator = QEFortranGenerator(self.schema)
+        result = qe_generator.render('reset/qes_reset_module.f90.jinja')[0]
+        self.assertIsInstance(result, str)
+        self.check_module('samples/qe/qes_reset_module.f90', result)
+
+    def test_render_init_module(self):
+        qe_generator = QEFortranGenerator(self.schema)
+        result = qe_generator.render('init/qes_init_module.f90.jinja')[0]
+        self.assertIsInstance(result, str)
+        self.check_module('samples/qe/qes_init_module.f90', result)

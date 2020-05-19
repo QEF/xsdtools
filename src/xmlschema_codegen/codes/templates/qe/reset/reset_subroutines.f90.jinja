@@ -1,9 +1,9 @@
   !
-  SUBROUTINE {{type.reset_function_name()}}(obj)
+  SUBROUTINE qes_reset_{{type|function_name}}(obj)
     !
     IMPLICIT NONE
-    TYPE({{type.fortran_type_name()}}),INTENT(INOUT)    :: obj
-    {%- if type.has_multi_sequence() %}
+    TYPE({{ type|type_name }}),INTENT(INOUT)    :: obj
+    {%- if ( type|has_multi_sequence ) %}
     INTEGER :: i
     {%- endif %}
     !
@@ -11,16 +11,67 @@
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-{%- with type_name=type.extension_xsd_type_name, attributes=type.extension_attributes(xsd_schema.sorted_complex_types()) %}
-{%- include "reset_attributes.f90.j2" %}
-{%- endwith %}
-{%- include "reset_sequence.f90.j2" %}
-{%- if type.extension_xsd_type_name != None %}
-{%- include "reset_extension.f90.j2" %}
+{#- Insert children #}
+{%- if not type.has_simple_content() %}
+{%- for element in type.content_type.iter_elements() %}
+  {%- if element.min_occurs == 0 and element.max_occurs == 1 %}
+    {%- if (element.type|is_qes_type) and element.type.is_complex() %}
+    IF (obj%{{element.local_name}}_ispresent) &
+      CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}})
+    {%- endif %}
+    obj%{{element.local_name}}_ispresent = .FALSE.
+  {%- elif element.min_occurs == 1 and element.max_occurs == 1 %}
+    {%- if (element.type|is_qes_type) and element.type.is_complex() %}
+    CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}})
+    {%- endif %}
+  {%- elif element.min_occurs == 0 %}
+    IF (obj%{{element.local_name}}_ispresent) THEN
+      IF (ALLOCATED(obj%{{element.local_name}})) THEN
+        {%- if (element.type|is_qes_type) and element.type.is_complex() %}
+        DO i=1, SIZE(obj%{{element.local_name}})
+          CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}}(i))
+        ENDDO
+        {%- endif %}
+        DEALLOCATE(obj%{{element.local_name}})
+      ENDIF
+      obj%ndim_{{element.local_name}} = 0
+      obj%{{element.local_name}}_ispresent = .FALSE.
+    ENDIF
+  {%- else %}
+    IF (ALLOCATED(obj%{{element.local_name}})) THEN
+      {%- if (element.type|is_qes_type) and element.type.is_complex() %}
+      DO i=1, SIZE(obj%{{element.local_name}})
+        CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}}(i))
+      ENDDO
+      {%- endif %}
+      DEALLOCATE(obj%{{element.local_name}})
+    ENDIF
+    obj%ndim_{{element.local_name}} = 0
+  {%- endif %}
+{%- endfor %}
 {%- endif %}
-{%- with type_name=type.name, attributes=type.attributes %}
-{%- include "reset_attributes.f90.j2" %}
-{%- endwith %}
+{#- Deallocate arrays #}
+{%- if (type|is_qes_array_type) %}
+    IF (ALLOCATED(obj%{{type.local_name.replace('Type','')}})) THEN
+      DEALLOCATE(obj%{{type.local_name.replace('Type','')}})
+    ENDIF
+{%- endif %}
+{#- Insert attributes #}
+{%- if type.local_name in ["matrixType", "integerMatrixType"] %}
+    IF (ALLOCATED(obj%dims)) THEN
+      DEALLOCATE(obj%dims)
+    ENDIF
+    obj%rank = 0
+    obj%order = 'F'
+{%- elif type.local_name in ["vectorType", "integerVectorType"] %}
+    obj%size = 0
+{%- else %}
+  {%- for attribute in type.attributes.values() %}
+    {%- if attribute.is_optional() %}
+    obj%{{attribute.local_name}}_ispresent = .FALSE.
+    {%- endif %}
+  {%- endfor %}
+{%- endif %}
     !
-  END SUBROUTINE {{type.reset_function_name()}}
+  END SUBROUTINE qes_reset_{{type|function_name}}
   !

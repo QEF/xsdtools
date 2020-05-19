@@ -19,7 +19,7 @@
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
 {%- with type_name=type.name, attributes=type.attributes %}
-{%- include "bcast_attributes.f90.j2" %}
+{%- include "bcast/bcast_attributes.f90.jinja" %}
 {%- endwith %}
 {%- with type_name=type.extension_xsd_type_name, attributes=type.extension_attributes(xsd_schema.sorted_complex_types()) %}
 {%- include "bcast_attributes.f90.j2" %}

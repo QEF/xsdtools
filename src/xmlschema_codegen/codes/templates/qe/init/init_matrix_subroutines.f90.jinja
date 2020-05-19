@@ -1,18 +1,18 @@
-{%- for function in type.init_function_name().replace(',',' ').split() %}
+{%- for function in ( type|init_function_name ).split() %}
   !
   SUBROUTINE {{function}}(obj, tagname, dims, mat, order)
     !
     IMPLICIT NONE
     !
-    TYPE({{type.fortran_type_name()}}), INTENT(OUT) :: obj
+    TYPE({{ type|type_name }}), INTENT(OUT) :: obj
     CHARACTER(LEN=*), INTENT(IN) :: tagname
     INTEGER,DIMENSION(:),INTENT(IN) :: dims
 {%- if '_1' in function %}
-    {{type.extension_fortran_type().replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:)
+    {{type.base_type.local_name.replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:)
 {%-elif '_2' in function %}
-    {{type.extension_fortran_type().replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:,:)
+    {{type.base_type.local_name.replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:,:)
 {%-elif '_3' in function %}
-    {{type.extension_fortran_type().replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:,:,:)
+    {{type.base_type.local_name.replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:,:,:)
 {%- endif %}
     CHARACTER(LEN=*),OPTIONAL :: order
     INTEGER :: rank, length, i
@@ -26,9 +26,9 @@
       length = length * dims(i)
     END DO
     obj%rank = rank
-    ALLOCATE(obj%{{type.name.replace('Type','')}}(length), obj%dims(rank) )
+    ALLOCATE(obj%{{ type.local_name.replace('Type','')}}(length), obj%dims(rank) )
 {%- if '_1' in function %}
-    obj%{{type.name.replace('Type','')}}(1:length) = mat(1:length)
+    obj%{{type.local_name.replace('Type','')}}(1:length) = mat(1:length)
 {%- else %}
     obj%{{type.name.replace('Type','')}}(1:length) = reshape(mat, [length])
 {%- endif %}

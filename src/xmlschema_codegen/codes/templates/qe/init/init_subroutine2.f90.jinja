@@ -1,5 +1,5 @@
   !
-  SUBROUTINE {{ type|init_function_name }}({{ type|init_argument_line }})
+  SUBROUTINE qes_init_{{ type.local_name.replace('Type', '') }}({{ type|init_argument_line }})
     !
     IMPLICIT NONE
     !

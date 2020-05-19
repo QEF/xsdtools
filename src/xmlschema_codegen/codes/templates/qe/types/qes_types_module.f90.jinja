@@ -16,8 +16,8 @@ MODULE qes_types_module
   !
   IMPLICIT NONE
   !
-  {%- for type in ( schema.types|sorted_complex_types ) %}
-  TYPE :: {{type | type_name}}
+  {%- for type in ( schema.complex_types|sorted_types ) %}
+  TYPE :: {{ type|type_name }}
     !
     CHARACTER(len=100) :: tagname
     LOGICAL  :: lwrite = .FALSE.
@@ -46,8 +46,8 @@ MODULE qes_types_module
     {{ element|fortran_type }} :: {{ element.local_name }}
     {%- endif %}
 {%- else %}
-    TYPE({{ element|type_name }}), DIMENSION(:), ALLOCATABLE :: {{ element|tag_name }}
-    INTEGER   :: ndim_{{ element|tag_name }}
+    TYPE({{ element|type_name }}), DIMENSION(:), ALLOCATABLE :: {{ element.local_name }}
+    INTEGER   :: ndim_{{ element.local_name }}
 {%- endif %}
 {%- endfor %}
 {%- endif %}

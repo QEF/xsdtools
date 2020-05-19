@@ -10,7 +10,7 @@ MODULE qes_init_module
   !
   ! Auto-generated code: don't edit or at least don't commit changes
   !
-  ! Quantum Espresso XSD namespace: {{xsd_schema.target_namespace}}
+  ! Quantum Espresso XSD namespace: {{schema.target_namespace}}
   !
   USE kinds, only: DP
   USE qes_types_module
@@ -23,24 +23,30 @@ MODULE qes_init_module
   !
   INTERFACE qes_init
     !
-  {%- for type in xsd_schema.complex_types %}
-    MODULE PROCEDURE {{type.init_function_name()}}
+  {%- for type in schema.complex_types %}
+      {%- if type.local_name in ['matrixType', 'integerMatrixType'] %}
+    MODULE PROCEDURE qes_init_{{ type.local_name.replace('Type', '') }}_1
+    MODULE PROCEDURE qes_init_{{ type.local_name.replace('Type', '') }}_2
+    MODULE PROCEDURE qes_init_{{ type.local_name.replace('Type', '') }}_3
+      {%- else %}
+    MODULE PROCEDURE qes_init_{{ type.local_name.replace('Type', '') }}
+      {%- endif %}
   {%- endfor %}
     !
   END INTERFACE qes_init
   !
   CONTAINS
   !
-  {%- for type in xsd_schema.complex_types %}
-    {%- if type.name in ['matrixType', 'integerMatrixType'] %}
-{%include "init_matrix_subroutines.f90.j2" %}
+  {%- for type in schema.complex_types %}
+    {%- if type.local_name in ['matrixType', 'integerMatrixType'] %}
+{% include "init/init_matrix_subroutines.f90.jinja" %}
     {%- elif type.extension_xsd_type_name in ['matrixType', 'integerMatrixType'] %}
-{%include "init_matrix_extension.f90.j2" %}
+{% include "init/init_matrix_extension.f90.jinja" %}
     {%- elif type.name in ['vectorType', 'integerVectorType'] or 
     type.extension_xsd_type_name in ['vectorType', 'integerVectorType'] %}
-{%include "init_vector_subroutines.f90.j2" %}
+{% include "init/init_vector_subroutines.f90.jinja" %}
     {%- else %}
-{% include "init_subroutine.f90.j2" %}
+{% include "init/init_subroutine.f90.jinja" %}
     {%- endif %}
   {%- endfor %}
   !

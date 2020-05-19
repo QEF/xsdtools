@@ -5,9 +5,13 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
+import re
+
 from xmlschema.validators import XsdType, XsdElement, XsdAttribute
 from ..helpers import filter_method
 from ..fortran_generator import FortranGenerator
+
+QE_NAMESPACE = "http://www.quantum-espresso.org/ns/qes/qes-1.0"
 
 
 class QEFortranGenerator(FortranGenerator):
@@ -36,8 +40,9 @@ class QEFortranGenerator(FortranGenerator):
             types_map = self.schema_types
         else:
             types_map = self.schema_types.copy().update(**types_map)
-        
+
         super(QEFortranGenerator, self).__init__(schema, searchpath, filters, types_map)
+        assert self.schema.target_namespace == QE_NAMESPACE
 
     @staticmethod
     @filter_method
@@ -85,9 +90,111 @@ class QEFortranGenerator(FortranGenerator):
 
     @staticmethod
     @filter_method
+    def function_name(xsd_type):
+        name = xsd_type.local_name or ''
+        if name.endswith('Type'):
+            return name.replace('Type', '')
+        else:
+            return name
+
+    @filter_method
+    def is_qes_array_type(self, xsd_type):
+        if xsd_type.local_name in ("vectorType", "integerVectorType", "integerMatrixType"):
+            return True
+        elif xsd_type.is_derived(self.schema.types['vectorType']):
+            return True
+        elif xsd_type.is_derived(self.schema.types['integerVectorType']):
+            return True
+        elif xsd_type.is_derived(self.schema.types['integerMatrixType']):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    @filter_method
+    def is_qes_type(xsd_type):
+        return xsd_type.target_namespace == QE_NAMESPACE
+
+    @staticmethod
+    @filter_method
+    def has_multi_sequence(xsd_type):
+        if xsd_type.has_simple_content():
+            return False
+        return any(e.is_multiple() for e in xsd_type.content_type.iter_elements())
+
+    @staticmethod
+    @filter_method
     def reset_function_name(xsd_type):
         try:
             if xsd_type.is_complex():
                 return 'qes_reset_' + xsd_type.local_name.replace('Type', '')
         except AttributeError:
             return
+
+    @filter_method
+    def init_fortran_type_name(self, xsd_type):
+        tmp = re.sub(r'LEN=[\d]+', 'LEN=*', self.type_name(xsd_type), flags=re.IGNORECASE)
+        return tmp.replace(', ALLOCATABLE','')
+
+    @filter_method
+    def init_extension_fortran_type(self, xsd_type):
+        tmp = re.sub(r'LEN=[\d]+', 'LEN=*', self.type_name(xsd_type.base_type),
+              flags=re.IGNORECASE)
+        return tmp.replace(', ALLOCATABLE','')
+
+    @staticmethod
+    @filter_method
+    def dimension(xsd_element):
+        if xsd_element.max_occurs in (0, 1):
+            return ''
+        elif xsd_element.min_occurs == xsd_element.max_occurs:
+            return 'DIMENSION({}),'.format(xsd_element.max_occurs)
+        else:
+            return 'DIMENSION(:),'
+
+    @staticmethod
+    @filter_method
+    def init_argument_line(xsd_type):
+        line_head = []
+        line_tail = []
+        indent = len('  SUBROUTINE qes_init_' + xsd_type.local_name.replace('Type', ''))
+        if xsd_type.is_complex():
+            for attribute in xsd_type.attributes.values():
+                if attribute.is_required:
+                    line_head.append(attribute.local_name)
+                else:
+                    line_tail.append(attribute.local_name)
+
+        if not xsd_type.has_simple_content():
+            for element in xsd_type.content_type.iter_elements():
+                if element.min_occurs != 0:
+                    line_head.append(element.tag)
+                else:
+                    line_tail.append(element.tag)
+
+        if xsd_type.is_extension():
+            line_head.append(xsd_type.local_name.replace('Type', ''))
+
+        line = 'obj, tagname'
+        lines=[]
+        max_line = 90
+        arglist = line_head + line_tail
+        lastindex = len(line_head + line_tail) - 1
+        for arg in line_head + line_tail:
+            if len(line) + indent > max_line and arglist.index(arg) < lastindex:
+                line = line + ',&'
+                lines.append(line)
+                line = ''
+            if line == '':
+                line = indent * ' ' + arg
+                max_line = 90 + indent
+            else:
+                line += ', ' + arg
+        max_line = 100
+        if  len(line) > max_line:
+            line += ' &'
+            lines.append(line)
+            lines.append(indent * ' ')
+        else:
+            lines.append(line)
+        return '\n'.join(lines)
