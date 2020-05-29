@@ -115,6 +115,16 @@ class QEFortranGenerator(FortranGenerator):
     def is_qes_type(xsd_type):
         return xsd_type.target_namespace == QE_NAMESPACE
 
+    @filter_method
+    def is_matrix_type(self, xsd_type):
+        return xsd_type.is_derived(self.schema.types['matrixType']) \
+            or xsd_type.is_derived(self.schema.types['integerMatrixType'])
+
+    @filter_method
+    def is_vector_type(self, xsd_type):
+        return xsd_type.is_derived(self.schema.types['vectorType']) \
+            or xsd_type.is_derived(self.schema.types['integerVectorType'])
+
     @staticmethod
     @filter_method
     def has_multi_sequence(xsd_type):

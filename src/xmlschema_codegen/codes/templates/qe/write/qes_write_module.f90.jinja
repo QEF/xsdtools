@@ -9,7 +9,7 @@ MODULE qes_write_module
   !
   ! Auto-generated code: don't edit this file
   !
-  ! Quantum Espresso XSD namespace: {{xsd_schema.target_namespace}}
+  ! Quantum Espresso XSD namespace: {{schema.target_namespace}}
   !
   USE qes_types_module
   USE FoX_wxml
@@ -19,14 +19,14 @@ MODULE qes_write_module
   PUBLIC
   !
   INTERFACE qes_write
-  {%- for type in xsd_schema.complex_types %}
-    MODULE PROCEDURE {{type.write_function_name()}}
+  {%- for type in schema.complex_types %}
+    MODULE PROCEDURE qes_write_{{type|function_name}}
   {%- endfor %}
   END INTERFACE qes_write
   !
   CONTAINS
   !
-  {% for type in xsd_schema.types.values() %}
+  {% for type in schema.types.values() %}
 {% include "write/qes_write_subroutines.f90.jinja" %}
   {%- endfor %}
   !

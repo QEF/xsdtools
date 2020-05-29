@@ -10,7 +10,7 @@ MODULE qes_read_module
   !
   ! Auto-generated code: don't edit this file
   !
-  ! Quantum Espresso XSD namespace: {{xsd_schema.target_namespace}}
+  ! Quantum Espresso XSD namespace: {{schema.target_namespace}}
   !
   USE FoX_dom
   USE qes_types_module
@@ -20,15 +20,15 @@ MODULE qes_read_module
   PUBLIC qes_read
   !
   INTERFACE qes_read
-  {%- for type in xsd_schema.complex_types %}
-    MODULE PROCEDURE {{type.read_function_name()}}
+  {%- for type in schema.complex_types %}
+    MODULE PROCEDURE qes_read_{{type|function_name}}
   {%- endfor %}
   END INTERFACE qes_read
   !
   CONTAINS
   !
-  {%- for type in xsd_schema.complex_types %}
-{% include "read_subroutine.f90.j2" %}
+  {%- for type in schema.complex_types %}
+{% include "read/read_subroutine.f90.jinja" %}
   {%- endfor %}
   !
 END MODULE qes_read_module

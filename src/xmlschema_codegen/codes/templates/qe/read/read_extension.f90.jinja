@@ -1,31 +1,31 @@
-{%- if (type.extension_xsd_type_name=="vectorType") or (type.name == "vectorType") %}
-    ALLOCATE (obj%{{type.name.replace('Type','')}}(obj%size))
-    CALL extractDataContent(xml_node, obj%{{type.name.replace('Type','')}} )
+{%- if type.is_derived(schema.types['vectorType']) %}
+    ALLOCATE (obj%{{type.local_name.replace('Type','')}}(obj%size))
+    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','')}} )
     !
-{%- elif (type.extension_xsd_type_name=="matrixType") or (type.name=="matrixType") %}
+{%- elif type.is_derived(schema.types['matrixType']) %}
     length = 1
     DO i =1, obj%rank
        length = length * obj%dims(i)
     END DO
-    ALLOCATE (obj%{{type.name.replace('Type','')}}(length) )
-    CALL extractDataContent(xml_node, obj%{{type.name.replace('Type','') }} )
+    ALLOCATE (obj%{{type.local_name.replace('Type','')}}(length) )
+    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','') }} )
     !
-{%- elif (type.extension_xsd_type_name=="integerMatrixType") or (type.name=="integerMatrixType") %}
+{%- elif type.is_derived(schema.types['integerMatrixType']) %}
     length = 1
     DO i = 1, obj%rank
         length = length * obj%dims(i)
     END DO
-    ALLOCATE(obj%{{type.name.replace('Type','')}}(length))
-    CALL extractDataContent(xml_node, obj%{{type.name.replace('Type','')}})
+    ALLOCATE(obj%{{type.local_name.replace('Type','')}}(length))
+    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','')}})
     !
-{%- elif (type.extension_xsd_type_name =="integerVectorType") or (type.name == "integerVectorType") %}
-    ALLOCATE (obj%{{type.name.replace('Type','')}}(obj%size))
-    CALL extractDataContent(xml_node, obj%{{type.name.replace('Type','')}})
+{%- elif type.is_derived(schema.types['integerVectorType']) %}
+    ALLOCATE (obj%{{type.local_name.replace('Type','')}}(obj%size))
+    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','')}})
     !
-{%- elif (type.extension_xsd_type_name=="doubleListType") %}
+{%- elif type.is_derived(schema.types['doubleListType']) %}
     !CALL extractDataContent(xml_node, obj%???? ) NEVER HAPPENED
     !
 {%- else %}
-    CALL extractDataContent(xml_node, obj%{{type.name.replace('Type', '')}} )
+    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type', '')}} )
     !
 {%- endif %}

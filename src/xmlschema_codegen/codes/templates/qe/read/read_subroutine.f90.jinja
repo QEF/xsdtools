@@ -1,35 +1,153 @@
   !
-  SUBROUTINE {{type.read_function_name()}}(xml_node, obj, ierr )
+  SUBROUTINE qes_read_{{type|function_name}}(xml_node, obj, ierr )
     !
     IMPLICIT NONE
     !
     TYPE(Node), INTENT(IN), POINTER                 :: xml_node
-    TYPE({{type.fortran_type_name()}}), INTENT(OUT) :: obj
+    TYPE({{type|type_name}}), INTENT(OUT) :: obj
     INTEGER, OPTIONAL, INTENT(INOUT)                  :: ierr
     !
     TYPE(Node), POINTER :: tmp_node
     TYPE(NodeList), POINTER :: tmp_node_list
     INTEGER :: tmp_node_list_size, index, iostat_
-    {%- if type.extension_xsd_type_name in ["matrixType", "integerMatrixType"] or
-    type.name in ["matrixType", "integerMatrixType"] %}
+    {%- if (type|is_matrix_type) %}
     INTEGER :: i, length
     {%- endif %}
     !
     obj%tagname = getTagName(xml_node)
     !
-{% with type_name=type.name, attributes=type.attributes %}
-{%- include "read_attributes.f90.j2" %}
-{% endwith %}
-{% with type_name=type.extension_xsd_type_name, attributes=type.extension_attributes(xsd_schema.sorted_complex_types()) %}
-{%- include "read_attributes.f90.j2" %}
-{% endwith %}
+{#- Insert attributes #}
+{%- for attribute in type.attributes.values() %}
+    IF (hasAttribute(xml_node, "{{attribute.local_name}}")) THEN
+      CALL extractDataAttribute(xml_node, "{{attribute.local_name}}", obj%{{attribute.local_name}})
+  {%- if attribute.is_required() %}
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: {{ type.local_name }}",&
+                        "required attribute {{ attribute.local_name }} not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: {{ type.local_name }}",&
+                      "required attribute {{ attribute.local_name }} not found", 10 )
+      END IF
+  {%- else %}
+      obj%{{attribute.local_name}}_ispresent = .TRUE.
+    ELSE
+      obj%{{attribute.local_name}}_ispresent = .FALSE.
+  {%- endif %}
+    END IF
     !
-{%- include "read_sequence.f90.j2" %}
+{%- endfor %}
+    !
+{#- Insert children #}
+{%- if type.has_complex_content() %}
+{%- for element in type.content_type.iter_elements() %}
+    tmp_node_list => getElementsByTagname(xml_node, "{{element.local_name}}")
+    tmp_node_list_size = getLength(tmp_node_list)
+    !
+{%- if element.min_occurs == element.max_occurs %}
+    IF (tmp_node_list_size /= {{element.min_occurs}}) THEN
+        IF (PRESENT(ierr) ) THEN
+           CALL infomsg("qes_read:{{type.local_name}}","{{ element.local_name}}: wrong number of occurrences")
+           ierr = ierr + 1
+        ELSE
+           CALL errore("qes_read:{{type.local_name}}","{{ element.local_name}}: wrong number of occurrences",10)
+        END IF
+    END IF
+{%- else %}
+    {%- if element.min_occurs %}
+    IF (tmp_node_list_size < {{element.min_occurs}}) THEN
+        IF (PRESENT(ierr) ) THEN
+           CALL infomsg("qes_read:{{type.local_name}}","{{element.local_name}}: not enough elements")
+           ierr = ierr + 1
+        ELSE
+           CALL errore("qes_read:{{type.local_name}}","{{element.local_name}}: not enough elements",10)
+        END IF
+    END IF
+    {%- endif %}
+    {%- if element.max_occurs %}
+    IF (tmp_node_list_size > {{element.max_occurs}}) THEN
+        IF (PRESENT(ierr) ) THEN
+           CALL infomsg("qes_read:{{type.local_name}}","{{element.local_name}}: too many occurrences")
+           ierr = ierr + 1
+        ELSE
+           CALL errore("qes_read:{{type.local_name}}","{{element.local_name}}: too many occurrences",10)
+        END IF
+    END IF
+    {%- endif %}
+{%- endif %}
+    !
+{%- if element.min_occurs == 0 and element.max_occurs==1 %}
+    IF (tmp_node_list_size>0) THEN
+      obj%{{element.local_name}}_ispresent = .TRUE.
+      tmp_node => item(tmp_node_list, 0)
+  {%- if (element.type|is_qes_type) and element.type.is_complex() %}
+      CALL qes_read_{{element.type|function_name}}(tmp_node, obj%{{element.local_name}}, ierr )
+  {%- else %}
+      CALL extractDataContent(tmp_node, obj%{{element.local_name}} , IOSTAT = iostat_)
+      IF ( iostat_ /= 0 ) THEN
+         IF ( PRESENT (ierr ) ) THEN
+            CALL infomsg("qes_read:{{type.local_name}}","error reading {{element.local_name}}")
+            ierr = ierr + 1
+         ELSE
+            CALL errore ("qes_read:{{type.local_name}}","error reading {{element.local_name}}",10)
+         END IF
+      END IF
+  {%- endif %}
+    ELSE
+       obj%{{element.local_name}}_ispresent = .FALSE.
+    END IF
+{%- elif element.min_occurs==1 and element.max_occurs==1 %}
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+  {%- if (element.type|is_qes_type) and element.type.is_complex() %}
+       CALL qes_read_{{element.type|function_name}}(tmp_node, obj%{{element.local_name}}, ierr )
+  {%- else %}
+       CALL extractDataContent(tmp_node, obj%{{element.local_name}}, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:{{type.local_name}}","error reading {{element.local_name}}")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:{{type.local_name}}","error reading {{element.local_name}}",10)
+       END IF
+    END IF
+  {%- endif %}
+{%- else %}
+    {%- if element.min_occurs == 0 %}
+    IF (tmp_node_list_size>0) THEN
+      obj%{{element.local_name}}_ispresent = .TRUE.
+    ELSE
+      obj%{{element.local_name}}_ispresent = .FALSE.
+    END IF
+    {%- endif %}
+    obj%ndim_{{element.local_name}} = tmp_node_list_size
+    ALLOCATE(obj%{{element.local_name}}(tmp_node_list_size))
+    DO index=1,tmp_node_list_size
+        tmp_node => item( tmp_node_list, index-1 )
+        {%- if (element.type|is_qes_type) and element.type.is_complex() %}
+        CALL qes_read_{{element.type|function_name}}(tmp_node, obj%{{element.local_name}}(index), ierr )
+        {%- else %}
+        CALL extractDataContent(tmp_node, obj%{{element.tag_name}}(index), IOSTAT = iostat_ )
+        IF ( iostat_ /= 0 ) THEN
+           IF ( PRESENT (ierr ) ) THEN
+              CALL infomsg("qes_read:{{type.local_name}}","error reading {{element.local_name}}")
+              ierr = ierr + 1
+           ELSE
+              CALL errore ("qes_read:{{type.local_name}}","error reading {{ element.local_name}}",10)
+           END IF
+        END IF
+        {%- endif %}
+    END DO
+{%- endif %}
+    !
+{%- endfor %}
+{%- endif %}
     !
 {%- if type.extension_xsd_type_name != None %}
-{%- include "read_extension.f90.j2" %}
+{%- include "read/read_extension.f90.jinja" %}
 {%- endif %}
     obj%lwrite = .TRUE.
     !
-  END SUBROUTINE {{type.read_function_name()}}
+  END SUBROUTINE qes_read_{{type|function_name}}
   !

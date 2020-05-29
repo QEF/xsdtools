@@ -257,9 +257,7 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    IF (obj%convergence_info_ispresent) &
-      CALL qes_reset_convergence_info(obj%convergence_info)
-    obj%convergence_info_ispresent = .FALSE.
+    CALL qes_reset_convergence_info(obj%convergence_info)
     CALL qes_reset_algorithmic_info(obj%algorithmic_info)
     CALL qes_reset_atomic_species(obj%atomic_species)
     CALL qes_reset_atomic_structure(obj%atomic_structure)
@@ -402,7 +400,6 @@ MODULE qes_reset_module
     CALL qes_reset_cell(obj%cell)
     obj%alat_ispresent = .FALSE.
     obj%bravais_index_ispresent = .FALSE.
-    obj%use_alternative_axes_ispresent = .FALSE.
     !
   END SUBROUTINE qes_reset_atomic_structure
   !
@@ -509,16 +506,7 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    IF (obj%qpoint_grid_ispresent) &
-      CALL qes_reset_qpoint_grid(obj%qpoint_grid)
-    obj%qpoint_grid_ispresent = .FALSE.
-    obj%ecutfock_ispresent = .FALSE.
-    obj%exx_fraction_ispresent = .FALSE.
-    obj%screening_parameter_ispresent = .FALSE.
-    obj%exxdiv_treatment_ispresent = .FALSE.
-    obj%x_gamma_extrapolation_ispresent = .FALSE.
-    obj%ecutvcut_ispresent = .FALSE.
-    obj%localization_threshold_ispresent = .FALSE.
+    CALL qes_reset_qpoint_grid(obj%qpoint_grid)
     !
   END SUBROUTINE qes_reset_hybrid
   !
@@ -658,10 +646,10 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    obj%size = 0
     IF (ALLOCATED(obj%starting_ns)) THEN
       DEALLOCATE(obj%starting_ns)
     ENDIF
+    obj%size = 0
     !
   END SUBROUTINE qes_reset_starting_ns
   !
@@ -675,14 +663,14 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
+    IF (ALLOCATED(obj%Hubbard_ns)) THEN
+      DEALLOCATE(obj%Hubbard_ns)
+    ENDIF
     IF (ALLOCATED(obj%dims)) THEN
       DEALLOCATE(obj%dims)
     ENDIF
     obj%rank = 0
     obj%order = 'F'
-    IF (ALLOCATED(obj%Hubbard_ns)) THEN
-      DEALLOCATE(obj%Hubbard_ns)
-    ENDIF
     !
   END SUBROUTINE qes_reset_Hubbard_ns
   !
@@ -697,12 +685,7 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    obj%vdw_corr_ispresent = .FALSE.
-    obj%dftd3_version_ispresent = .FALSE.
-    obj%dftd3_threebody_ispresent = .FALSE.
     obj%non_local_term_ispresent = .FALSE.
-    obj%functional_ispresent = .FALSE.
-    obj%total_energy_term_ispresent = .FALSE.
     obj%london_s6_ispresent = .FALSE.
     obj%ts_vdw_econv_thr_ispresent = .FALSE.
     obj%ts_vdw_isolated_ispresent = .FALSE.
@@ -877,10 +860,7 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    obj%real_space_q_ispresent = .FALSE.
-    obj%real_space_beta_ispresent = .FALSE.
     obj%diago_cg_maxiter_ispresent = .FALSE.
-    obj%diago_ppcg_maxiter_ispresent = .FALSE.
     obj%diago_david_ndim_ispresent = .FALSE.
     !
   END SUBROUTINE qes_reset_electron_control
@@ -1168,10 +1148,10 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    obj%size = 0
     IF (ALLOCATED(obj%inputOccupations)) THEN
       DEALLOCATE(obj%inputOccupations)
     ENDIF
+    obj%size = 0
     !
   END SUBROUTINE qes_reset_inputOccupations
   !
@@ -1389,7 +1369,6 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    obj%real_space_beta_ispresent = .FALSE.
     !
   END SUBROUTINE qes_reset_algorithmic_info
   !
@@ -1443,10 +1422,10 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    obj%size = 0
     IF (ALLOCATED(obj%equivalent_atoms)) THEN
       DEALLOCATE(obj%equivalent_atoms)
     ENDIF
+    obj%size = 0
     !
   END SUBROUTINE qes_reset_equivalent_atoms
   !
@@ -1511,7 +1490,6 @@ MODULE qes_reset_module
     obj%efieldcorr_ispresent = .FALSE.
     obj%potentiostat_contr_ispresent = .FALSE.
     obj%gatefield_contr_ispresent = .FALSE.
-    obj%vdW_term_ispresent = .FALSE.
     !
   END SUBROUTINE qes_reset_total_energy
   !
@@ -1526,13 +1504,11 @@ MODULE qes_reset_module
     obj%lwrite  = .FALSE.
     obj%lread  = .FALSE.
     !
-    obj%nbnd_ispresent = .FALSE.
     obj%nbnd_up_ispresent = .FALSE.
     obj%nbnd_dw_ispresent = .FALSE.
     obj%num_of_atomic_wfc_ispresent = .FALSE.
     obj%fermi_energy_ispresent = .FALSE.
     obj%highestOccupiedLevel_ispresent = .FALSE.
-    obj%lowestUnoccupiedLevel_ispresent = .FALSE.
     obj%two_fermi_energies_ispresent = .FALSE.
     CALL qes_reset_k_points_IBZ(obj%starting_k_points)
     CALL qes_reset_occupations(obj%occupations_kind)

@@ -23,7 +23,7 @@ setup(
             'xmlschema-codegen=xmlschema_codegen.__main__:main',
         ]
     },
-    install_requires=['xmlschema>=1.1.0', 'jinja2'],
+    install_requires=['xmlschema>=1.2.0', 'jinja2'],
     author='Davide Brunato et al.',
     url='https://github.com/sissaschool/xmlschema-codegen',
     license='BSD 3-Clause',

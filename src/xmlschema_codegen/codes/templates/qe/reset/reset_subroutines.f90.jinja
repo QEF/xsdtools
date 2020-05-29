@@ -51,27 +51,26 @@
 {%- endfor %}
 {%- endif %}
 {#- Deallocate arrays #}
-{%- if (type|is_qes_array_type) %}
+{%- if (type|is_matrix_type) or (type|is_vector_type) %}
     IF (ALLOCATED(obj%{{type.local_name.replace('Type','')}})) THEN
       DEALLOCATE(obj%{{type.local_name.replace('Type','')}})
     ENDIF
 {%- endif %}
 {#- Insert attributes #}
-{%- if type.local_name in ["matrixType", "integerMatrixType"] %}
+{%- if (type|is_matrix_type) %}
     IF (ALLOCATED(obj%dims)) THEN
       DEALLOCATE(obj%dims)
     ENDIF
     obj%rank = 0
     obj%order = 'F'
-{%- elif type.local_name in ["vectorType", "integerVectorType"] %}
+{%- elif (type|is_vector_type) %}
     obj%size = 0
-{%- else %}
+{%- endif %}
   {%- for attribute in type.attributes.values() %}
     {%- if attribute.is_optional() %}
     obj%{{attribute.local_name}}_ispresent = .FALSE.
     {%- endif %}
   {%- endfor %}
-{%- endif %}
     !
   END SUBROUTINE qes_reset_{{type|function_name}}
   !
