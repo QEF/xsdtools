@@ -154,6 +154,9 @@ class TestAbstractGenerator(unittest.TestCase):
             self.generator.render('sort_types_filter_test.jinja'), ['type4type1type2type3']
         )
 
+    def test_extension_test(self):
+        pass
+
 
 class TestCGenerator(TestAbstractGenerator):
 

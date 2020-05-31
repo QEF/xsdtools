@@ -19,7 +19,7 @@ import xmlschema
 from xmlschema.validators import XsdType, XsdElement, XsdAttribute
 
 from .helpers import NCNAME_PATTERN, QNAME_PATTERN, \
-    is_shell_wildcard, xsd_qname, filter_method
+    is_shell_wildcard, xsd_qname, filter_method, test_method
 
 logger = logging.getLogger('xmlschema-codegen')
 logging_formatter = logging.Formatter('[%(levelname)s] %(message)s')
@@ -38,6 +38,7 @@ class GeneratorMeta(ABCMeta):
         formal_language = None
         default_paths = []
         default_filters = {}
+        default_tests = {}
         builtin_types = {}
         for base in bases:
             if getattr(base, 'formal_language', None):
@@ -51,6 +52,8 @@ class GeneratorMeta(ABCMeta):
                 default_paths.extend(base.default_paths)
             if hasattr(base, 'default_filters'):
                 default_filters.update(base.default_filters)
+            if hasattr(base, 'default_tests'):
+                default_tests.update(base.default_tests)
             if getattr(base, 'builtin_types', None):
                 builtin_types.update(base.builtin_types)
 
@@ -80,12 +83,17 @@ class GeneratorMeta(ABCMeta):
             if inspect.isfunction(v):
                 if getattr(v, 'is_filter', False):
                     default_filters[k] = v
+                elif getattr(v, 'is_test', False):
+                    default_tests[k] = v
             elif inspect.isroutine(v):
                 # static and class methods
                 if getattr(v.__func__, 'is_filter', False):
                     default_filters[k] = v
+                elif getattr(v.__func__, 'is_test', False):
+                    default_tests[k] = v
 
         attrs['default_filters'] = default_filters
+        attrs['default_tests'] = default_tests
 
         try:
             for k, v in attrs['builtin_types'].items():
@@ -108,6 +116,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     :param schema: the XSD schema instance.
     :param searchpath: additional search path for custom templates.
     :param filters: additional custom filter functions.
+    :param test: additional custom tests functions.
     :param types_map: a dictionary with custom mapping for XSD types.
     """
     formal_language = None
@@ -119,13 +128,16 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     default_filters = None
     """Default filter functions."""
 
+    default_tests = None
+    """Default test functions."""
+
     builtin_types = {
         'anyType': '',
         'anySimpleType': '',
     }
     """Translation map for XSD builtin types."""
 
-    def __init__(self, schema, searchpath=None, filters=None, types_map=None):
+    def __init__(self, schema, searchpath=None, filters=None, tests=None, types_map=None):
         if isinstance(schema, xmlschema.XMLSchemaBase):
             self.schema = schema
         else:
@@ -155,6 +167,17 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         if filters:
             self.filters.update(filters)
 
+        self.tests = dict(self.default_tests)
+        for name, func in self.default_tests.items():
+            if isinstance(func, (staticmethod, classmethod)) or \
+                    func.__name__ != func.__qualname__:
+                # Replace unbound method with instance bound one
+                self.tests[name] = getattr(self, name)
+            else:
+                self.tests[name] = func
+        if tests:
+            self.tests.update(tests)
+
         type_mapping_filter = '{}_type'.format(self.formal_language).lower().replace(' ', '_')
         if type_mapping_filter not in self.filters:
             self.filters[type_mapping_filter] = self.map_type
@@ -169,6 +192,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
         self._env = Environment(loader=loader)
         self._env.filters.update(self.filters)
+        self._env.tests.update(self.tests)
 
     def __repr__(self):
         return '%s(xsd_file=%r, searchpath=%r)' % (
@@ -180,6 +204,13 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         """Registers a function as default filter for the code generator."""
         cls.default_filters[func.__name__] = func
         func.is_filter = True
+        return func
+
+    @classmethod
+    def register_test(cls, func):
+        """Registers a function as default test for the code generator."""
+        cls.default_tests[func.__name__] = func
+        func.is_test = True
         return func
 
     @property
@@ -495,3 +526,36 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
         assert len(xsd_types) == len(ordered_types)
         return ordered_types
+
+    def is_derived(self, xsd_type, *names, derivation=None):
+        for type_name in names:
+            if not isinstance(type_name, str) or not type_name:
+                continue
+            elif type_name[0] == '{':
+                if xsd_type.is_derived(self.schema.maps.types[type_name], derivation):
+                    return True
+            elif ':' in type_name:
+                try:
+                    other = self.schema.resolve_qname(type_name)
+                except xmlschema.XMLSchemaException:
+                    continue
+                else:
+                    if xsd_type.is_derived(other, derivation):
+                        return True
+            else:
+                if xsd_type.is_derived(self.schema.types[type_name], derivation):
+                    return True
+
+        return False
+
+    @test_method
+    def derivation(self, xsd_type, *names):
+        return self.is_derived(xsd_type, *names)
+
+    @test_method
+    def extension(self, xsd_type, *names):
+        return self.is_derived(xsd_type, *names, derivation='extension')
+
+    @test_method
+    def restriction(self, xsd_type, *names):
+        return self.is_derived(xsd_type, *names, derivation='restriction')

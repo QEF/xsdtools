@@ -21,7 +21,7 @@
     {%- endif %}
     obj%{{ element.local_name }}_ispresent = .FALSE.
   {%- elif element.min_occurs == 1 and element.max_occurs == 1 %}
-    {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+    {%- if ( element.type.schema is sameas schema ) and element.type.is_complex() %}
     CALL qes_reset_{{ element|type_name }}(obj%{{ element.local_name }})
     {%- endif %}
   {%- elif element.min_occurs == 0 %}
@@ -51,13 +51,13 @@
 {%- endfor %}
 {%- endif %}
 {#- Deallocate arrays #}
-{%- if ( type|is_matrix_type ) or ( type|is_vector_type ) %}
+{%- if type is extension('matrixType', 'integerMatrixType', 'vectorType', 'integerVectorType') %}
     IF (ALLOCATED(obj%{{ type|type_name }})) THEN
       DEALLOCATE(obj%{{ type|type_name }})
     ENDIF
 {%- endif %}
 {#- Insert attributes #}
-{%- if ( type|is_matrix_type ) %}
+{%- if type is extension('matrixType','integerMatrixType') %}
     IF (ALLOCATED(obj%dims)) THEN
       DEALLOCATE(obj%dims)
     ENDIF

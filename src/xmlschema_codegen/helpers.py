@@ -40,3 +40,9 @@ def filter_method(func):
     """Marks a method for registration as template filter."""
     func.is_filter = True
     return func
+
+
+def test_method(func):
+    """Marks a method for registration as template test."""
+    func.is_test = True
+    return func
