@@ -46,18 +46,6 @@ class QEFortranGenerator(FortranGenerator):
 
     @staticmethod
     @filter_method
-    def type_name(obj):
-        if isinstance(obj, XsdType):
-            name = obj.local_name or ''
-        elif isinstance(obj, (XsdAttribute, XsdElement)):
-            name = obj.type.local_name or ''
-        else:
-            return ''
-
-        return name[:-4] + '_type' if name.endswith('Type') else name
-
-    @staticmethod
-    @filter_method
     def read_function_name(xsd_type):
         if xsd_type.is_simple():
             return 'extractDataContent'
@@ -87,15 +75,6 @@ class QEFortranGenerator(FortranGenerator):
         if xsd_type.is_simple():
             return "xml_addCharacters"
         return 'qes_write_' + xsd_type.local_name.replace('Type', '')
-
-    @staticmethod
-    @filter_method
-    def function_name(xsd_type):
-        name = xsd_type.local_name or ''
-        if name.endswith('Type'):
-            return name.replace('Type', '')
-        else:
-            return name
 
     @filter_method
     def is_qes_array_type(self, xsd_type):

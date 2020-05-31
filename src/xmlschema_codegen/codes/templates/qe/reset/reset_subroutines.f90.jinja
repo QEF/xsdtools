@@ -1,8 +1,8 @@
   !
-  SUBROUTINE qes_reset_{{type|function_name}}(obj)
+  SUBROUTINE qes_reset_{{ type|type_name }}(obj)
     !
     IMPLICIT NONE
-    TYPE({{ type|type_name }}),INTENT(INOUT)    :: obj
+    TYPE({{ type|type_name('_type') }}),INTENT(INOUT)    :: obj
     {%- if ( type|has_multi_sequence ) %}
     INTEGER :: i
     {%- endif %}
@@ -12,65 +12,65 @@
     obj%lread  = .FALSE.
     !
 {#- Insert children #}
-{%- if not type.has_simple_content() %}
+{%- if type.has_complex_content() %}
 {%- for element in type.content_type.iter_elements() %}
   {%- if element.min_occurs == 0 and element.max_occurs == 1 %}
-    {%- if (element.type|is_qes_type) and element.type.is_complex() %}
-    IF (obj%{{element.local_name}}_ispresent) &
-      CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}})
+    {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+    IF (obj%{{ element.local_name }}_ispresent) &
+      CALL qes_reset_{{ element|type_name }}(obj%{{ element.local_name }})
     {%- endif %}
-    obj%{{element.local_name}}_ispresent = .FALSE.
+    obj%{{ element.local_name }}_ispresent = .FALSE.
   {%- elif element.min_occurs == 1 and element.max_occurs == 1 %}
-    {%- if (element.type|is_qes_type) and element.type.is_complex() %}
-    CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}})
+    {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+    CALL qes_reset_{{ element|type_name }}(obj%{{ element.local_name }})
     {%- endif %}
   {%- elif element.min_occurs == 0 %}
-    IF (obj%{{element.local_name}}_ispresent) THEN
-      IF (ALLOCATED(obj%{{element.local_name}})) THEN
-        {%- if (element.type|is_qes_type) and element.type.is_complex() %}
-        DO i=1, SIZE(obj%{{element.local_name}})
-          CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}}(i))
+    IF (obj%{{ element.local_name }}_ispresent) THEN
+      IF (ALLOCATED(obj%{{ element.local_name }})) THEN
+        {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+        DO i=1, SIZE(obj%{{ element.local_name }})
+          CALL qes_reset_{{ element|type_name }}(obj%{{element.local_name}}(i))
         ENDDO
         {%- endif %}
-        DEALLOCATE(obj%{{element.local_name}})
+        DEALLOCATE(obj%{{ element.local_name }})
       ENDIF
-      obj%ndim_{{element.local_name}} = 0
-      obj%{{element.local_name}}_ispresent = .FALSE.
+      obj%ndim_{{ element.local_name }} = 0
+      obj%{{ element.local_name }}_ispresent = .FALSE.
     ENDIF
   {%- else %}
-    IF (ALLOCATED(obj%{{element.local_name}})) THEN
-      {%- if (element.type|is_qes_type) and element.type.is_complex() %}
-      DO i=1, SIZE(obj%{{element.local_name}})
-        CALL qes_reset_{{element.type|function_name}}(obj%{{element.local_name}}(i))
+    IF (ALLOCATED(obj%{{ element.local_name }})) THEN
+      {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+      DO i=1, SIZE(obj%{{ element.local_name }})
+        CALL qes_reset_{{ element|type_name }}(obj%{{ element.local_name }}(i))
       ENDDO
       {%- endif %}
-      DEALLOCATE(obj%{{element.local_name}})
+      DEALLOCATE(obj%{{ element.local_name }})
     ENDIF
-    obj%ndim_{{element.local_name}} = 0
+    obj%ndim_{{ element.local_name }} = 0
   {%- endif %}
 {%- endfor %}
 {%- endif %}
 {#- Deallocate arrays #}
-{%- if (type|is_matrix_type) or (type|is_vector_type) %}
-    IF (ALLOCATED(obj%{{type.local_name.replace('Type','')}})) THEN
-      DEALLOCATE(obj%{{type.local_name.replace('Type','')}})
+{%- if ( type|is_matrix_type ) or ( type|is_vector_type ) %}
+    IF (ALLOCATED(obj%{{ type|type_name }})) THEN
+      DEALLOCATE(obj%{{ type|type_name }})
     ENDIF
 {%- endif %}
 {#- Insert attributes #}
-{%- if (type|is_matrix_type) %}
+{%- if ( type|is_matrix_type ) %}
     IF (ALLOCATED(obj%dims)) THEN
       DEALLOCATE(obj%dims)
     ENDIF
     obj%rank = 0
     obj%order = 'F'
-{%- elif (type|is_vector_type) %}
+{%- elif ( type|is_vector_type ) %}
     obj%size = 0
 {%- endif %}
   {%- for attribute in type.attributes.values() %}
     {%- if attribute.is_optional() %}
-    obj%{{attribute.local_name}}_ispresent = .FALSE.
+    obj%{{ attribute.local_name }}_ispresent = .FALSE.
     {%- endif %}
   {%- endfor %}
     !
-  END SUBROUTINE qes_reset_{{type|function_name}}
+  END SUBROUTINE qes_reset_{{ type|type_name }}
   !

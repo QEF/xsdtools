@@ -1,31 +1,31 @@
 {%- if type.is_derived(schema.types['vectorType']) %}
-    ALLOCATE (obj%{{type.local_name.replace('Type','')}}(obj%size))
-    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','')}} )
+    ALLOCATE (obj%{{ type|type_name }}(obj%size))
+    CALL extractDataContent(xml_node, obj%{{ type|type_name }} )
     !
 {%- elif type.is_derived(schema.types['matrixType']) %}
     length = 1
     DO i =1, obj%rank
        length = length * obj%dims(i)
     END DO
-    ALLOCATE (obj%{{type.local_name.replace('Type','')}}(length) )
-    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','') }} )
+    ALLOCATE (obj%{{ type|type_name }}(length) )
+    CALL extractDataContent(xml_node, obj%{{ type|type_name }} )
     !
 {%- elif type.is_derived(schema.types['integerMatrixType']) %}
     length = 1
     DO i = 1, obj%rank
         length = length * obj%dims(i)
     END DO
-    ALLOCATE(obj%{{type.local_name.replace('Type','')}}(length))
-    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','')}})
+    ALLOCATE(obj%{{ type|type_name }}(length))
+    CALL extractDataContent(xml_node, obj%{{ type|type_name }})
     !
 {%- elif type.is_derived(schema.types['integerVectorType']) %}
-    ALLOCATE (obj%{{type.local_name.replace('Type','')}}(obj%size))
-    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type','')}})
+    ALLOCATE (obj%{{ type|type_name }}(obj%size))
+    CALL extractDataContent(xml_node, obj%{{ type|type_name }})
     !
 {%- elif type.is_derived(schema.types['doubleListType']) %}
     !CALL extractDataContent(xml_node, obj%???? ) NEVER HAPPENED
     !
 {%- else %}
-    CALL extractDataContent(xml_node, obj%{{type.local_name.replace('Type', '')}} )
+    CALL extractDataContent(xml_node, obj%{{ type|type_name }} )
     !
 {%- endif %}

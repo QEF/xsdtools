@@ -117,25 +117,15 @@ class TestAbstractGenerator(unittest.TestCase):
             with self.assertRaises(KeyError):
                 self.generator.filters['instance_filter'](dt)
 
-    def test_local_name_filter(self):
+    def test_name_filter(self):
         xsd_element = self.schema.elements['root']
-        self.assertEqual(self.generator.filters['local_name'](xsd_element), 'root')
-        self.assertListEqual(self.generator.render('local_name_filter_test.jinja'), ['root'])
+        self.assertEqual(self.generator.filters['name'](xsd_element), 'root')
+        self.assertListEqual(self.generator.render('name_filter_test.jinja'), ['root'])
 
     def test_qname_filter(self):
         xsd_element = self.schema.elements['root']
-        self.assertEqual(self.generator.filters['qname'](xsd_element), 'tns:root')
-        self.assertListEqual(self.generator.render('qname_filter_test.jinja'), ['tns:root'])
-
-    def test_tag_name_filter(self):
-        xsd_element = self.schema.elements['root']
-        self.assertEqual(self.generator.filters['tag_name'](xsd_element), 'root')
-        self.assertListEqual(self.generator.render('tag_name_filter_test.jinja'), ['root'])
-
-    def test_type_name_filter(self):
-        xsd_element = self.schema.elements['root']
-        self.assertEqual(self.generator.filters['type_name'](xsd_element), 'string')
-        self.assertListEqual(self.generator.render('type_name_filter_test.jinja'), ['string'])
+        self.assertEqual(self.generator.filters['qname'](xsd_element), 'tns__root')
+        self.assertListEqual(self.generator.render('qname_filter_test.jinja'), ['tns__root'])
 
     def test_namespace_filter(self):
         xsd_element = self.schema.elements['root']
@@ -143,24 +133,25 @@ class TestAbstractGenerator(unittest.TestCase):
         self.assertEqual(self.generator.filters['namespace'](xsd_element), tns)
         self.assertListEqual(self.generator.render('namespace_filter_test.jinja'), [tns])
 
-    def test_sorted_types_filter(self):
+    def test_type_name_filter(self):
+        xsd_element = self.schema.elements['root']
+        self.assertEqual(self.generator.filters['type_name'](xsd_element), 'string')
+        self.assertListEqual(self.generator.render('type_name_filter_test.jinja'), ['string'])
+
+    def test_type_qname_filter(self):
+        xsd_element = self.schema.elements['root']
+        self.assertEqual(self.generator.filters['type_qname'](xsd_element), 'xs__string')
+        self.assertListEqual(
+            self.generator.render('type_qname_filter_test.jinja'), ['xs__string'])
+
+    def test_sort_types_filter(self):
         xsd_types = self.schema.types
         self.assertListEqual(
-            self.generator.filters['sorted_types'](xsd_types),
+            self.generator.filters['sort_types'](xsd_types),
             [xsd_types['type4'], xsd_types['type1'], xsd_types['type2'], xsd_types['type3']]
         )
         self.assertListEqual(
-            self.generator.render('sorted_types_filter_test.jinja'), ['type4type1type2type3']
-        )
-
-    def test_sorted_complex_types_filter(self):
-        xsd_types = self.schema.types
-        self.assertListEqual(
-            self.generator.filters['sorted_complex_types'](xsd_types),
-            [xsd_types['type1'], xsd_types['type2'], xsd_types['type3']]
-        )
-        self.assertListEqual(
-            self.generator.render('sorted_complex_types_filter_test.jinja'), ['type1type2type3']
+            self.generator.render('sort_types_filter_test.jinja'), ['type4type1type2type3']
         )
 
 

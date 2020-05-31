@@ -18,8 +18,8 @@ from jinja2 import Environment, ChoiceLoader, FileSystemLoader, \
 import xmlschema
 from xmlschema.validators import XsdType, XsdElement, XsdAttribute
 
-from .helpers import NCNAME_PATTERN, QNAME_PATTERN, is_shell_wildcard, xsd_qname, \
-    filter_method
+from .helpers import NCNAME_PATTERN, QNAME_PATTERN, \
+    is_shell_wildcard, xsd_qname, filter_method
 
 logger = logging.getLogger('xmlschema-codegen')
 logging_formatter = logging.Formatter('[%(levelname)s] %(message)s')
@@ -155,9 +155,9 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         if filters:
             self.filters.update(filters)
 
-        xsd_type_filter = '{}_type'.format(self.formal_language).lower().replace(' ', '_')
-        if xsd_type_filter not in self.filters:
-            self.filters[xsd_type_filter] = self.map_type
+        type_mapping_filter = '{}_type'.format(self.formal_language).lower().replace(' ', '_')
+        if type_mapping_filter not in self.filters:
+            self.filters[type_mapping_filter] = self.map_type
 
         self.types_map = self.builtin_types.copy()
         if types_map:
@@ -193,13 +193,13 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     def matching_templates(self, name):
         return self._env.list_templates(filter_func=lambda x: fnmatch(x, name))
 
-    def get_template(self, name, parent=None, globals=None):
-        return self._env.get_template(name, parent, globals)
+    def get_template(self, name, parent=None, global_vars=None):
+        return self._env.get_template(name, parent, global_vars)
 
-    def select_template(self, names, parent=None, globals=None):
-        return self._env.select_template(names, parent, globals)
+    def select_template(self, names, parent=None, global_vars=None):
+        return self._env.select_template(names, parent, global_vars)
 
-    def render(self, names, parent=None, globals=None):
+    def render(self, names, parent=None, global_vars=None):
         if isinstance(names, str):
             names = [names]
         elif not all(isinstance(x, str) for x in names):
@@ -208,7 +208,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         results = []
         for name in names:
             try:
-                template = self._env.get_template(name, parent, globals)
+                template = self._env.get_template(name, parent, global_vars)
             except TemplateNotFound as err:
                 logger.debug("name %r: %s", name, str(err))
             except TemplateAssertionError as err:
@@ -217,7 +217,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 results.append(template.render(schema=self.schema))
         return results
 
-    def render_to_files(self, names, parent=None, globals=None, output_dir='.', force=False):
+    def render_to_files(self, names, parent=None, global_vars=None, output_dir='.', force=False):
         if isinstance(names, str):
             names = [names]
         elif not all(isinstance(x, str) for x in names):
@@ -235,7 +235,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
         for name in template_names:
             try:
-                template = self._env.get_template(name, parent, globals)
+                template = self._env.get_template(name, parent, global_vars)
             except TemplateNotFound as err:
                 logger.debug("name %r: %s", name, str(err))
             except TemplateAssertionError as err:
@@ -245,12 +245,10 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 if not force and output_file.exists():
                     continue
 
-                result = template.render(schema=self.schema,
-                                         sorted_complex_types=self.sorted_complex_types(self.schema.types))
-                print(result)
+                result = template.render(schema=self.schema)
                 logger.info("write file %r", str(output_file))
-                # with open(output_file, 'w') as fp:
-                # fp.write(result)
+                with open(output_file, 'w') as fp:
+                    fp.write(result)
                 rendered.append(template.filename)
 
         return rendered
@@ -258,6 +256,8 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     def map_type(self, obj):
         """
         Maps an XSD type to a type declaration of the target language.
+        This method is registered as filter with a name dependant from
+        the language name (eg. c_type).
 
         :param obj: an XSD type or another type-related declaration as \
         an attribute or an element.
@@ -283,9 +283,17 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
     @staticmethod
     @filter_method
-    def local_name(obj):
+    def name(obj, unnamed='none'):
+        """
+        Get the unqualified name of the provided object. Invalid
+        chars for identifiers are replaced by an underscore.
+
+        :param obj: an XSD object or a named object or a string.
+        :param unnamed: value for unnamed objects. Defaults to 'none'.
+        :return: str
+        """
         try:
-            local_name = obj.local_name
+            name = obj.local_name
         except AttributeError:
             try:
                 obj = obj.name
@@ -293,30 +301,38 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 pass
 
             if not isinstance(obj, str):
-                return ''
+                return unnamed
 
             try:
                 if obj[0] == '{':
-                    _, local_name = obj.split('}')
+                    _, name = obj.split('}')
                 elif ':' in obj:
-                    prefix, local_name = obj.split(':')
+                    prefix, name = obj.split(':')
                     if NCNAME_PATTERN.match(prefix) is None:
                         return ''
                 else:
-                    local_name = obj
+                    name = obj
             except (IndexError, ValueError):
                 return ''
         else:
-            if not isinstance(local_name, str):
+            if not isinstance(name, str):
                 return ''
 
-        if NCNAME_PATTERN.match(local_name) is None:
-            return ''
-        return local_name
+        if NCNAME_PATTERN.match(name) is None:
+            return unnamed
+        return name.replace('.', '_').replace('-', '_')
 
-    @staticmethod
     @filter_method
-    def qname(obj):
+    def qname(self, obj, unnamed='none', sep='__'):
+        """
+        Get the QName of the provided object. Invalid chars for
+        identifiers are replaced by an underscore.
+
+        :param obj: an XSD object or a named object or a string.
+        :param unnamed: value for unnamed objects. Defaults to 'none'.
+        :param sep: the replacement for colon. Defaults to double underscore.
+        :return: str
+        """
         try:
             qname = obj.prefixed_name
         except AttributeError:
@@ -326,53 +342,25 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
                 pass
 
             if not isinstance(obj, str):
-                return ''
+                return unnamed
 
             try:
                 if obj[0] == '{':
-                    _, local_name = obj.split('}')
-                    return obj
+                    namespace, local_name = obj.split('}')
+                    for prefix, uri in self.schema.namespaces.items():
+                        if uri == namespace:
+                            qname = '%s:%s' % (uri, local_name)
+                            break
+                    else:
+                        qname = local_name
                 else:
                     qname = obj
             except (IndexError, ValueError):
-                return ''
+                return unnamed
 
-        if QNAME_PATTERN.match(qname) is None:
-            return ''
-        return qname
-
-    @staticmethod
-    @filter_method
-    def tag_name(obj):
-        try:
-            tag = obj.tag
-        except AttributeError:
-            return ''
-
-        if not isinstance(tag, str):
-            return ''
-
-        try:
-            if tag[0] == '{':
-                _, local_name = tag.split('}')
-            else:
-                local_name = tag
-        except (IndexError, ValueError):
-            return ''
-
-        if NCNAME_PATTERN.match(local_name) is None:
-            return ''
-        return local_name
-
-    @staticmethod
-    @filter_method
-    def type_name(obj):
-        if isinstance(obj, XsdType):
-            return obj.local_name or ''
-        elif isinstance(obj, (XsdAttribute, XsdElement)):
-            return obj.type.local_name or ''
-        else:
-            return ''
+        if not qname or QNAME_PATTERN.match(qname) is None:
+            return unnamed
+        return qname.replace('.', '_').replace('-', '_').replace(':', sep)
 
     @staticmethod
     @filter_method
@@ -398,7 +386,72 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
     @staticmethod
     @filter_method
-    def sorted_types(xsd_types, accept_circularity=False):
+    def type_name(obj, suffix=None, unnamed='none'):
+        """
+        Get the unqualified name of the XSD type. Invalid
+        chars for identifiers are replaced by an underscore.
+
+        :param obj: an instance of (XsdType|XsdAttribute|XsdElement).
+        :param suffix: force a suffix. For default removes '_type' or 'Type' suffixes.
+        :param unnamed: value for unnamed XSD types. Defaults to 'none'.
+        :return: str
+        """
+        if isinstance(obj, XsdType):
+            name = obj.local_name or unnamed
+        elif isinstance(obj, (XsdElement, XsdAttribute)):
+            name = obj.type.local_name or unnamed
+        else:
+            name = unnamed
+
+        if not name or NCNAME_PATTERN.match(name) is None:
+            name = unnamed
+
+        if name.endswith('Type'):
+            name = name[:-4]
+        elif name.endswith('_type'):
+            name = name[:-5]
+
+        if suffix:
+            name = '{}{}'.format(name, suffix)
+
+        return name.replace('.', '_').replace('-', '_')
+
+    @staticmethod
+    @filter_method
+    def type_qname(obj, suffix=None, unnamed='none', sep='__'):
+        """
+        Get the unqualified name of the XSD type. Invalid
+        chars for identifiers are replaced by an underscore.
+
+        :param obj: an instance of (XsdType|XsdAttribute|XsdElement).
+        :param suffix: force a suffix. For default removes '_type' or 'Type' suffixes.
+        :param unnamed: value for unnamed XSD types. Defaults to 'none'.
+        :param sep: the replacement for colon. Defaults to double underscore.
+        :return: str
+        """
+        if isinstance(obj, XsdType):
+            qname = obj.prefixed_name or unnamed
+        elif isinstance(obj, (XsdElement, XsdAttribute)):
+            qname = obj.type.prefixed_name or unnamed
+        else:
+            qname = unnamed
+
+        if not qname or QNAME_PATTERN.match(qname) is None:
+            qname = unnamed
+
+        if qname.endswith('Type'):
+            qname = qname[:-4]
+        elif qname.endswith('_type'):
+            qname = qname[:-5]
+
+        if suffix:
+            qname = '{}{}'.format(qname, suffix)
+
+        return qname.replace('.', '_').replace('-', '_').replace(':', sep)
+
+    @staticmethod
+    @filter_method
+    def sort_types(xsd_types, accept_circularity=False):
         """
         Returns a sorted sequence of XSD types. Sorted types can be used to build code declarations.
 
@@ -406,10 +459,11 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         :param accept_circularity: if set to `True` circularities are accepted. Defaults to `False`.
         :return: a list with ordered types.
         """
-        try:
-            xsd_types = list(xsd_types.values())
-        except AttributeError:
-            pass
+        if not isinstance(xsd_types, (list, tuple)):
+            try:
+                xsd_types = list(xsd_types.values())
+            except AttributeError:
+                pass
 
         assert all(isinstance(x, XsdType) for x in xsd_types)
         ordered_types = [x for x in xsd_types if x.is_simple()]
@@ -441,23 +495,3 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
 
         assert len(xsd_types) == len(ordered_types)
         return ordered_types
-
-    @classmethod
-    @filter_method
-    def complex_types(cls, xsd_types):
-        """Returns a list of complex types from a sequence of XSD types."""
-        try:
-            return [x for x in xsd_types.values() if x.is_complex()]
-        except AttributeError:
-            return [x for x in xsd_types if x.is_complex()]
-
-    @classmethod
-    @filter_method
-    def sorted_complex_types(cls, xsd_types, accept_circularity=False):
-        """Like `sorted_types` but remove simple types."""
-        try:
-            xsd_types = [x for x in xsd_types.values() if not x.is_simple()]
-        except AttributeError:
-            xsd_types = [x for x in xsd_types if not x.is_simple()]
-
-        return cls.sorted_types(xsd_types, accept_circularity)

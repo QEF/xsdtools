@@ -10,7 +10,7 @@ MODULE qes_reset_module
   !
   ! Auto-generated code: don't edit or at least don't commit changes
   !
-  ! Quantum Espresso XSD namespace: {{schema.target_namespace}}
+  ! Quantum Espresso XSD namespace: {{ schema.target_namespace }}
   !
   USE qes_types_module
   !
@@ -22,7 +22,7 @@ MODULE qes_reset_module
   !
   INTERFACE qes_reset
   {%- for type in schema.complex_types %}
-    MODULE PROCEDURE qes_reset_{{type|function_name}}
+    MODULE PROCEDURE qes_reset_{{ type|type_name }}
   {%- endfor %}
   END INTERFACE qes_reset
   !
