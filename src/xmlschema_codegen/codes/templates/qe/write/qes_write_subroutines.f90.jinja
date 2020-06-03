@@ -1,19 +1,105 @@
-   SUBROUTINE {{type | write_function_name }}(xp, obj)
+   SUBROUTINE qes_write_{{ type|type_name }}(xp, obj)
      !-----------------------------------------------------------------
      IMPLICIT NONE
      TYPE (xmlf_t),INTENT(INOUT)                      :: xp
-     TYPE({{type | fortran_type_name }}),INTENT(IN)    :: obj
+     TYPE({{ type|type_name('_type') }}),INTENT(IN)    :: obj
      ! 
      INTEGER                                          :: i 
      ! 
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
-     CALL xml_NewElement(xp, TRIM(obj%tagname)) 
-{%- include "write/write_attributes.f90.jinja" %}
-{%- if  type.is_extension() %}
+     CALL xml_NewElement(xp, TRIM(obj%tagname))
+
+{#- Insert attributes #}
+{%- for attr in type.attributes.values() %}
+   {%- if attr.is_optional %}
+      {%- if 'CHARACTER' in ( attr|fortran_type ) %}
+     IF (obj%{{ attr|name }}_ispresent) CALL xml_addAttribute(xp, '{{ attr|name }}', TRIM(obj%{{ attr|name }}) )
+      {%- else %}
+     IF (obj%{{ attr|name }}_ispresent) CALL xml_addAttribute(xp, '{{ attr|name }}', obj%{{ attr|name }} )
+      {%- endif %}
+   {%- else %}
+      {%- if 'CHARACTER' in ( attr|fortran_type ) %}
+     CALL xml_addAttribute(xp, '{{ attr|name }}', TRIM(obj%{{ attr|name }}) )
+      {%- else %}
+     CALL xml_addAttribute(xp, '{{ attr|name }}', obj%{{ attr|name }} )
+      {%- endif %}
+   {%- endif %}
+{%- endfor %}
+
+{%- if type.is_extension() %}
 {%- include "write/write_extension.f90.jinja" %}
-{%- endif %} 
-{%- include "write/write_sequence.f90.jinja" %}
+{%- endif %}
+{#- Insert children #}
+{%- if type.has_complex_content() %}
+{%- for element in type.content_type.iter_elements() %}
+   {%- if element.min_occurs == 0 %}
+     IF (obj%{{ element|name }}_ispresent) THEN
+      {%- if element.max_occurs == 1 %}
+         {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+        CALL qes_write_{{ element|type_name }} (xp, obj%{{ element|name }})
+         {%- else %}
+        CALL xml_NewElement(xp, "{{ element|name }}")
+           {%- if 'CHARACTER' in ( element|fortran_type ) %}
+           CALL xml_addCharacters(xp, TRIM(obj%{{ element|name }}))
+           {%- elif 'REAL' in ( element|fortran_type ) %}
+           CALL xml_addCharacters(xp, obj%{{ element|name }}, fmt='s16')
+           {%- else %}
+           CALL xml_addCharacters(xp, obj%{{ element|name }})
+           {%- endif %}
+        CALL xml_EndElement(xp, "{{ element|name }}")
+         {%- endif %}
+      {%- else %}
+        DO i = 1, obj%ndim_{{ element|name }}
+         {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+           CALL qes_write_{{ element|type_name }}(xp, obj%{{ element|name }}(i) )
+         {%- else %}
+           CALL xml_NewElement(xp, "{{ element|name }}")
+              {%- if 'CHARACTER' in ( element|fortran_type ) %}
+           CALL xml_addCharacters(xp, TRIM(obj%{{ element|name }}(i)))
+              {%- elif 'REAL' in ( element|fortran_type ) %}
+           CALL xml_addCharacters(xp, obj%{{ element|name }}(i), fmt='s16')
+              {%- else %}
+              CALL xml_addCharacters(xp, obj%{{ element|name }}(i) )
+              {%- endif %}
+           CALL xml_EndElement(xp, "{{ element|name }}")
+         {%- endif %}
+        END DO
+      {%- endif %}
+     END IF
+   {%- elif element.max_occurs == 1 %}
+     {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+     CALL qes_write_{{ element|type_name }} (xp, obj%{{ element|name }})
+     {%- else %}
+     CALL xml_NewElement(xp, '{{ element|name }}')
+        {%- if 'CHARACTER' in ( element|fortran_type ) %}
+        CALL xml_addCharacters(xp, TRIM(obj%{{ element|name }}))
+        {%- elif 'REAL' in ( element|fortran_type ) %}
+        CALL xml_addCharacters(xp, obj%{{ element|name }}, fmt='s16')
+        {%- else %}
+        CALL xml_addCharacters(xp, obj%{{ element|name }})
+        {%- endif %}
+     CALL xml_EndElement(xp, '{{ element|name }}')
+     {%- endif %}
+   {%- else %}
+     DO i = 1, obj%ndim_{{ element|name }}
+     {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+        CALL qes_write_{{ element|type_name }}(xp, obj%{{ element|name }}(i) )
+     {%- else %}
+        CALL xml_NewElelement(xp, '{{ element|name }}')
+           {%- if 'CHARACTER' in ( element|fortran_type ) %}
+           CALL xml_addCharacters(xp, TRIM(obj%{{ element|name }}(i)))
+           {%- elif 'REAL' in ( element|fortran_type ) %}
+           CALL xml_addCharacters(xp, obj%{{ element|name }}(i), fmt='s16')
+           {%- else %}
+           CALL xml_addCharacters(xp, obj%{{ element|name }}(i) )
+           {%- endif %}
+        CALL xml_EndElement(xp, '{{ element|name }}')
+     {%- endif %}
+     END DO
+   {%- endif %}
+{%- endfor %}
+{%- endif %}
      CALL xml_EndElement(xp, TRIM(obj%tagname))
-   END SUBROUTINE {{type | write_function_name }}
+   END SUBROUTINE qes_write_{{ type|type_name }}
 

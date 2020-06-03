@@ -26,7 +26,7 @@ MODULE qes_write_module
   !
   CONTAINS
   !
-  {% for type in schema.types.values() %}
+  {% for type in schema.complex_types %}
 {% include "write/qes_write_subroutines.f90.jinja" %}
   {%- endfor %}
   !
