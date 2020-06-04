@@ -116,6 +116,13 @@ class TestQEFortranGenerator(unittest.TestCase):
         self.assertIsInstance(result, str)
         self.check_module('samples/qe/qes_write_module.f90', result)
 
+    def test_render_bcast_module(self):
+        qe_generator = QEFortranGenerator(self.schema)
+        result = qe_generator.render('bcast/qes_bcast_module.f90.jinja')[0]
+        self.assertIsInstance(result, str)
+        self.check_module('samples/qe/qes_bcast_module.f90', result)
+
+
     def test_render_init_module(self):
         qe_generator = QEFortranGenerator(self.schema)
         result = qe_generator.render('init/qes_init_module.f90.jinja')[0]

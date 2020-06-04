@@ -306,7 +306,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         except KeyError:
             try:
                 return self.types_map[xsd_type.base_type.name]
-            except KeyError:
+            except (KeyError, AttributeError):
                 if xsd_type.is_complex():
                     return self.types_map[xsd_qname('anyType')]
                 else:
@@ -559,3 +559,10 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     @test_method
     def restriction(self, xsd_type, *names):
         return self.is_derived(xsd_type, *names, derivation='restriction')
+
+    @staticmethod
+    @test_method
+    def multi_sequence(xsd_type):
+        if xsd_type.has_simple_content():
+            return False
+        return any(e.is_multiple() for e in xsd_type.content_type.iter_elements())

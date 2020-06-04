@@ -1,16 +1,14 @@
   !
-  SUBROUTINE {{type.bcast_function_name()}}(obj, ionode_id, comm )
+  SUBROUTINE qes_bcast_{{ type|type_name }}(obj, ionode_id, comm )
     !
     IMPLICIT NONE
     !
-    TYPE({{type.fortran_type_name()}}), INTENT(INOUT) :: obj
+    TYPE({{ type|type_name('_type') }}), INTENT(INOUT) :: obj
     INTEGER, INTENT(IN) :: ionode_id, comm
-    {%- if (type.extension_xsd_type_name=="matrixType") or (type.name=="matrixType") or
-        (type.extension_xsd_type_name=="integerMatrixType") or (type.name=="integerMatrixType") %}
+    {%- if type is extension("matrixType", "integerMatrixType") %}
     INTEGER :: length
     {%- endif %}
-    {%- if (type.extension_xsd_type_name=="matrixType") or (type.name=="matrixType") or
-        (type.extension_xsd_type_name=="integerMatrixType") or (type.name=="integerMatrixType") or (type.has_multi_sequence()) %}
+    {%- if type is extension("matrixType", "integerMatrixType") or type is multi_sequence %}
     INTEGER :: i
     {%- endif %}
     !
@@ -18,16 +16,89 @@
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-{%- with type_name=type.name, attributes=type.attributes %}
-{%- include "bcast/bcast_attributes.f90.jinja" %}
-{%- endwith %}
-{%- with type_name=type.extension_xsd_type_name, attributes=type.extension_attributes(xsd_schema.sorted_complex_types()) %}
-{%- include "bcast_attributes.f90.j2" %}
-{%- endwith %}
-{%- include "bcast_sequence.f90.j2" %}
-{%- if type.extension_xsd_type_name != None %}
-{%- include "bcast_extension.f90.j2" %}
+{#- Include attributes #}
+{%- if type is extension("matrixType", "integerMatrixType") %}
+    CALL mp_bcast(obj%rank, ionode_id, comm)
+    IF (.NOT.ionode) ALLOCATE(obj%dims(obj%rank))
+    CALL mp_bcast(obj%dims, ionode_id, comm)
+    CALL mp_bcast(obj%order, ionode_id, comm)
+{%- elif type is extension("vectorType", "integerVectorType") %}
+    CALL mp_bcast(obj%size, ionode_id, comm)
+{%- else %}
+  {%- for attribute in type.attributes.values() %}
+    {%- if attribute.is_optional %}
+    CALL mp_bcast(obj%{{ attribute|name }}_ispresent, ionode_id, comm)
+    IF (obj%{{ attribute|name }}_ispresent) &
+      CALL mp_bcast(obj%{{ attribute|name }}, ionode_id, comm)
+    {%- else %}
+    CALL mp_bcast(obj%{{ attribute|name }}, ionode_id, comm)
+    {%- endif %}
+  {%- endfor %}
 {%- endif %}
+{#- Include children #}
+{%- if type.has_complex_content() %}
+{%- for element in type.content_type.iter_elements() %}
+  {%- if element.min_occurs == 0 and element.max_occurs == 1 %}
+    CALL mp_bcast(obj%{{ element|name }}_ispresent, ionode_id, comm)
+    IF (obj%{{ element|name }}_ispresent) &
+    {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+      CALL qes_bcast_{{ element|type_name }}(obj%{{ element|name }}, ionode_id, comm)
+    {%- else %}
+      CALL mp_bcast(obj%{{ element|name }}, ionode_id, comm)
+    {%- endif %}
+  {%- elif element.min_occurs == 1 and element.max_occurs==1 %}
+    {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+    CALL qes_bcast_{{ element|type_name }}(obj%{{ element|name }}, ionode_id, comm)
+    {%- else %}
+    CALL mp_bcast(obj%{{ element|name }}, ionode_id, comm)
+    {%- endif %}
+  {%- else %}
+    {%- if (element.min_occurs==0) %}
+    CALL mp_bcast(obj%{{ element|name }}_ispresent, ionode_id, comm)
+    IF (obj%{{ element|name }}_ispresent) THEN
+      CALL mp_bcast(obj%ndim_{{ element|name }}, ionode_id, comm)
+      IF (.NOT.ionode) ALLOCATE(obj%{{ element|name }}(obj%ndim_{{ element|name }}))
+      DO i=1, obj%ndim_{{ element|name }}
+      {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+        CALL qes_bcast_{{ element|type_name }}(obj%{{ element|name }}(i), ionode_id, comm)
+      {%- else %}
+        CALL mp_bcast(obj%{{ element|name }}(i), ionode_id, comm)
+      {%- endif %}
+      ENDDO
+    ENDIF
+    {%- else %}
+    CALL mp_bcast(obj%ndim_{{ element|name }}, ionode_id, comm)
+    IF (.NOT.ionode) ALLOCATE(obj%{{ element|name }}(obj%ndim_{{ element|name }}))
+    DO i=1, obj%ndim_{{ element|name }}
+      {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
+      CALL qes_bcast_{{ element|type_name }}(obj%{{ element|name }}(i), ionode_id, comm)
+      {%- else %}
+      CALL mp_bcast(obj%{{ element|name }}(i), ionode_id, comm)
+      {%- endif %}
+    ENDDO
+    {%- endif %}
+  {%- endif %}
+{%- endfor %}
+{%- endif %}
+{#- Insert extension #}
+{%- if type.is_extension() %}
+{%- if type is extension("vectorType", "integerVectorType") %}
+    IF (.NOT.ionode) ALLOCATE(obj%{{ type|type_name }}(obj%size))
+    CALL mp_bcast(obj%{{ type|type_name }}, ionode_id, comm)
+{%- elif type is extension("matrixType", "integerMatrixType") %}
+    IF (.NOT. ionode) THEN
+      length = 1
+      DO i=1, obj%rank
+        length = length * obj%dims(i)
+      END DO
+      ALLOCATE (obj%{{ type|type_name }}(length) )
+    ENDIF
+    CALL mp_bcast(obj%{{ type|type_name }}, ionode_id, comm)
+{%- elif type is extension("doubleListType") %}
+    !CALL mp_bcast(obj%?????, ionode_id, comm) NEVER HAPPENED
+{%- else %}
+    CALL mp_bcast(obj%{{ type|type_name }}, ionode_id, comm)
+{%- endif %}{%- endif %}
     !
-  END SUBROUTINE {{type.bcast_function_name()}}
+  END SUBROUTINE qes_bcast_{{ type|type_name }}
   !

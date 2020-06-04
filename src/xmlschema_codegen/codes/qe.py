@@ -46,13 +46,6 @@ class QEFortranGenerator(FortranGenerator):
 
     @staticmethod
     @filter_method
-    def read_function_name(xsd_type):
-        if xsd_type.is_simple():
-            return 'extractDataContent'
-        return 'qes_read_' + xsd_type.local_name.replace('Type', '')
-
-    @staticmethod
-    @filter_method
     def bcast_function_name(xsd_type):
         return 'qes_bcast_' + xsd_type.local_name.replace('Type', '')
 
@@ -68,13 +61,6 @@ class QEFortranGenerator(FortranGenerator):
             return 'qes_init_' + name.replace('Type', '')
         else:
             return None
-
-    @staticmethod
-    @filter_method
-    def write_function_name(xsd_type):
-        if xsd_type.is_simple():
-            return "xml_addCharacters"
-        return 'qes_write_' + xsd_type.local_name.replace('Type', '')
 
     @filter_method
     def is_qes_array_type(self, xsd_type):
@@ -110,15 +96,6 @@ class QEFortranGenerator(FortranGenerator):
         if xsd_type.has_simple_content():
             return False
         return any(e.is_multiple() for e in xsd_type.content_type.iter_elements())
-
-    @staticmethod
-    @filter_method
-    def reset_function_name(xsd_type):
-        try:
-            if xsd_type.is_complex():
-                return 'qes_reset_' + xsd_type.local_name.replace('Type', '')
-        except AttributeError:
-            return
 
     @filter_method
     def init_fortran_type_name(self, xsd_type):

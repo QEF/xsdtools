@@ -9,7 +9,7 @@ MODULE qes_bcast_module
   !
   ! Auto-generated code: don't edit this file
   !
-  ! Quantum Espresso XSD namespace: {{xsd_schema.target_namespace}}
+  ! Quantum Espresso XSD namespace: {{ schema.target_namespace }}
   !
   USE qes_types_module
   USE io_global, ONLY : ionode
@@ -20,14 +20,14 @@ MODULE qes_bcast_module
   PUBLIC qes_bcast
   !
   INTERFACE qes_bcast
-  {%- for type in xsd_schema.complex_types %}
-    MODULE PROCEDURE {{type.bcast_function_name()}}
+  {%- for type in schema.complex_types %}
+    MODULE PROCEDURE qes_bcast_{{ type|type_name }}
   {%- endfor %}
   END INTERFACE qes_bcast
   !
   CONTAINS
   !
-  {%- for type in xsd_schema.complex_types %}
+  {%- for type in schema.complex_types %}
 {% include "bcast/bcast_subroutine.f90.jinja" %}
   {%- endfor %}
   !

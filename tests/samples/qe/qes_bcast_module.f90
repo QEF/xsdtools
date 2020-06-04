@@ -26,8 +26,6 @@ MODULE qes_bcast_module
     MODULE PROCEDURE qes_bcast_input
     MODULE PROCEDURE qes_bcast_step
     MODULE PROCEDURE qes_bcast_output
-    MODULE PROCEDURE qes_bcast_timing
-    MODULE PROCEDURE qes_bcast_clock
     MODULE PROCEDURE qes_bcast_control_variables
     MODULE PROCEDURE qes_bcast_xml_format
     MODULE PROCEDURE qes_bcast_creator
@@ -146,9 +144,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%cputime_ispresent, ionode_id, comm)
     IF (obj%cputime_ispresent) &
       CALL mp_bcast(obj%cputime, ionode_id, comm)
-    CALL mp_bcast(obj%timing_info_ispresent, ionode_id, comm)
-    IF (obj%timing_info_ispresent) &
-      CALL qes_bcast_timing(obj%timing_info, ionode_id, comm)
     CALL mp_bcast(obj%closed_ispresent, ionode_id, comm)
     IF (obj%closed_ispresent) &
       CALL qes_bcast_closed(obj%closed, ionode_id, comm)
@@ -260,7 +255,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%n_step, ionode_id, comm)
+    CALL mp_bcast(obj%n_step_ispresent, ionode_id, comm)
+    IF (obj%n_step_ispresent) &
+      CALL mp_bcast(obj%n_step, ionode_id, comm)
     CALL qes_bcast_scf_conv(obj%scf_conv, ionode_id, comm)
     CALL qes_bcast_atomic_structure(obj%atomic_structure, ionode_id, comm)
     CALL qes_bcast_total_energy(obj%total_energy, ionode_id, comm)
@@ -289,9 +286,7 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%convergence_info_ispresent, ionode_id, comm)
-    IF (obj%convergence_info_ispresent) &
-      CALL qes_bcast_convergence_info(obj%convergence_info, ionode_id, comm)
+    CALL qes_bcast_convergence_info(obj%convergence_info, ionode_id, comm)
     CALL qes_bcast_algorithmic_info(obj%algorithmic_info, ionode_id, comm)
     CALL qes_bcast_atomic_species(obj%atomic_species, ionode_id, comm)
     CALL qes_bcast_atomic_structure(obj%atomic_structure, ionode_id, comm)
@@ -323,52 +318,6 @@ MODULE qes_bcast_module
       CALL mp_bcast(obj%FCP_tot_charge, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_output
-  !
-  !
-  SUBROUTINE qes_bcast_timing(obj, ionode_id, comm )
-    !
-    IMPLICIT NONE
-    !
-    TYPE(timing_type), INTENT(INOUT) :: obj
-    INTEGER, INTENT(IN) :: ionode_id, comm
-    INTEGER :: i
-    !
-    CALL mp_bcast(obj%tagname, ionode_id, comm)
-    CALL mp_bcast(obj%lwrite, ionode_id, comm)
-    CALL mp_bcast(obj%lread, ionode_id, comm)
-    !
-    CALL qes_bcast_clock(obj%total, ionode_id, comm)
-    CALL mp_bcast(obj%partial_ispresent, ionode_id, comm)
-    IF (obj%partial_ispresent) THEN
-      CALL mp_bcast(obj%ndim_partial, ionode_id, comm)
-      IF (.NOT.ionode) ALLOCATE(obj%partial(obj%ndim_partial))
-      DO i=1, obj%ndim_partial
-        CALL qes_bcast_clock(obj%partial(i), ionode_id, comm)
-      ENDDO
-    ENDIF
-    !
-  END SUBROUTINE qes_bcast_timing
-  !
-  !
-  SUBROUTINE qes_bcast_clock(obj, ionode_id, comm )
-    !
-    IMPLICIT NONE
-    !
-    TYPE(clock_type), INTENT(INOUT) :: obj
-    INTEGER, INTENT(IN) :: ionode_id, comm
-    !
-    CALL mp_bcast(obj%tagname, ionode_id, comm)
-    CALL mp_bcast(obj%lwrite, ionode_id, comm)
-    CALL mp_bcast(obj%lread, ionode_id, comm)
-    !
-    CALL mp_bcast(obj%label, ionode_id, comm)
-    CALL mp_bcast(obj%calls_ispresent, ionode_id, comm)
-    IF (obj%calls_ispresent) &
-      CALL mp_bcast(obj%calls, ionode_id, comm)
-    CALL mp_bcast(obj%cpu, ionode_id, comm)
-    CALL mp_bcast(obj%wall, ionode_id, comm)
-    !
-  END SUBROUTINE qes_bcast_clock
   !
   !
   SUBROUTINE qes_bcast_control_variables(obj, ionode_id, comm )
@@ -416,8 +365,12 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%NAME, ionode_id, comm)
-    CALL mp_bcast(obj%VERSION, ionode_id, comm)
+    CALL mp_bcast(obj%NAME_ispresent, ionode_id, comm)
+    IF (obj%NAME_ispresent) &
+      CALL mp_bcast(obj%NAME, ionode_id, comm)
+    CALL mp_bcast(obj%VERSION_ispresent, ionode_id, comm)
+    IF (obj%VERSION_ispresent) &
+      CALL mp_bcast(obj%VERSION, ionode_id, comm)
     CALL mp_bcast(obj%xml_format, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_xml_format
@@ -434,8 +387,12 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%NAME, ionode_id, comm)
-    CALL mp_bcast(obj%VERSION, ionode_id, comm)
+    CALL mp_bcast(obj%NAME_ispresent, ionode_id, comm)
+    IF (obj%NAME_ispresent) &
+      CALL mp_bcast(obj%NAME, ionode_id, comm)
+    CALL mp_bcast(obj%VERSION_ispresent, ionode_id, comm)
+    IF (obj%VERSION_ispresent) &
+      CALL mp_bcast(obj%VERSION, ionode_id, comm)
     CALL mp_bcast(obj%creator, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_creator
@@ -452,8 +409,12 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%DATE, ionode_id, comm)
-    CALL mp_bcast(obj%TIME, ionode_id, comm)
+    CALL mp_bcast(obj%DATE_ispresent, ionode_id, comm)
+    IF (obj%DATE_ispresent) &
+      CALL mp_bcast(obj%DATE, ionode_id, comm)
+    CALL mp_bcast(obj%TIME_ispresent, ionode_id, comm)
+    IF (obj%TIME_ispresent) &
+      CALL mp_bcast(obj%TIME, ionode_id, comm)
     CALL mp_bcast(obj%created, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_created
@@ -471,7 +432,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%ntyp, ionode_id, comm)
+    CALL mp_bcast(obj%ntyp_ispresent, ionode_id, comm)
+    IF (obj%ntyp_ispresent) &
+      CALL mp_bcast(obj%ntyp, ionode_id, comm)
     CALL mp_bcast(obj%pseudo_dir_ispresent, ionode_id, comm)
     IF (obj%pseudo_dir_ispresent) &
       CALL mp_bcast(obj%pseudo_dir, ionode_id, comm)
@@ -495,7 +458,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%name, ionode_id, comm)
+    CALL mp_bcast(obj%name_ispresent, ionode_id, comm)
+    IF (obj%name_ispresent) &
+      CALL mp_bcast(obj%name, ionode_id, comm)
     CALL mp_bcast(obj%mass_ispresent, ionode_id, comm)
     IF (obj%mass_ispresent) &
       CALL mp_bcast(obj%mass, ionode_id, comm)
@@ -524,16 +489,15 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%nat, ionode_id, comm)
+    CALL mp_bcast(obj%nat_ispresent, ionode_id, comm)
+    IF (obj%nat_ispresent) &
+      CALL mp_bcast(obj%nat, ionode_id, comm)
     CALL mp_bcast(obj%alat_ispresent, ionode_id, comm)
     IF (obj%alat_ispresent) &
       CALL mp_bcast(obj%alat, ionode_id, comm)
     CALL mp_bcast(obj%bravais_index_ispresent, ionode_id, comm)
     IF (obj%bravais_index_ispresent) &
       CALL mp_bcast(obj%bravais_index, ionode_id, comm)
-    CALL mp_bcast(obj%use_alternative_axes_ispresent, ionode_id, comm)
-    IF (obj%use_alternative_axes_ispresent) &
-      CALL mp_bcast(obj%use_alternative_axes, ionode_id, comm)
     CALL mp_bcast(obj%atomic_positions_ispresent, ionode_id, comm)
     IF (obj%atomic_positions_ispresent) &
       CALL qes_bcast_atomic_positions(obj%atomic_positions, ionode_id, comm)
@@ -580,7 +544,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%name, ionode_id, comm)
+    CALL mp_bcast(obj%name_ispresent, ionode_id, comm)
+    IF (obj%name_ispresent) &
+      CALL mp_bcast(obj%name, ionode_id, comm)
     CALL mp_bcast(obj%position_ispresent, ionode_id, comm)
     IF (obj%position_ispresent) &
       CALL mp_bcast(obj%position, ionode_id, comm)
@@ -604,7 +570,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%space_group, ionode_id, comm)
+    CALL mp_bcast(obj%space_group_ispresent, ionode_id, comm)
+    IF (obj%space_group_ispresent) &
+      CALL mp_bcast(obj%space_group, ionode_id, comm)
     CALL mp_bcast(obj%more_options_ispresent, ionode_id, comm)
     IF (obj%more_options_ispresent) &
       CALL mp_bcast(obj%more_options, ionode_id, comm)
@@ -671,30 +639,13 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%qpoint_grid_ispresent, ionode_id, comm)
-    IF (obj%qpoint_grid_ispresent) &
-      CALL qes_bcast_qpoint_grid(obj%qpoint_grid, ionode_id, comm)
-    CALL mp_bcast(obj%ecutfock_ispresent, ionode_id, comm)
-    IF (obj%ecutfock_ispresent) &
-      CALL mp_bcast(obj%ecutfock, ionode_id, comm)
-    CALL mp_bcast(obj%exx_fraction_ispresent, ionode_id, comm)
-    IF (obj%exx_fraction_ispresent) &
-      CALL mp_bcast(obj%exx_fraction, ionode_id, comm)
-    CALL mp_bcast(obj%screening_parameter_ispresent, ionode_id, comm)
-    IF (obj%screening_parameter_ispresent) &
-      CALL mp_bcast(obj%screening_parameter, ionode_id, comm)
-    CALL mp_bcast(obj%exxdiv_treatment_ispresent, ionode_id, comm)
-    IF (obj%exxdiv_treatment_ispresent) &
-      CALL mp_bcast(obj%exxdiv_treatment, ionode_id, comm)
-    CALL mp_bcast(obj%x_gamma_extrapolation_ispresent, ionode_id, comm)
-    IF (obj%x_gamma_extrapolation_ispresent) &
-      CALL mp_bcast(obj%x_gamma_extrapolation, ionode_id, comm)
-    CALL mp_bcast(obj%ecutvcut_ispresent, ionode_id, comm)
-    IF (obj%ecutvcut_ispresent) &
-      CALL mp_bcast(obj%ecutvcut, ionode_id, comm)
-    CALL mp_bcast(obj%localization_threshold_ispresent, ionode_id, comm)
-    IF (obj%localization_threshold_ispresent) &
-      CALL mp_bcast(obj%localization_threshold, ionode_id, comm)
+    CALL qes_bcast_qpoint_grid(obj%qpoint_grid, ionode_id, comm)
+    CALL mp_bcast(obj%ecutfock, ionode_id, comm)
+    CALL mp_bcast(obj%exx_fraction, ionode_id, comm)
+    CALL mp_bcast(obj%screening_parameter, ionode_id, comm)
+    CALL mp_bcast(obj%exxdiv_treatment, ionode_id, comm)
+    CALL mp_bcast(obj%x_gamma_extrapolation, ionode_id, comm)
+    CALL mp_bcast(obj%ecutvcut, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_hybrid
   !
@@ -710,9 +661,15 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%nqx1, ionode_id, comm)
-    CALL mp_bcast(obj%nqx2, ionode_id, comm)
-    CALL mp_bcast(obj%nqx3, ionode_id, comm)
+    CALL mp_bcast(obj%nqx1_ispresent, ionode_id, comm)
+    IF (obj%nqx1_ispresent) &
+      CALL mp_bcast(obj%nqx1, ionode_id, comm)
+    CALL mp_bcast(obj%nqx2_ispresent, ionode_id, comm)
+    IF (obj%nqx2_ispresent) &
+      CALL mp_bcast(obj%nqx2, ionode_id, comm)
+    CALL mp_bcast(obj%nqx3_ispresent, ionode_id, comm)
+    IF (obj%nqx3_ispresent) &
+      CALL mp_bcast(obj%nqx3, ionode_id, comm)
     CALL mp_bcast(obj%qpoint_grid, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_qpoint_grid
@@ -807,7 +764,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%specie, ionode_id, comm)
+    CALL mp_bcast(obj%specie_ispresent, ionode_id, comm)
+    IF (obj%specie_ispresent) &
+      CALL mp_bcast(obj%specie, ionode_id, comm)
     CALL mp_bcast(obj%label_ispresent, ionode_id, comm)
     IF (obj%label_ispresent) &
       CALL mp_bcast(obj%label, ionode_id, comm)
@@ -827,8 +786,12 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%specie, ionode_id, comm)
-    CALL mp_bcast(obj%label, ionode_id, comm)
+    CALL mp_bcast(obj%specie_ispresent, ionode_id, comm)
+    IF (obj%specie_ispresent) &
+      CALL mp_bcast(obj%specie, ionode_id, comm)
+    CALL mp_bcast(obj%label_ispresent, ionode_id, comm)
+    IF (obj%label_ispresent) &
+      CALL mp_bcast(obj%label, ionode_id, comm)
     CALL mp_bcast(obj%HubbardJ, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_HubbardJ
@@ -845,9 +808,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%specie, ionode_id, comm)
-    CALL mp_bcast(obj%label, ionode_id, comm)
-    CALL mp_bcast(obj%spin, ionode_id, comm)
     CALL mp_bcast(obj%size, ionode_id, comm)
     IF (.NOT.ionode) ALLOCATE(obj%starting_ns(obj%size))
     CALL mp_bcast(obj%starting_ns, ionode_id, comm)
@@ -868,10 +828,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%specie, ionode_id, comm)
-    CALL mp_bcast(obj%label, ionode_id, comm)
-    CALL mp_bcast(obj%spin, ionode_id, comm)
-    CALL mp_bcast(obj%index, ionode_id, comm)
     CALL mp_bcast(obj%rank, ionode_id, comm)
     IF (.NOT.ionode) ALLOCATE(obj%dims(obj%rank))
     CALL mp_bcast(obj%dims, ionode_id, comm)
@@ -900,24 +856,10 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%vdw_corr_ispresent, ionode_id, comm)
-    IF (obj%vdw_corr_ispresent) &
-      CALL mp_bcast(obj%vdw_corr, ionode_id, comm)
-    CALL mp_bcast(obj%dftd3_version_ispresent, ionode_id, comm)
-    IF (obj%dftd3_version_ispresent) &
-      CALL mp_bcast(obj%dftd3_version, ionode_id, comm)
-    CALL mp_bcast(obj%dftd3_threebody_ispresent, ionode_id, comm)
-    IF (obj%dftd3_threebody_ispresent) &
-      CALL mp_bcast(obj%dftd3_threebody, ionode_id, comm)
+    CALL mp_bcast(obj%vdw_corr, ionode_id, comm)
     CALL mp_bcast(obj%non_local_term_ispresent, ionode_id, comm)
     IF (obj%non_local_term_ispresent) &
       CALL mp_bcast(obj%non_local_term, ionode_id, comm)
-    CALL mp_bcast(obj%functional_ispresent, ionode_id, comm)
-    IF (obj%functional_ispresent) &
-      CALL mp_bcast(obj%functional, ionode_id, comm)
-    CALL mp_bcast(obj%total_energy_term_ispresent, ionode_id, comm)
-    IF (obj%total_energy_term_ispresent) &
-      CALL mp_bcast(obj%total_energy_term, ionode_id, comm)
     CALL mp_bcast(obj%london_s6_ispresent, ionode_id, comm)
     IF (obj%london_s6_ispresent) &
       CALL mp_bcast(obj%london_s6, ionode_id, comm)
@@ -1014,7 +956,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%degauss, ionode_id, comm)
+    CALL mp_bcast(obj%degauss_ispresent, ionode_id, comm)
+    IF (obj%degauss_ispresent) &
+      CALL mp_bcast(obj%degauss, ionode_id, comm)
     CALL mp_bcast(obj%smearing, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_smearing
@@ -1116,9 +1060,15 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%nr1, ionode_id, comm)
-    CALL mp_bcast(obj%nr2, ionode_id, comm)
-    CALL mp_bcast(obj%nr3, ionode_id, comm)
+    CALL mp_bcast(obj%nr1_ispresent, ionode_id, comm)
+    IF (obj%nr1_ispresent) &
+      CALL mp_bcast(obj%nr1, ionode_id, comm)
+    CALL mp_bcast(obj%nr2_ispresent, ionode_id, comm)
+    IF (obj%nr2_ispresent) &
+      CALL mp_bcast(obj%nr2, ionode_id, comm)
+    CALL mp_bcast(obj%nr3_ispresent, ionode_id, comm)
+    IF (obj%nr3_ispresent) &
+      CALL mp_bcast(obj%nr3, ionode_id, comm)
     CALL mp_bcast(obj%basisSetItem, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_basisSetItem
@@ -1159,12 +1109,7 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%conv_thr, ionode_id, comm)
     CALL mp_bcast(obj%mixing_ndim, ionode_id, comm)
     CALL mp_bcast(obj%max_nstep, ionode_id, comm)
-    CALL mp_bcast(obj%real_space_q_ispresent, ionode_id, comm)
-    IF (obj%real_space_q_ispresent) &
-      CALL mp_bcast(obj%real_space_q, ionode_id, comm)
-    CALL mp_bcast(obj%real_space_beta_ispresent, ionode_id, comm)
-    IF (obj%real_space_beta_ispresent) &
-      CALL mp_bcast(obj%real_space_beta, ionode_id, comm)
+    CALL mp_bcast(obj%real_space_q, ionode_id, comm)
     CALL mp_bcast(obj%tq_smoothing, ionode_id, comm)
     CALL mp_bcast(obj%tbeta_smoothing, ionode_id, comm)
     CALL mp_bcast(obj%diago_thr_init, ionode_id, comm)
@@ -1172,9 +1117,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%diago_cg_maxiter_ispresent, ionode_id, comm)
     IF (obj%diago_cg_maxiter_ispresent) &
       CALL mp_bcast(obj%diago_cg_maxiter, ionode_id, comm)
-    CALL mp_bcast(obj%diago_ppcg_maxiter_ispresent, ionode_id, comm)
-    IF (obj%diago_ppcg_maxiter_ispresent) &
-      CALL mp_bcast(obj%diago_ppcg_maxiter, ionode_id, comm)
     CALL mp_bcast(obj%diago_david_ndim_ispresent, ionode_id, comm)
     IF (obj%diago_david_ndim_ispresent) &
       CALL mp_bcast(obj%diago_david_ndim, ionode_id, comm)
@@ -1223,12 +1165,24 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%nk1, ionode_id, comm)
-    CALL mp_bcast(obj%nk2, ionode_id, comm)
-    CALL mp_bcast(obj%nk3, ionode_id, comm)
-    CALL mp_bcast(obj%k1, ionode_id, comm)
-    CALL mp_bcast(obj%k2, ionode_id, comm)
-    CALL mp_bcast(obj%k3, ionode_id, comm)
+    CALL mp_bcast(obj%nk1_ispresent, ionode_id, comm)
+    IF (obj%nk1_ispresent) &
+      CALL mp_bcast(obj%nk1, ionode_id, comm)
+    CALL mp_bcast(obj%nk2_ispresent, ionode_id, comm)
+    IF (obj%nk2_ispresent) &
+      CALL mp_bcast(obj%nk2, ionode_id, comm)
+    CALL mp_bcast(obj%nk3_ispresent, ionode_id, comm)
+    IF (obj%nk3_ispresent) &
+      CALL mp_bcast(obj%nk3, ionode_id, comm)
+    CALL mp_bcast(obj%k1_ispresent, ionode_id, comm)
+    IF (obj%k1_ispresent) &
+      CALL mp_bcast(obj%k1, ionode_id, comm)
+    CALL mp_bcast(obj%k2_ispresent, ionode_id, comm)
+    IF (obj%k2_ispresent) &
+      CALL mp_bcast(obj%k2, ionode_id, comm)
+    CALL mp_bcast(obj%k3_ispresent, ionode_id, comm)
+    IF (obj%k3_ispresent) &
+      CALL mp_bcast(obj%k3, ionode_id, comm)
     CALL mp_bcast(obj%monkhorst_pack, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_monkhorst_pack
@@ -1598,8 +1552,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%ispin, ionode_id, comm)
-    CALL mp_bcast(obj%spin_factor, ionode_id, comm)
     CALL mp_bcast(obj%size, ionode_id, comm)
     IF (.NOT.ionode) ALLOCATE(obj%inputOccupations(obj%size))
     CALL mp_bcast(obj%inputOccupations, ionode_id, comm)
@@ -1831,7 +1783,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%convergence_achieved, ionode_id, comm)
     CALL mp_bcast(obj%n_scf_steps, ionode_id, comm)
     CALL mp_bcast(obj%scf_error, ionode_id, comm)
     !
@@ -1849,7 +1800,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%convergence_achieved, ionode_id, comm)
     CALL mp_bcast(obj%n_opt_steps, ionode_id, comm)
     CALL mp_bcast(obj%grad_norm, ionode_id, comm)
     !
@@ -1868,9 +1818,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
     CALL mp_bcast(obj%real_space_q, ionode_id, comm)
-    CALL mp_bcast(obj%real_space_beta_ispresent, ionode_id, comm)
-    IF (obj%real_space_beta_ispresent) &
-      CALL mp_bcast(obj%real_space_beta, ionode_id, comm)
     CALL mp_bcast(obj%uspp, ionode_id, comm)
     CALL mp_bcast(obj%paw, ionode_id, comm)
     !
@@ -1935,7 +1882,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%nat, ionode_id, comm)
     CALL mp_bcast(obj%size, ionode_id, comm)
     IF (.NOT.ionode) ALLOCATE(obj%equivalent_atoms(obj%size))
     CALL mp_bcast(obj%equivalent_atoms, ionode_id, comm)
@@ -2044,9 +1990,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%gatefield_contr_ispresent, ionode_id, comm)
     IF (obj%gatefield_contr_ispresent) &
       CALL mp_bcast(obj%gatefield_contr, ionode_id, comm)
-    CALL mp_bcast(obj%vdW_term_ispresent, ionode_id, comm)
-    IF (obj%vdW_term_ispresent) &
-      CALL mp_bcast(obj%vdW_term, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_total_energy
   !
@@ -2066,9 +2009,7 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lsda, ionode_id, comm)
     CALL mp_bcast(obj%noncolin, ionode_id, comm)
     CALL mp_bcast(obj%spinorbit, ionode_id, comm)
-    CALL mp_bcast(obj%nbnd_ispresent, ionode_id, comm)
-    IF (obj%nbnd_ispresent) &
-      CALL mp_bcast(obj%nbnd, ionode_id, comm)
+    CALL mp_bcast(obj%nbnd, ionode_id, comm)
     CALL mp_bcast(obj%nbnd_up_ispresent, ionode_id, comm)
     IF (obj%nbnd_up_ispresent) &
       CALL mp_bcast(obj%nbnd_up, ionode_id, comm)
@@ -2086,9 +2027,6 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%highestOccupiedLevel_ispresent, ionode_id, comm)
     IF (obj%highestOccupiedLevel_ispresent) &
       CALL mp_bcast(obj%highestOccupiedLevel, ionode_id, comm)
-    CALL mp_bcast(obj%lowestUnoccupiedLevel_ispresent, ionode_id, comm)
-    IF (obj%lowestUnoccupiedLevel_ispresent) &
-      CALL mp_bcast(obj%lowestUnoccupiedLevel, ionode_id, comm)
     CALL mp_bcast(obj%two_fermi_energies_ispresent, ionode_id, comm)
     IF (obj%two_fermi_energies_ispresent) &
       CALL mp_bcast(obj%two_fermi_energies, ionode_id, comm)
@@ -2137,8 +2075,12 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%DATE, ionode_id, comm)
-    CALL mp_bcast(obj%TIME, ionode_id, comm)
+    CALL mp_bcast(obj%DATE_ispresent, ionode_id, comm)
+    IF (obj%DATE_ispresent) &
+      CALL mp_bcast(obj%DATE, ionode_id, comm)
+    CALL mp_bcast(obj%TIME_ispresent, ionode_id, comm)
+    IF (obj%TIME_ispresent) &
+      CALL mp_bcast(obj%TIME, ionode_id, comm)
     CALL mp_bcast(obj%closed, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_closed
@@ -2249,7 +2191,9 @@ MODULE qes_bcast_module
     CALL mp_bcast(obj%lwrite, ionode_id, comm)
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
-    CALL mp_bcast(obj%Units, ionode_id, comm)
+    CALL mp_bcast(obj%Units_ispresent, ionode_id, comm)
+    IF (obj%Units_ispresent) &
+      CALL mp_bcast(obj%Units, ionode_id, comm)
     CALL mp_bcast(obj%scalarQuantity, ionode_id, comm)
     !
   END SUBROUTINE qes_bcast_scalarQuantity
