@@ -14,7 +14,7 @@ with open("README.rst") as readme:
 
 setup(
     name='xmlschema-codegen',
-    version='0.1',
+    version='0.2.0a1',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
@@ -32,7 +32,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/x-rst',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',

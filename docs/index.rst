@@ -1,9 +1,11 @@
-.. include:: ../README.rst
-
-Welcome to xmlschema-codegen's documentation!
-=============================================
+###############################
+xmlschema-codegen Documentation
+###############################
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   intro
+   generators
+   filters
+   tests

@@ -21,7 +21,7 @@ copyright = '2020, SISSA (International School for Advanced Studies)'
 author = 'Davide Brunato'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '0.2.0a1'
 
 # The short X.Y version
 version = '.'.join(release.split('.')[:2])
@@ -35,6 +35,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
 ]
+
+# Option for autodoc: do not add module name as prefix to classes or functions.
+add_module_names = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -56,3 +59,32 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
+# -- Options for LaTeX output ---------------------------------------------
+
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    'papersize': 'a4paper',
+
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    'pointsize': '11pt',
+
+    # Additional stuff for the LaTeX preamble.
+    #
+    'preamble': '',
+
+    # Latex figure (float) alignment
+    #
+    'figure_align': 'htbp',
+}
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title,
+#  author, documentclass [howto, manual, or own class]).
+latex_documents = [
+    ('index', 'xmlschema-codegen.tex', 'xmlschema-codegen Documentation',
+     'Davide Brunato', 'manual'),
+]

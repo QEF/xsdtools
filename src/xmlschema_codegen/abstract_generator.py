@@ -33,7 +33,10 @@ class GeneratorMeta(ABCMeta):
 
     def __new__(mcs, name, bases, attrs):
         module = attrs['__module__']
-        module_path = sys.modules[module].__file__
+        try:
+            module_path = sys.modules[module].__file__
+        except AttributeError:
+            module_path = os.getcwd()
 
         formal_language = None
         default_paths = []

@@ -1,6 +1,8 @@
-#################
+*****************
 xmlschema-codegen
-#################
+*****************
+
+.. introduction-start
 
 This is a code generator software from XSD schemas. The generator engine
 uses XSD schemas and Jinja2 templates to produce code and structures.
@@ -16,7 +18,7 @@ it's opened to contributions on developing other languages or other template set
 
 
 Installation
-------------
+============
 
 First clone the project and then switch into its directory::
 
@@ -38,7 +40,7 @@ otherwise install the package in user space, avoiding root installations::
 
 
 Usage
------
+=====
 
 From command line::
 
@@ -46,15 +48,18 @@ From command line::
 
 From Python console or module::
 
-  import xmlschema_codegen as xcg
+  from xmlschema_codegen import FortranGenerator
+  codegen = FortranGenerator('schema.xsd')
+  codegen.render_to_files('*', output_dir='./output')
 
-or::
+You can provide your own templates through *searchpath* argument::
 
-  from xmlschema_codegen import generate
+  codegen = FortranGenerator('schema.xsd', searchpath='./templates')
+  codegen.render_to_files('my_template.jinja', output_dir='./output')
 
 
 License
--------
+=======
 
 This software is distributed under the terms of the BSD 3-Clause License.
 See the file 'LICENSE' in the root directory of the present distribution,
