@@ -1,73 +1,42 @@
   !
-  SUBROUTINE {{type.init_function_name()}}({{type.init_argument_line(xsd_schema.sorted_complex_types()).replace('size, ','')}})
+  SUBROUTINE qes_init_{{ type|type_name }}({{ type|init_argument_line|replace('size, ','') }})
     !
     IMPLICIT NONE
     !
-    TYPE({{type.fortran_type_name()}}), INTENT(OUT) :: obj
+    TYPE({{ type|type_name('_type') }}), INTENT(OUT) :: obj
     CHARACTER(LEN=*), INTENT(IN) :: tagname
-    {{ type.init_extension_fortran_type()}}, INTENT(IN) :: {{ type.name.replace('Type','')}} 
-{%- for attribute in type.attributes %}
-  {%- if (attribute.name != 'size')%}
-    {%- if attribute.is_required %}
-    {{attribute.init_fortran_type_name()}}, INTENT(IN) :: {{attribute.name}}
+    {{ type|init_fortran_type }}, INTENT(IN) :: {{ type|type_name }}
+{%- for attribute in type.attributes.values() %}
+  {%- if attribute.local_name != 'size' %}
+    {%- if attribute.is_required() %}
+    {{ attribute|init_fortran_type }}, INTENT(IN) :: {{ attribute|name }}
     {%- else %}
-    {{attribute.init_fortran_type_name()}}, OPTIONAL, INTENT(IN) :: {{attribute.name}}
+    {{ attribute|init_fortran_type }}, OPTIONAL, INTENT(IN) :: {{ attribute|name }}
     {%- endif %}
   {%- endif %}
 {%- endfor %}
-{%- if type.is_extension() %}
-  {%- if type.extension_type(xsd_schema.sorted_complex_types()) != None %}
-    {%- for attribute in type.extension_type(xsd_schema.sorted_complex_types()).attributes %}
-      {%- if (attribute.name != 'size')%}
-        {%- if attribute.is_required %}
-    {{attribute.init_fortran_type_name()}},INTENT(IN) :: {{attribute.name}}
-        {%- else %}
-    {{attribute.init_fortran_type_name()}},OPTIONAL,INTENT(IN) :: {{attribute.name}}
-        {%- endif %}
-      {%- endif %}
-    {%- endfor %}
-  {%- endif %}
-{%- endif %}
     !
     obj%tagname = TRIM(tagname)
     obj%lwrite = .TRUE.
     obj%lread = .TRUE.
     !
-{%- for attribute in type.attributes %}
-  {%- if (attribute.name != 'size')%}
-    {%- if attribute.is_required %}
-    obj%{{attribute.name}} = {{attribute.name}}
+{%- for attribute in type.attributes.values() %}
+  {%- if attribute.local_name != 'size' %}
+    {%- if attribute.is_required() %}
+    obj%{{ attribute|name }} = {{ attribute|name }}
     {%- else %}
     IF (PRESENT({{ attribute.name }})) THEN
-      obj%{{attribute.name}}_ispresent = .TRUE.
-      obj%{{attribute.name}} = {{attribute.name}}
+      obj%{{ attribute|name }}_ispresent = .TRUE.
+      obj%{{ attribute|name }} = {{ attribute|name }}
     ELSE 
-      obj%{{attribute.name}}_ispresent = .FALSE.
+      obj%{{ attribute|name }}_ispresent = .FALSE.
     END IF
     {%- endif %}
   {%- endif %}
 {%- endfor %}
-{%- if type.is_extension() %}
-  {%- if type.extension_type(xsd_schema.sorted_complex_types()) != None %}
-    {%- for attribute in type.extension_type(xsd_schema.sorted_complex_types()).attributes %}
-      {%- if (attribute.name != 'size')%}
-        {%- if attribute.is_required %}
-    obj%{{attribute.name}} = {{attribute.name}}
-        {%- else %}
-    IF ( PRESENT({{attribute.name}})) THEN
-      obj%{{attribute.name}}_ispresent = .TRUE.
-      obj%{{attribute.name}} = {{attribute.name}}
-    ELSE 
-      obj%{{attribute.name}}_ispresent = .FALSE.
-    END IF
-        {%- endif %} 
-      {%- endif %}
-    {%- endfor %}
-  {%- endif %}
-{%- endif %}
-    obj%size = size({{ type.name.replace('Type','')}})
-    ALLOCATE(obj%{{ type.name.replace('Type','')}}(obj%size))
-    obj%{{type.name.replace('Type', '')}} = {{ type.name.replace('Type','')}}
+    obj%size = size({{ type|type_name }})
+    ALLOCATE(obj%{{ type|type_name }}(obj%size))
+    obj%{{ type|type_name }} = {{ type|type_name }}
     !
-  END SUBROUTINE {{type.init_function_name()}} 
+  END SUBROUTINE qes_init_{{ type|type_name }}
   !

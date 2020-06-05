@@ -1,18 +1,19 @@
-{%- for function in ( type|init_function_name ).split() %}
+{#- Compose subroutines for matrixType and integerMatrixType #}
+{%- for suffix in ['_1', '_2', '_3'] %}
   !
-  SUBROUTINE {{function}}(obj, tagname, dims, mat, order)
+  SUBROUTINE qes_init_{{ type|type_name(suffix) }}(obj, tagname, dims, mat, order)
     !
     IMPLICIT NONE
     !
-    TYPE({{ type|type_name }}), INTENT(OUT) :: obj
+    TYPE({{ type|type_name('_type') }}), INTENT(OUT) :: obj
     CHARACTER(LEN=*), INTENT(IN) :: tagname
     INTEGER,DIMENSION(:),INTENT(IN) :: dims
-{%- if '_1' in function %}
-    {{type.base_type.local_name.replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:)
-{%-elif '_2' in function %}
-    {{type.base_type.local_name.replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:,:)
-{%-elif '_3' in function %}
-    {{type.base_type.local_name.replace('ALLOCATABLE','').replace('DIMENSION(:), ','')}}INTENT(IN) :: mat(:,:,:)
+{%- if suffix == '_1' %}
+    {{ type|fortran_type|replace('ALLOCATABLE','')|replace('DIMENSION(:), ','') }}INTENT(IN) :: mat(:)
+{%-elif suffix == '_2' %}
+    {{ type|fortran_type|replace('ALLOCATABLE','')|replace('DIMENSION(:), ','') }}INTENT(IN) :: mat(:,:)
+{%-elif suffix == '_3' %}
+    {{ type|fortran_type|replace('ALLOCATABLE','')|replace('DIMENSION(:), ','') }}INTENT(IN) :: mat(:,:,:)
 {%- endif %}
     CHARACTER(LEN=*),OPTIONAL :: order
     INTEGER :: rank, length, i
@@ -26,11 +27,11 @@
       length = length * dims(i)
     END DO
     obj%rank = rank
-    ALLOCATE(obj%{{ type.local_name.replace('Type','')}}(length), obj%dims(rank) )
-{%- if '_1' in function %}
-    obj%{{type.local_name.replace('Type','')}}(1:length) = mat(1:length)
+    ALLOCATE(obj%{{ type|type_name }}(length), obj%dims(rank) )
+{%- if suffix == '_1' %}
+    obj%{{ type|type_name }}(1:length) = mat(1:length)
 {%- else %}
-    obj%{{type.name.replace('Type','')}}(1:length) = reshape(mat, [length])
+    obj%{{ type|type_name }}(1:length) = reshape(mat, [length])
 {%- endif %}
     obj%dims = dims
     IF (PRESENT(order)) THEN
@@ -39,6 +40,6 @@
       obj%order = 'F'
     END IF
     !
-  END SUBROUTINE {{function}}
+  END SUBROUTINE qes_init_{{ type|type_name(suffix) }}
   !
 {%- endfor %}

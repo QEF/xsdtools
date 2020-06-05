@@ -1,77 +1,74 @@
   !
-  SUBROUTINE {{ type|init_function_name }}({{ type|init_argument_line }})
+  SUBROUTINE qes_init_{{ type|type_name }}({{ type|init_argument_line }})
     !
     IMPLICIT NONE
     !
-    TYPE({{ type|type_name }}), INTENT(OUT) :: obj
+    TYPE({{ type|type_name('_type') }}), INTENT(OUT) :: obj
     CHARACTER(LEN=*), INTENT(IN) :: tagname
-{%- if type.is_complex() %}
 {%- for attribute in type.attributes.values() %}
-  {%- if attribute.is_required %}
-    {{ attribute|init_fortran_type_name }}, INTENT(IN) :: {{attribute.name}}
+  {%- if attribute.is_required() %}
+    {{ attribute.type|init_fortran_type }}, INTENT(IN) :: {{ attribute|name }}
   {%- else %}
-    {{ attribute|init_fortran_type_name }}, OPTIONAL, INTENT(IN) :: {{attribute.name}}
+    {{ attribute.type|init_fortran_type }}, OPTIONAL, INTENT(IN) :: {{ attribute|name }}
   {%- endif %}
 {%- endfor %}
-{%- endif  %}
 {%- if type.is_extension() %}
-    {{ type|init_extension_fortran_type }}, INTENT(IN) :: {{ type.name.replace('Type','')}}
+    {{ type.base_type|init_fortran_type }}, INTENT(IN) :: {{ type|type_name }}
 {%- endif %}
-{%- for element in type.sequence %}
-  {%- if element.is_qes_type %} 
-    {%- if element.xsd_type.is_simple() %}
-    {{ element.xsd_type|init_fortran_type_name }},{{element.is_optional()}}{{ element|dimension }}INTENT(IN) :: {{element.local_name}}
+{%- if type.has_complex_content() %}
+{%- for element in type.content_type.iter_elements() %}
+  {%- if (element|is_qes_type) %}
+    {%- if element.type.is_simple() %}
+    {{ element.type|init_fortran_type }},{{ element|optional }}{{ element|dimension }}INTENT(IN) :: {{ element|name }}
     {%- else %}
-    TYPE({{ element.xsd_type|init_fortran_type_name }}),{{element.is_optional()}}{{ element|dimension }}INTENT(IN) :: {{element.local_name}}
+    TYPE({{ element|type_name('_type') }}),{{ element|optional }}{{ element|dimension }}INTENT(IN) :: {{ element|name }}
     {%- endif %}
   {%- else %}
-    {{ element|init_fortran_type_name }},{{element.is_optional()}}{{element|dimension}}INTENT(IN) :: {{element.local_name}}
+    {{ element.type|init_fortran_type }},{{ element|optional }}{{ element|dimension }}INTENT(IN) :: {{ element|name }}
   {%- endif %}
 {%- endfor %}
+{%- endif %}
     !
-    obj%tagname = TRIM(tagname) 
+    obj%tagname = TRIM(tagname)
     obj%lwrite = .TRUE.
     obj%lread = .TRUE.
-{%- if type.is_complex() %}
 {%- for attribute in type.attributes.values() %}
-  {%- if attribute.is_required %}
-    obj%{{attribute.local_name}} = {{attribute.local_name}}
+  {%- if attribute.is_required() %}
+    obj%{{ attribute|name }} = {{ attribute|name }}
   {%- else %}
-    IF (PRESENT({{ attribute.name }})) THEN
-      obj%{{attribute.local_name}}_ispresent = .TRUE.
-      obj%{{attribute.local_name}} = {{attribute.local_name}}
-    ELSE 
-      obj%{{attribute.local_name}}_ispresent = .FALSE.
-    END IF  
+    IF (PRESENT({{ attribute|name }})) THEN
+      obj%{{ attribute|name }}_ispresent = .TRUE.
+      obj%{{ attribute|name }} = {{ attribute|name }}
+    ELSE
+      obj%{{ attribute|name }}_ispresent = .FALSE.
+    END IF
   {%- endif %}
 {%- endfor %}
-{%- endif %}
     !
-{%- if type.is_extension() %}
-    obj%{{type.name.replace('Type', '')}} = {{ type.name.replace('Type','')}}
-{%- endif %}
-{%- if not type.has_simple_content() %}
+{%- if type.has_complex_content() %}
 {%- for element in type.content_type.iter_elements() %}
-  {%- if element.is_emptiable() %}
-    IF ( PRESENT({{element.local_name}})) THEN
-      obj%{{element.local_name}}_ispresent = .TRUE.
+  {%- if element.min_occurs == 0 %}
+    IF ( PRESENT({{ element|name }})) THEN
+      obj%{{ element|name }}_ispresent = .TRUE.
     {%- if element.is_multiple() %}
-      ALLOCATE(obj%{{element.local_name}}(SIZE({{element.local_name}})))
-      obj%ndim_{{element.local_name}} = SIZE({{element.local_name}})
+      ALLOCATE(obj%{{ element|name }}(SIZE({{ element|name }})))
+      obj%ndim_{{ element|name }} = SIZE({{ element|name }})
     {%- endif %} 
-      obj%{{element.local_name}} = {{element.local_name}}
-    ELSE 
-      obj%{{element.local_name}}_ispresent = .FALSE.
+      obj%{{ element|name }} = {{ element|name }}
+    ELSE
+      obj%{{ element|name }}_ispresent = .FALSE.
     END IF 
   {%- else %}
     {%- if element.is_multiple() %}
-    ALLOCATE( obj%{{element.local_name}}(SIZE({{element.local_name}})))
-    obj%ndim_{{element.local_name}} = SIZE({{element.local_name}})
+    ALLOCATE(obj%{{ element|name }}(SIZE({{ element|name }})))
+    obj%ndim_{{ element|name }} = SIZE({{ element|name }})
     {%- endif %}
-    obj%{{element.local_name}} = {{element.local_name}}
+    obj%{{ element|name }} = {{ element|name }}
   {%- endif %}
 {%- endfor %}
+{%- elif type.has_simple_content() %}
+    obj%{{ type|type_name }} = {{ type|type_name }}
 {%- endif %}
     !
-  END SUBROUTINE {{ type|init_function_name }}
+  END SUBROUTINE qes_init_{{ type|type_name }}
   !

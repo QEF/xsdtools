@@ -98,15 +98,14 @@ class QEFortranGenerator(FortranGenerator):
         return any(e.is_multiple() for e in xsd_type.content_type.iter_elements())
 
     @filter_method
-    def init_fortran_type_name(self, xsd_type):
-        tmp = re.sub(r'LEN=[\d]+', 'LEN=*', self.type_name(xsd_type), flags=re.IGNORECASE)
+    def init_fortran_type(self, xsd_type):
+        tmp = re.sub(r'LEN=[\d]+', 'LEN=*', self.map_type(xsd_type), flags=re.IGNORECASE)
         return tmp.replace(', ALLOCATABLE','')
 
+    @staticmethod
     @filter_method
-    def init_extension_fortran_type(self, xsd_type):
-        tmp = re.sub(r'LEN=[\d]+', 'LEN=*', self.type_name(xsd_type.base_type),
-              flags=re.IGNORECASE)
-        return tmp.replace(', ALLOCATABLE','')
+    def optional(xsd_element):
+        return 'OPTIONAL,' if not xsd_element.min_occurs else ''
 
     @staticmethod
     @filter_method
