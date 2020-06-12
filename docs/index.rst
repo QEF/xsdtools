@@ -1,6 +1,6 @@
-###############################
-xmlschema-codegen Documentation
-###############################
+######################
+xsdtools Documentation
+######################
 
 .. toctree::
    :maxdepth: 2

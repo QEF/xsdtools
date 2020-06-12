@@ -11,8 +11,8 @@ import jinja2
 import xmlschema
 import datetime
 
-from xmlschema_codegen import *
-from xmlschema_codegen.helpers import xsd_qname
+from xsdtools import *
+from xsdtools.helpers import xsd_qname
 
 
 XSD_TEST = """

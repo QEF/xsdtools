@@ -51,7 +51,7 @@ filters also using class decorator function or decorating a method.
 
 .. doctest::
 
-    >>> from xmlschema_codegen import AbstractGenerator, filter_method
+    >>> from xsdtools import AbstractGenerator, filter_method
     >>>
     >>> class FooGenerator(AbstractGenerator):
     ...     formal_language = 'Foo'

@@ -16,12 +16,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'xmlschema-codegen'
+project = 'xsdtools'
 copyright = '2020, SISSA (International School for Advanced Studies)'
 author = 'Davide Brunato'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.0a1'
+release = '0.2.0a2'
 
 # The short X.Y version
 version = '.'.join(release.split('.')[:2])
@@ -85,6 +85,6 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'xmlschema-codegen.tex', 'xmlschema-codegen Documentation',
+    ('index', 'xsdtools.tex', 'xsdtools Documentation',
      'Davide Brunato', 'manual'),
 ]

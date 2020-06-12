@@ -1,10 +1,10 @@
-*****************
-xmlschema-codegen
-*****************
+********
+xsdtools
+********
 
 .. introduction-start
 
-This is a code generator software from XSD schemas. The generator engine
+This package implements code generators for XSD schemas. The generator engine
 uses XSD schemas and Jinja2 templates to produce code and structures.
 
 The generator requires Python 3.7+ for working and is based on the libraries
@@ -22,8 +22,8 @@ Installation
 
 First clone the project and then switch into its directory::
 
-  git clone https://github.com/QEF/xmltool_dev.git xmlschema-codegen/
-  cd xmlschema-codegen/
+  git clone https://github.com/QEF/xsdtools.git
+  cd xsdtools/
 
 If you can create a virtual environment for this project, activate it and then run the command::
 
@@ -44,19 +44,19 @@ Usage
 
 From command line::
 
-  xmlschema-codegen --help
+  xsdtools --help
 
 From Python console or module::
 
-  from xmlschema_codegen import FortranGenerator
-  codegen = FortranGenerator('schema.xsd')
+  import xsdtools
+  codegen = xsdtools.FortranGenerator('schema.xsd')
   codegen.render_to_files('*', output_dir='./output')
 
 You can provide your own templates through *searchpath* argument::
 
-  codegen = FortranGenerator('schema.xsd', searchpath='./templates')
+  codegen = xsdtools.FortranGenerator('schema.xsd', searchpath='./templates')
   codegen.render_to_files('my_template.jinja', output_dir='./output')
-
+    
 
 License
 =======

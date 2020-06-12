@@ -21,7 +21,7 @@ from xmlschema.validators import XsdType, XsdElement, XsdAttribute
 from .helpers import NCNAME_PATTERN, QNAME_PATTERN, \
     is_shell_wildcard, xsd_qname, filter_method, test_method
 
-logger = logging.getLogger('xmlschema-codegen')
+logger = logging.getLogger('xsdtools')
 logging_formatter = logging.Formatter('[%(levelname)s] %(message)s')
 logging_handler = logging.StreamHandler(sys.stderr)
 logging_handler.setFormatter(logging_formatter)

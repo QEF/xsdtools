@@ -13,22 +13,20 @@ with open("README.rst") as readme:
     long_description = readme.read()
 
 setup(
-    name='xmlschema-codegen',
-    version='0.2.0a1',
+    name='xsdtools',
+    version='0.2.0a2',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
     entry_points={
-        'console_scripts': [
-            'xmlschema-codegen=xmlschema_codegen.__main__:main',
-        ]
+        'console_scripts': ['xsdtools=xsdtools.__main__:main']
     },
-    install_requires=['xmlschema>=1.2.0', 'jinja2'],
+    install_requires=['xmlschema~=1.2', 'jinja2'],
     author='Davide Brunato et al.',
-    url='https://github.com/sissaschool/xmlschema-codegen',
+    url='https://github.com/QEF/xsdtools',
     license='BSD 3-Clause',
     license_file='LICENSE',
-    description='A code generator for XSD schemas based on xmlschema and Jinja2 libraries',
+    description='Tools for code generation from XSD schemas',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     classifiers=[

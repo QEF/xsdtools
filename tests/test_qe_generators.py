@@ -10,7 +10,7 @@ from pathlib import Path
 import jinja2
 import xmlschema
 
-from xmlschema_codegen import QEFortranGenerator
+from xsdtools import QEFortranGenerator
 
 
 class TestQEFortranGenerator(unittest.TestCase):

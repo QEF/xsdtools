@@ -17,9 +17,9 @@ from xmlschema import XMLSchema, XMLSchema11
 from xmlschema.cli import xsd_version_number, get_loglevel
 from xmlschema.exceptions import XMLSchemaValueError
 
-from xmlschema_codegen import CGenerator, FortranGenerator, \
+from xsdtools import CGenerator, FortranGenerator, \
     PythonGenerator, JSONSchemaGenerator, QEFortranGenerator
-from xmlschema_codegen.helpers import is_shell_wildcard
+from xsdtools.helpers import is_shell_wildcard
 
 
 PROGRAM_NAME = os.path.basename(sys.argv[0])
@@ -67,7 +67,7 @@ def main():
     args = parser.parse_args()
 
     loglevel = get_loglevel(args.verbosity)
-    logger = logging.getLogger('xmlschema-codegen')
+    logger = logging.getLogger('xsdtools')
     logger.setLevel(loglevel)
 
     schema_class = XMLSchema if args.version == '1.0' else XMLSchema11

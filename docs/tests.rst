@@ -30,7 +30,7 @@ tests also using class decorator function or decorating a method.
 
 .. doctest::
 
-    >>> from xmlschema_codegen import AbstractGenerator, test_method
+    >>> from xsdtools import AbstractGenerator, test_method
     >>>
     >>> class FooGenerator(AbstractGenerator):
     ...     formal_language = 'Foo'

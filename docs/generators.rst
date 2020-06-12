@@ -8,7 +8,7 @@ Abstract base class
 Code generator classes have a common abstract base class that cannot be
 used for generate code but defines a common API:
 
-.. autoclass:: xmlschema_codegen.AbstractGenerator
+.. autoclass:: xsdtools.AbstractGenerator
 
     .. autoattribute:: xsd_file
     .. automethod:: register_filter
@@ -25,11 +25,11 @@ used for generate code but defines a common API:
 Code generator classes
 ======================
 
-.. autoclass:: xmlschema_codegen.CGenerator
-.. autoclass:: xmlschema_codegen.PythonGenerator
-.. autoclass:: xmlschema_codegen.FortranGenerator
-.. autoclass:: xmlschema_codegen.QEFortranGenerator
-.. autoclass:: xmlschema_codegen.JSONSchemaGenerator
+.. autoclass:: xsdtools.CGenerator
+.. autoclass:: xsdtools.PythonGenerator
+.. autoclass:: xsdtools.FortranGenerator
+.. autoclass:: xsdtools.QEFortranGenerator
+.. autoclass:: xsdtools.JSONSchemaGenerator
 
 
 
