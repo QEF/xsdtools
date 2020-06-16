@@ -5,7 +5,7 @@ include setup.py
 include tox.ini
 include .coveragerc
 
-recursive-include src/xmlschema_codegen *
+recursive-include src/xsdtools *
 recursive-include tests *
 
 global-exclude *.py[cod]

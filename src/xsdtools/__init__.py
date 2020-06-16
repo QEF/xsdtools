@@ -11,7 +11,7 @@ from .c_generator import CGenerator
 from .fortran_generator import FortranGenerator
 from .jsonschema_generator import JSONSchemaGenerator
 from .python_generator import PythonGenerator
-from .codes import *
+from .codes import QEFortranGenerator
 
 __all__ = ['filter_method', 'test_method', 'AbstractGenerator', 'CGenerator',
            'FortranGenerator', 'PythonGenerator', 'JSONSchemaGenerator',

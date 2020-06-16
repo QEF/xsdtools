@@ -7,7 +7,6 @@
 #
 import re
 
-from xmlschema.validators import XsdType, XsdElement, XsdAttribute
 from ..helpers import filter_method
 from ..fortran_generator import FortranGenerator
 
@@ -100,7 +99,7 @@ class QEFortranGenerator(FortranGenerator):
     @filter_method
     def init_fortran_type(self, xsd_type):
         tmp = re.sub(r'LEN=[\d]+', 'LEN=*', self.map_type(xsd_type), flags=re.IGNORECASE)
-        return tmp.replace(', ALLOCATABLE','')
+        return tmp.replace(', ALLOCATABLE', '')
 
     @staticmethod
     @filter_method
@@ -141,7 +140,7 @@ class QEFortranGenerator(FortranGenerator):
             line_head.append(xsd_type.local_name.replace('Type', ''))
 
         line = 'obj, tagname'
-        lines=[]
+        lines = []
         max_line = 90
         arglist = line_head + line_tail
         lastindex = len(line_head + line_tail) - 1
@@ -156,7 +155,7 @@ class QEFortranGenerator(FortranGenerator):
             else:
                 line += ', ' + arg
         max_line = 100
-        if  len(line) > max_line:
+        if len(line) > max_line:
             line += ' &'
             lines.append(line)
             lines.append(indent * ' ')
