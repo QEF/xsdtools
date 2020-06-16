@@ -2759,219 +2759,165 @@ MODULE qes_read_module
     tmp_node_list => getElementsByTagname(xml_node, "qpoint_grid")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","qpoint_grid: too many occurrences")
+           CALL infomsg("qes_read:hybridType","qpoint_grid: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:hybridType","qpoint_grid: too many occurrences",10)
+           CALL errore("qes_read:hybridType","qpoint_grid: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%qpoint_grid_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL qes_read_qpoint_grid(tmp_node, obj%qpoint_grid, ierr )
-    ELSE
-       obj%qpoint_grid_ispresent = .FALSE.
-    END IF
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL qes_read_qpoint_grid(tmp_node, obj%qpoint_grid, ierr )
     !
     tmp_node_list => getElementsByTagname(xml_node, "ecutfock")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","ecutfock: too many occurrences")
+           CALL infomsg("qes_read:hybridType","ecutfock: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:hybridType","ecutfock: too many occurrences",10)
+           CALL errore("qes_read:hybridType","ecutfock: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%ecutfock_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%ecutfock , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:hybridType","error reading ecutfock")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:hybridType","error reading ecutfock",10)
-         END IF
-      END IF
-    ELSE
-       obj%ecutfock_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%ecutfock, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:hybridType","error reading ecutfock")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:hybridType","error reading ecutfock",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "exx_fraction")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","exx_fraction: too many occurrences")
+           CALL infomsg("qes_read:hybridType","exx_fraction: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:hybridType","exx_fraction: too many occurrences",10)
+           CALL errore("qes_read:hybridType","exx_fraction: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%exx_fraction_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%exx_fraction , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:hybridType","error reading exx_fraction")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:hybridType","error reading exx_fraction",10)
-         END IF
-      END IF
-    ELSE
-       obj%exx_fraction_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%exx_fraction, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:hybridType","error reading exx_fraction")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:hybridType","error reading exx_fraction",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "screening_parameter")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","screening_parameter: too many occurrences")
+           CALL infomsg("qes_read:hybridType","screening_parameter: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:hybridType","screening_parameter: too many occurrences",10)
+           CALL errore("qes_read:hybridType","screening_parameter: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%screening_parameter_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%screening_parameter , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:hybridType","error reading screening_parameter")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:hybridType","error reading screening_parameter",10)
-         END IF
-      END IF
-    ELSE
-       obj%screening_parameter_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%screening_parameter, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:hybridType","error reading screening_parameter")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:hybridType","error reading screening_parameter",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "exxdiv_treatment")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","exxdiv_treatment: too many occurrences")
+           CALL infomsg("qes_read:hybridType","exxdiv_treatment: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:hybridType","exxdiv_treatment: too many occurrences",10)
+           CALL errore("qes_read:hybridType","exxdiv_treatment: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%exxdiv_treatment_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%exxdiv_treatment , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:hybridType","error reading exxdiv_treatment")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:hybridType","error reading exxdiv_treatment",10)
-         END IF
-      END IF
-    ELSE
-       obj%exxdiv_treatment_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%exxdiv_treatment, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:hybridType","error reading exxdiv_treatment")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:hybridType","error reading exxdiv_treatment",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "x_gamma_extrapolation")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","x_gamma_extrapolation: too many occurrences")
+           CALL infomsg("qes_read:hybridType","x_gamma_extrapolation: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:hybridType","x_gamma_extrapolation: too many occurrences",10)
+           CALL errore("qes_read:hybridType","x_gamma_extrapolation: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%x_gamma_extrapolation_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%x_gamma_extrapolation , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:hybridType","error reading x_gamma_extrapolation")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:hybridType","error reading x_gamma_extrapolation",10)
-         END IF
-      END IF
-    ELSE
-       obj%x_gamma_extrapolation_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%x_gamma_extrapolation, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:hybridType","error reading x_gamma_extrapolation")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:hybridType","error reading x_gamma_extrapolation",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "ecutvcut")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","ecutvcut: too many occurrences")
+           CALL infomsg("qes_read:hybridType","ecutvcut: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:hybridType","ecutvcut: too many occurrences",10)
+           CALL errore("qes_read:hybridType","ecutvcut: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%ecutvcut_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%ecutvcut , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:hybridType","error reading ecutvcut")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:hybridType","error reading ecutvcut",10)
-         END IF
-      END IF
-    ELSE
-       obj%ecutvcut_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%ecutvcut, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:hybridType","error reading ecutvcut")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:hybridType","error reading ecutvcut",10)
+       END IF
     END IF
     !
-    tmp_node_list => getElementsByTagname(xml_node, "localization_threshold")
-    tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:hybridType","localization_threshold: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:hybridType","localization_threshold: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%localization_threshold_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%localization_threshold , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:hybridType","error reading localization_threshold")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:hybridType","error reading localization_threshold",10)
-         END IF
-      END IF
-    ELSE
-       obj%localization_threshold_ispresent = .FALSE.
-    END IF
-    !
+    CALL extractDataContent(xml_node, obj%hybrid )
     !
     obj%lwrite = .TRUE.
     !
@@ -2992,7 +2938,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "nqx1")) THEN
       CALL extractDataAttribute(xml_node, "nqx1", obj%nqx1)
     ELSE
@@ -3031,7 +2976,8 @@ MODULE qes_read_module
                       "required attribute nqx3 not found", 10 )
       END IF
     END IF
-    !!
+    !
+    !
     !
     CALL extractDataContent(xml_node, obj%qpoint_grid )
     !
@@ -3224,6 +3170,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%dftU )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_dftU
@@ -3243,7 +3191,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3264,9 +3211,6 @@ MODULE qes_read_module
       obj%label_ispresent = .FALSE.
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%HubbardCommon )
@@ -3290,7 +3234,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3317,9 +3260,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%HubbardJ )
@@ -3343,7 +3283,19 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
+    IF (hasAttribute(xml_node, "size")) THEN
+      CALL extractDataAttribute(xml_node, "size", obj%size)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: starting_nsType",&
+                        "required attribute size not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: starting_nsType",&
+                      "required attribute size not found", 10 )
+      END IF
+    END IF
+    !
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3383,15 +3335,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-    IF (hasAttribute(xml_node, "size"))  THEN
-        CALL extractDataAttribute(xml_node, "size", obj%size)
-    ELSE
-        CALL errore ("qes_read: starting_nsType", &
-                     "mandatory size attribute not found in "//TRIM(obj%tagname), 12)
-    END IF
-    !
-
     !
     !
     ALLOCATE (obj%starting_ns(obj%size))
@@ -3417,7 +3360,45 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
+    IF (hasAttribute(xml_node, "rank")) THEN
+      CALL extractDataAttribute(xml_node, "rank", obj%rank)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: Hubbard_nsType",&
+                        "required attribute rank not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: Hubbard_nsType",&
+                      "required attribute rank not found", 10 )
+      END IF
+    END IF
+    !
+    IF (hasAttribute(xml_node, "dims")) THEN
+      CALL extractDataAttribute(xml_node, "dims", obj%dims)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: Hubbard_nsType",&
+                        "required attribute dims not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: Hubbard_nsType",&
+                      "required attribute dims not found", 10 )
+      END IF
+    END IF
+    !
+    IF (hasAttribute(xml_node, "order")) THEN
+      CALL extractDataAttribute(xml_node, "order", obj%order)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: Hubbard_nsType",&
+                        "required attribute order not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: Hubbard_nsType",&
+                      "required attribute order not found", 10 )
+      END IF
+    END IF
+    !
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3470,27 +3451,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-    IF (hasAttribute(xml_node, "rank"))  THEN
-        CALL extractDataAttribute(xml_node, "rank", obj%rank)
-    ELSE
-        CALL errore ("qes_read: Hubbard_nsType",&
-                      "required attribute rank not found, can't read further, stopping", 10 )
-    END IF
-    ALLOCATE (obj%dims(obj%rank))
-    IF (hasAttribute(xml_node, "dims")) THEN
-        CALL extractDataAttribute(xml_node, "dims", obj%dims)
-    ELSE
-        CALL errore ("qes_read: Hubbard_nsType",&
-                      "required attribute dims not found, can't read further, stopping", 10 )
-    END IF
-    IF (hasAttribute(xml_node,"order")) THEN
-        CALL extractDataAttribute(xml_node, "order", obj%order)
-    ELSE
-        obj%order = "F"
-    END IF
-    !
-
     !
     !
     length = 1
@@ -3523,85 +3483,25 @@ MODULE qes_read_module
     tmp_node_list => getElementsByTagname(xml_node, "vdw_corr")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:vdWType","vdw_corr: too many occurrences")
+           CALL infomsg("qes_read:vdWType","vdw_corr: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:vdWType","vdw_corr: too many occurrences",10)
+           CALL errore("qes_read:vdWType","vdw_corr: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%vdw_corr_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%vdw_corr , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:vdWType","error reading vdw_corr")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:vdWType","error reading vdw_corr",10)
-         END IF
-      END IF
-    ELSE
-       obj%vdw_corr_ispresent = .FALSE.
-    END IF
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "dftd3_version")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:vdWType","dftd3_version: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:vdWType","dftd3_version: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%dftd3_version_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%dftd3_version , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:vdWType","error reading dftd3_version")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:vdWType","error reading dftd3_version",10)
-         END IF
-      END IF
-    ELSE
-       obj%dftd3_version_ispresent = .FALSE.
-    END IF
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "dftd3_threebody")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:vdWType","dftd3_threebody: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:vdWType","dftd3_threebody: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%dftd3_threebody_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%dftd3_threebody , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:vdWType","error reading dftd3_threebody")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:vdWType","error reading dftd3_threebody",10)
-         END IF
-      END IF
-    ELSE
-       obj%dftd3_threebody_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%vdw_corr, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:vdWType","error reading vdw_corr")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:vdWType","error reading vdw_corr",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "non_local_term")
@@ -3630,62 +3530,6 @@ MODULE qes_read_module
       END IF
     ELSE
        obj%non_local_term_ispresent = .FALSE.
-    END IF
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "functional")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:vdWType","functional: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:vdWType","functional: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%functional_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%functional , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:vdWType","error reading functional")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:vdWType","error reading functional",10)
-         END IF
-      END IF
-    ELSE
-       obj%functional_ispresent = .FALSE.
-    END IF
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "total_energy_term")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:vdWType","total_energy_term: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:vdWType","total_energy_term: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%total_energy_term_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%total_energy_term , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:vdWType","error reading total_energy_term")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:vdWType","error reading total_energy_term",10)
-         END IF
-      END IF
-    ELSE
-       obj%total_energy_term_ispresent = .FALSE.
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "london_s6")
@@ -3873,6 +3717,8 @@ MODULE qes_read_module
     END DO
     !
     !
+    CALL extractDataContent(xml_node, obj%vdW )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_vdW
@@ -3965,6 +3811,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%spin )
     !
     obj%lwrite = .TRUE.
     !
@@ -4131,6 +3979,8 @@ MODULE qes_read_module
     END DO
     !
     !
+    CALL extractDataContent(xml_node, obj%bands )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_bands
@@ -4150,7 +4000,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "degauss")) THEN
       CALL extractDataAttribute(xml_node, "degauss", obj%degauss)
     ELSE
@@ -4164,9 +4013,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%smearing )
@@ -4190,7 +4036,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "spin")) THEN
       CALL extractDataAttribute(xml_node, "spin", obj%spin)
       obj%spin_ispresent = .TRUE.
@@ -4198,9 +4043,6 @@ MODULE qes_read_module
       obj%spin_ispresent = .FALSE.
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%occupations )
@@ -4365,6 +4207,8 @@ MODULE qes_read_module
        obj%fft_box_ispresent = .FALSE.
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%basis )
     !
     obj%lwrite = .TRUE.
     !
@@ -4615,6 +4459,8 @@ MODULE qes_read_module
        CALL qes_read_reciprocal_lattice(tmp_node, obj%reciprocal_lattice, ierr )
     !
     !
+    CALL extractDataContent(xml_node, obj%basis_set )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_basis_set
@@ -4634,7 +4480,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "nr1")) THEN
       CALL extractDataAttribute(xml_node, "nr1", obj%nr1)
     ELSE
@@ -4674,9 +4519,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%basisSetItem )
@@ -4773,6 +4615,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%reciprocal_lattice )
     !
     obj%lwrite = .TRUE.
     !
@@ -4941,57 +4785,25 @@ MODULE qes_read_module
     tmp_node_list => getElementsByTagname(xml_node, "real_space_q")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:electron_controlType","real_space_q: too many occurrences")
+           CALL infomsg("qes_read:electron_controlType","real_space_q: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:electron_controlType","real_space_q: too many occurrences",10)
+           CALL errore("qes_read:electron_controlType","real_space_q: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%real_space_q_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%real_space_q , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:electron_controlType","error reading real_space_q")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:electron_controlType","error reading real_space_q",10)
-         END IF
-      END IF
-    ELSE
-       obj%real_space_q_ispresent = .FALSE.
-    END IF
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "real_space_beta")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:electron_controlType","real_space_beta: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:electron_controlType","real_space_beta: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%real_space_beta_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%real_space_beta , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:electron_controlType","error reading real_space_beta")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:electron_controlType","error reading real_space_beta",10)
-         END IF
-      END IF
-    ELSE
-       obj%real_space_beta_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%real_space_q, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:electron_controlType","error reading real_space_q")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:electron_controlType","error reading real_space_q",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "tq_smoothing")
@@ -5118,34 +4930,6 @@ MODULE qes_read_module
        obj%diago_cg_maxiter_ispresent = .FALSE.
     END IF
     !
-    tmp_node_list => getElementsByTagname(xml_node, "diago_ppcg_maxiter")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:electron_controlType","diago_ppcg_maxiter: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:electron_controlType","diago_ppcg_maxiter: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%diago_ppcg_maxiter_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%diago_ppcg_maxiter , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:electron_controlType","error reading diago_ppcg_maxiter")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:electron_controlType","error reading diago_ppcg_maxiter",10)
-         END IF
-      END IF
-    ELSE
-       obj%diago_ppcg_maxiter_ispresent = .FALSE.
-    END IF
-    !
     tmp_node_list => getElementsByTagname(xml_node, "diago_david_ndim")
     tmp_node_list_size = getLength(tmp_node_list)
     !
@@ -5174,6 +4958,8 @@ MODULE qes_read_module
        obj%diago_david_ndim_ispresent = .FALSE.
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%electron_control )
     !
     obj%lwrite = .TRUE.
     !
@@ -5260,6 +5046,8 @@ MODULE qes_read_module
     END DO
     !
     !
+    CALL extractDataContent(xml_node, obj%k_points_IBZ )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_k_points_IBZ
@@ -5279,7 +5067,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "nk1")) THEN
       CALL extractDataAttribute(xml_node, "nk1", obj%nk1)
     ELSE
@@ -5358,9 +5145,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%monkhorst_pack )
@@ -5384,7 +5168,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "weight")) THEN
       CALL extractDataAttribute(xml_node, "weight", obj%weight)
       obj%weight_ispresent = .TRUE.
@@ -5399,9 +5182,6 @@ MODULE qes_read_module
       obj%label_ispresent = .FALSE.
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%k_point )
@@ -5575,6 +5355,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%ion_control )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_ion_control
@@ -5739,6 +5521,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%bfgs )
     !
     obj%lwrite = .TRUE.
     !
@@ -5952,6 +5736,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%md )
     !
     obj%lwrite = .TRUE.
     !
@@ -6182,6 +5968,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%cell_control )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_cell_control
@@ -6347,6 +6135,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%symmetry_flags )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_symmetry_flags
@@ -6468,6 +6258,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%boundary_conditions )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_boundary_conditions
@@ -6585,6 +6377,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%esm )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_esm
@@ -6677,6 +6471,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%ekin_functional )
     !
     obj%lwrite = .TRUE.
     !
@@ -6774,6 +6570,8 @@ MODULE qes_read_module
        obj%target_magnetization_ispresent = .FALSE.
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%spin_constraints )
     !
     obj%lwrite = .TRUE.
     !
@@ -7064,6 +6862,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%electric_field )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_electric_field
@@ -7277,6 +7077,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%gate_settings )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_gate_settings
@@ -7364,6 +7166,8 @@ MODULE qes_read_module
         CALL qes_read_atomic_constraint(tmp_node, obj%atomic_constraint(index), ierr )
     END DO
     !
+    !
+    CALL extractDataContent(xml_node, obj%atomic_constraints )
     !
     obj%lwrite = .TRUE.
     !
@@ -7458,6 +7262,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%atomic_constraint )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_atomic_constraint
@@ -7477,7 +7283,19 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
+    IF (hasAttribute(xml_node, "size")) THEN
+      CALL extractDataAttribute(xml_node, "size", obj%size)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: inputOccupationsType",&
+                        "required attribute size not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: inputOccupationsType",&
+                      "required attribute size not found", 10 )
+      END IF
+    END IF
+    !
     IF (hasAttribute(xml_node, "ispin")) THEN
       CALL extractDataAttribute(xml_node, "ispin", obj%ispin)
     ELSE
@@ -7504,15 +7322,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-    IF (hasAttribute(xml_node, "size"))  THEN
-        CALL extractDataAttribute(xml_node, "size", obj%size)
-    ELSE
-        CALL errore ("qes_read: inputOccupationsType", &
-                     "mandatory size attribute not found in "//TRIM(obj%tagname), 12)
-    END IF
-    !
-
     !
     !
     ALLOCATE (obj%inputOccupations(obj%size))
@@ -7619,6 +7428,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%outputElectricField )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_outputElectricField
@@ -7709,6 +7520,8 @@ MODULE qes_read_module
         CALL qes_read_electronicPolarization(tmp_node, obj%electronicPolarization(index), ierr )
     END DO
     !
+    !
+    CALL extractDataContent(xml_node, obj%BerryPhaseOutput )
     !
     obj%lwrite = .TRUE.
     !
@@ -7851,6 +7664,8 @@ MODULE qes_read_module
        CALL qes_read_scalarQuantity(tmp_node, obj%totalLength, ierr )
     !
     !
+    CALL extractDataContent(xml_node, obj%dipoleOutput )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_dipoleOutput
@@ -7919,6 +7734,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%finiteFieldOut )
     !
     obj%lwrite = .TRUE.
     !
@@ -8005,6 +7822,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%polarization )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_polarization
@@ -8081,6 +7900,8 @@ MODULE qes_read_module
     IF (ASSOCIATED(tmp_node))&
        CALL qes_read_phase(tmp_node, obj%phase, ierr )
     !
+    !
+    CALL extractDataContent(xml_node, obj%ionicPolarization )
     !
     obj%lwrite = .TRUE.
     !
@@ -8163,6 +7984,8 @@ MODULE qes_read_module
        CALL qes_read_phase(tmp_node, obj%phase, ierr )
     !
     !
+    CALL extractDataContent(xml_node, obj%electronicPolarization )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_electronicPolarization
@@ -8182,7 +8005,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "ionic")) THEN
       CALL extractDataAttribute(xml_node, "ionic", obj%ionic)
       obj%ionic_ispresent = .TRUE.
@@ -8204,9 +8026,6 @@ MODULE qes_read_module
       obj%modulus_ispresent = .FALSE.
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%phase )
@@ -8328,6 +8147,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%gateInfo )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_gateInfo
@@ -8385,6 +8206,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%convergence_info )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_convergence_info
@@ -8404,30 +8227,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "convergence_achieved")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size /= 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:scf_convType","convergence_achieved: wrong number of occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:scf_convType","convergence_achieved: wrong number of occurrences",10)
-        END IF
-    END IF
-    !
-    tmp_node => item(tmp_node_list, 0)
-    IF (ASSOCIATED(tmp_node))&
-       CALL extractDataContent(tmp_node, obj%convergence_achieved, IOSTAT = iostat_ )
-    IF ( iostat_ /= 0 ) THEN
-       IF ( PRESENT (ierr ) ) THEN
-          CALL infomsg("qes_read:scf_convType","error reading convergence_achieved")
-          ierr = ierr + 1
-       ELSE
-          CALL errore ("qes_read:scf_convType","error reading convergence_achieved",10)
-       END IF
-    END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "n_scf_steps")
     tmp_node_list_size = getLength(tmp_node_list)
@@ -8478,6 +8277,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%scf_conv )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_scf_conv
@@ -8497,30 +8298,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "convergence_achieved")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size /= 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:opt_convType","convergence_achieved: wrong number of occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:opt_convType","convergence_achieved: wrong number of occurrences",10)
-        END IF
-    END IF
-    !
-    tmp_node => item(tmp_node_list, 0)
-    IF (ASSOCIATED(tmp_node))&
-       CALL extractDataContent(tmp_node, obj%convergence_achieved, IOSTAT = iostat_ )
-    IF ( iostat_ /= 0 ) THEN
-       IF ( PRESENT (ierr ) ) THEN
-          CALL infomsg("qes_read:opt_convType","error reading convergence_achieved")
-          ierr = ierr + 1
-       ELSE
-          CALL errore ("qes_read:opt_convType","error reading convergence_achieved",10)
-       END IF
-    END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "n_opt_steps")
     tmp_node_list_size = getLength(tmp_node_list)
@@ -8571,6 +8348,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%opt_conv )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_opt_conv
@@ -8613,34 +8392,6 @@ MODULE qes_read_module
        ELSE
           CALL errore ("qes_read:algorithmic_infoType","error reading real_space_q",10)
        END IF
-    END IF
-    !
-    tmp_node_list => getElementsByTagname(xml_node, "real_space_beta")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:algorithmic_infoType","real_space_beta: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:algorithmic_infoType","real_space_beta: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%real_space_beta_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%real_space_beta , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:algorithmic_infoType","error reading real_space_beta")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:algorithmic_infoType","error reading real_space_beta",10)
-         END IF
-      END IF
-    ELSE
-       obj%real_space_beta_ispresent = .FALSE.
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "uspp")
@@ -8691,6 +8442,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%algorithmic_info )
     !
     obj%lwrite = .TRUE.
     !
@@ -8812,6 +8565,8 @@ MODULE qes_read_module
     END DO
     !
     !
+    CALL extractDataContent(xml_node, obj%symmetries )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_symmetries
@@ -8913,6 +8668,8 @@ MODULE qes_read_module
     END IF
     !
     !
+    CALL extractDataContent(xml_node, obj%symmetry )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_symmetry
@@ -8932,7 +8689,19 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
+    IF (hasAttribute(xml_node, "size")) THEN
+      CALL extractDataAttribute(xml_node, "size", obj%size)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: equivalent_atomsType",&
+                        "required attribute size not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: equivalent_atomsType",&
+                      "required attribute size not found", 10 )
+      END IF
+    END IF
+    !
     IF (hasAttribute(xml_node, "nat")) THEN
       CALL extractDataAttribute(xml_node, "nat", obj%nat)
     ELSE
@@ -8946,15 +8715,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-    IF (hasAttribute(xml_node, "size"))  THEN
-        CALL extractDataAttribute(xml_node, "size", obj%size)
-    ELSE
-        CALL errore ("qes_read: equivalent_atomsType", &
-                     "mandatory size attribute not found in "//TRIM(obj%tagname), 12)
-    END IF
-    !
-
     !
     !
     ALLOCATE (obj%equivalent_atoms(obj%size))
@@ -8979,7 +8739,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "name")) THEN
       CALL extractDataAttribute(xml_node, "name", obj%name)
       obj%name_ispresent = .TRUE.
@@ -9001,9 +8760,6 @@ MODULE qes_read_module
       obj%time_reversal_ispresent = .FALSE.
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%info )
@@ -9052,6 +8808,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%outputPBC )
     !
     obj%lwrite = .TRUE.
     !
@@ -9217,6 +8975,8 @@ MODULE qes_read_module
        END IF
     END IF
     !
+    !
+    CALL extractDataContent(xml_node, obj%magnetization )
     !
     obj%lwrite = .TRUE.
     !
@@ -9514,34 +9274,8 @@ MODULE qes_read_module
        obj%gatefield_contr_ispresent = .FALSE.
     END IF
     !
-    tmp_node_list => getElementsByTagname(xml_node, "vdW_term")
-    tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:total_energyType","vdW_term: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:total_energyType","vdW_term: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%vdW_term_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%vdW_term , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:total_energyType","error reading vdW_term")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:total_energyType","error reading vdW_term",10)
-         END IF
-      END IF
-    ELSE
-       obj%vdW_term_ispresent = .FALSE.
-    END IF
-    !
+    CALL extractDataContent(xml_node, obj%total_energy )
     !
     obj%lwrite = .TRUE.
     !
@@ -9638,29 +9372,25 @@ MODULE qes_read_module
     tmp_node_list => getElementsByTagname(xml_node, "nbnd")
     tmp_node_list_size = getLength(tmp_node_list)
     !
-    IF (tmp_node_list_size > 1) THEN
+    IF (tmp_node_list_size /= 1) THEN
         IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:band_structureType","nbnd: too many occurrences")
+           CALL infomsg("qes_read:band_structureType","nbnd: wrong number of occurrences")
            ierr = ierr + 1
         ELSE
-           CALL errore("qes_read:band_structureType","nbnd: too many occurrences",10)
+           CALL errore("qes_read:band_structureType","nbnd: wrong number of occurrences",10)
         END IF
     END IF
     !
-    IF (tmp_node_list_size>0) THEN
-      obj%nbnd_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%nbnd , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:band_structureType","error reading nbnd")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:band_structureType","error reading nbnd",10)
-         END IF
-      END IF
-    ELSE
-       obj%nbnd_ispresent = .FALSE.
+    tmp_node => item(tmp_node_list, 0)
+    IF (ASSOCIATED(tmp_node))&
+       CALL extractDataContent(tmp_node, obj%nbnd, IOSTAT = iostat_ )
+    IF ( iostat_ /= 0 ) THEN
+       IF ( PRESENT (ierr ) ) THEN
+          CALL infomsg("qes_read:band_structureType","error reading nbnd")
+          ierr = ierr + 1
+       ELSE
+          CALL errore ("qes_read:band_structureType","error reading nbnd",10)
+       END IF
     END IF
     !
     tmp_node_list => getElementsByTagname(xml_node, "nbnd_up")
@@ -9851,34 +9581,6 @@ MODULE qes_read_module
        obj%highestOccupiedLevel_ispresent = .FALSE.
     END IF
     !
-    tmp_node_list => getElementsByTagname(xml_node, "lowestUnoccupiedLevel")
-    tmp_node_list_size = getLength(tmp_node_list)
-    !
-    IF (tmp_node_list_size > 1) THEN
-        IF (PRESENT(ierr) ) THEN
-           CALL infomsg("qes_read:band_structureType","lowestUnoccupiedLevel: too many occurrences")
-           ierr = ierr + 1
-        ELSE
-           CALL errore("qes_read:band_structureType","lowestUnoccupiedLevel: too many occurrences",10)
-        END IF
-    END IF
-    !
-    IF (tmp_node_list_size>0) THEN
-      obj%lowestUnoccupiedLevel_ispresent = .TRUE.
-      tmp_node => item(tmp_node_list, 0)
-      CALL extractDataContent(tmp_node, obj%lowestUnoccupiedLevel , IOSTAT = iostat_)
-      IF ( iostat_ /= 0 ) THEN
-         IF ( PRESENT (ierr ) ) THEN
-            CALL infomsg("qes_read:band_structureType","error reading lowestUnoccupiedLevel")
-            ierr = ierr + 1
-         ELSE
-            CALL errore ("qes_read:band_structureType","error reading lowestUnoccupiedLevel",10)
-         END IF
-      END IF
-    ELSE
-       obj%lowestUnoccupiedLevel_ispresent = .FALSE.
-    END IF
-    !
     tmp_node_list => getElementsByTagname(xml_node, "two_fermi_energies")
     tmp_node_list_size = getLength(tmp_node_list)
     !
@@ -10003,6 +9705,8 @@ MODULE qes_read_module
     END DO
     !
     !
+    CALL extractDataContent(xml_node, obj%band_structure )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_band_structure
@@ -10096,6 +9800,8 @@ MODULE qes_read_module
        CALL qes_read_vector(tmp_node, obj%occupations, ierr )
     !
     !
+    CALL extractDataContent(xml_node, obj%ks_energies )
+    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_ks_energies
@@ -10115,7 +9821,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "DATE")) THEN
       CALL extractDataAttribute(xml_node, "DATE", obj%DATE)
     ELSE
@@ -10142,9 +9847,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%closed )
@@ -10168,16 +9870,19 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-    IF (hasAttribute(xml_node, "size"))  THEN
-        CALL extractDataAttribute(xml_node, "size", obj%size)
+    IF (hasAttribute(xml_node, "size")) THEN
+      CALL extractDataAttribute(xml_node, "size", obj%size)
     ELSE
-        CALL errore ("qes_read: vectorType", &
-                     "mandatory size attribute not found in "//TRIM(obj%tagname), 12)
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: vectorType",&
+                        "required attribute size not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: vectorType",&
+                      "required attribute size not found", 10 )
+      END IF
     END IF
     !
-
-
-
     !
     !
     ALLOCATE (obj%vector(obj%size))
@@ -10202,16 +9907,19 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-    IF (hasAttribute(xml_node, "size"))  THEN
-        CALL extractDataAttribute(xml_node, "size", obj%size)
+    IF (hasAttribute(xml_node, "size")) THEN
+      CALL extractDataAttribute(xml_node, "size", obj%size)
     ELSE
-        CALL errore ("qes_read: integerVectorType", &
-                     "mandatory size attribute not found in "//TRIM(obj%tagname), 12)
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: integerVectorType",&
+                        "required attribute size not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: integerVectorType",&
+                      "required attribute size not found", 10 )
+      END IF
     END IF
     !
-
-
-
     !
     !
     ALLOCATE (obj%integerVector(obj%size))
@@ -10237,28 +9945,45 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-    IF (hasAttribute(xml_node, "rank"))  THEN
-        CALL extractDataAttribute(xml_node, "rank", obj%rank)
+    IF (hasAttribute(xml_node, "rank")) THEN
+      CALL extractDataAttribute(xml_node, "rank", obj%rank)
     ELSE
-        CALL errore ("qes_read: matrixType",&
-                      "required attribute rank not found, can't read further, stopping", 10 )
-    END IF
-    ALLOCATE (obj%dims(obj%rank))
-    IF (hasAttribute(xml_node, "dims")) THEN
-        CALL extractDataAttribute(xml_node, "dims", obj%dims)
-    ELSE
-        CALL errore ("qes_read: matrixType",&
-                      "required attribute dims not found, can't read further, stopping", 10 )
-    END IF
-    IF (hasAttribute(xml_node,"order")) THEN
-        CALL extractDataAttribute(xml_node, "order", obj%order)
-    ELSE
-        obj%order = "F"
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: matrixType",&
+                        "required attribute rank not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: matrixType",&
+                      "required attribute rank not found", 10 )
+      END IF
     END IF
     !
-
-
-
+    IF (hasAttribute(xml_node, "dims")) THEN
+      CALL extractDataAttribute(xml_node, "dims", obj%dims)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: matrixType",&
+                        "required attribute dims not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: matrixType",&
+                      "required attribute dims not found", 10 )
+      END IF
+    END IF
+    !
+    IF (hasAttribute(xml_node, "order")) THEN
+      CALL extractDataAttribute(xml_node, "order", obj%order)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: matrixType",&
+                        "required attribute order not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: matrixType",&
+                      "required attribute order not found", 10 )
+      END IF
+    END IF
+    !
     !
     !
     length = 1
@@ -10288,28 +10013,45 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-    IF (hasAttribute(xml_node, "rank"))  THEN
-        CALL extractDataAttribute(xml_node, "rank", obj%rank)
+    IF (hasAttribute(xml_node, "rank")) THEN
+      CALL extractDataAttribute(xml_node, "rank", obj%rank)
     ELSE
-        CALL errore ("qes_read: integerMatrixType",&
-                      "required attribute rank not found, can't read further, stopping", 10 )
-    END IF
-    ALLOCATE (obj%dims(obj%rank))
-    IF (hasAttribute(xml_node, "dims")) THEN
-        CALL extractDataAttribute(xml_node, "dims", obj%dims)
-    ELSE
-        CALL errore ("qes_read: integerMatrixType",&
-                      "required attribute dims not found, can't read further, stopping", 10 )
-    END IF
-    IF (hasAttribute(xml_node,"order")) THEN
-        CALL extractDataAttribute(xml_node, "order", obj%order)
-    ELSE
-        obj%order = "F"
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: integerMatrixType",&
+                        "required attribute rank not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: integerMatrixType",&
+                      "required attribute rank not found", 10 )
+      END IF
     END IF
     !
-
-
-
+    IF (hasAttribute(xml_node, "dims")) THEN
+      CALL extractDataAttribute(xml_node, "dims", obj%dims)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: integerMatrixType",&
+                        "required attribute dims not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: integerMatrixType",&
+                      "required attribute dims not found", 10 )
+      END IF
+    END IF
+    !
+    IF (hasAttribute(xml_node, "order")) THEN
+      CALL extractDataAttribute(xml_node, "order", obj%order)
+    ELSE
+      IF ( PRESENT(ierr) ) THEN
+         CALL infomsg ( "qes_read: integerMatrixType",&
+                        "required attribute order not found" )
+         ierr = ierr + 1
+      ELSE
+         CALL errore ("qes_read: integerMatrixType",&
+                      "required attribute order not found", 10 )
+      END IF
+    END IF
+    !
     !
     !
     length = 1
@@ -10338,7 +10080,6 @@ MODULE qes_read_module
     !
     obj%tagname = getTagName(xml_node)
     !
-
     IF (hasAttribute(xml_node, "Units")) THEN
       CALL extractDataAttribute(xml_node, "Units", obj%Units)
     ELSE
@@ -10352,9 +10093,6 @@ MODULE qes_read_module
       END IF
     END IF
     !
-
-
-
     !
     !
     CALL extractDataContent(xml_node, obj%scalarQuantity )
