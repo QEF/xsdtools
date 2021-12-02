@@ -26,7 +26,7 @@
     CALL mp_bcast(obj%size, ionode_id, comm)
 {%- else %}
   {%- for attribute in type.attributes.values() %}
-    {%- if attribute.is_optional %}
+    {%- if attribute.is_optional() %}
     CALL mp_bcast(obj%{{ attribute|name }}_ispresent, ionode_id, comm)
     IF (obj%{{ attribute|name }}_ispresent) &
       CALL mp_bcast(obj%{{ attribute|name }}, ionode_id, comm)

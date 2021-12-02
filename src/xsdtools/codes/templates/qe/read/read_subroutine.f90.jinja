@@ -144,7 +144,7 @@
 {%- endfor %}
 {%- endif %}
     !
-{%- if type.extension_xsd_type_name != None %}
+{%- if type.is_extension() %}
 {%- include "read/read_extension.f90.jinja" %}
 {%- endif %}
     obj%lwrite = .TRUE.
