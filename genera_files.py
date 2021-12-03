@@ -8,4 +8,4 @@ temps = map(pathlib.Path,glob('src/xsdtools/codes/templates/qe/*/qes_*_module.f9
 
 g1 = ( (xsdtools.QEFortranGenerator(schema, p.parent ),p.name) for p in temps) 
 g2 = (_[0].render_to_files(_[1], force=True) for _ in g1)
-deque(g2)
+deque(g2, maxlen=0)

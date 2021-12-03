@@ -17,7 +17,23 @@
     obj%tagname = getTagName(xml_node)
     !
 {#- Insert attributes #}
-{%- for attribute in type.attributes.values() %}
+{%- if (type|is_matrix_type) %} 
+    IF hasAttribute(xml_node, "rank")) THEN 
+       CALL extractDataAttribute(xml_node, "rank", obj%rank) 
+    ELSE
+       CALL errore ("qes_read: {{type|name }}",&
+                    "required attribute rank not found, can't read further, stopping", 10) 
+    END IF 
+    ALLOCATE (obj%dims(obj%rank))
+    IF (hasAttribute(xml_node, "dims")) THEN 
+      CALL extractDataAttribute(xml_node, "dims", obj%dims) 
+    ELSE 
+      CALL errore ("qes_read: {{type|name}}",&
+                      "required attribute dims not found, can't read further, stopping", 10 )
+    END IF
+{%- endif %}  
+ 
+{%- for attribute in type|attributes_list  %} 
     IF (hasAttribute(xml_node, "{{ attribute.local_name }}")) THEN
       CALL extractDataAttribute(xml_node, "{{ attribute|name }}", obj%{{ attribute|name }})
   {%- if attribute.is_required() %}
