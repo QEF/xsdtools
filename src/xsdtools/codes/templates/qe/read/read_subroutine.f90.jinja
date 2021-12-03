@@ -18,7 +18,7 @@
     !
 {#- Insert attributes #}
 {%- if (type|is_matrix_type) %} 
-    IF hasAttribute(xml_node, "rank")) THEN 
+    IF (hasAttribute(xml_node, "rank")) THEN 
        CALL extractDataAttribute(xml_node, "rank", obj%rank) 
     ELSE
        CALL errore ("qes_read: {{type|name }}",&
