@@ -262,7 +262,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%n_step_ispresent) CALL xml_addAttribute(xp, 'n_step', obj%n_step )
+     CALL xml_addAttribute(xp, 'n_step', obj%n_step )
      CALL qes_write_scf_conv (xp, obj%scf_conv)
      CALL qes_write_atomic_structure (xp, obj%atomic_structure)
      CALL qes_write_total_energy (xp, obj%total_energy)
@@ -409,8 +409,8 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%NAME_ispresent) CALL xml_addAttribute(xp, 'NAME', TRIM(obj%NAME) )
-     IF (obj%VERSION_ispresent) CALL xml_addAttribute(xp, 'VERSION', TRIM(obj%VERSION) )
+     CALL xml_addAttribute(xp, 'NAME', TRIM(obj%NAME) )
+     CALL xml_addAttribute(xp, 'VERSION', TRIM(obj%VERSION) )
         CALL xml_AddCharacters(xp, TRIM(obj%xml_format))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_xml_format
@@ -426,8 +426,8 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%NAME_ispresent) CALL xml_addAttribute(xp, 'NAME', TRIM(obj%NAME) )
-     IF (obj%VERSION_ispresent) CALL xml_addAttribute(xp, 'VERSION', TRIM(obj%VERSION) )
+     CALL xml_addAttribute(xp, 'NAME', TRIM(obj%NAME) )
+     CALL xml_addAttribute(xp, 'VERSION', TRIM(obj%VERSION) )
         CALL xml_AddCharacters(xp, TRIM(obj%creator))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_creator
@@ -443,8 +443,8 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%DATE_ispresent) CALL xml_addAttribute(xp, 'DATE', TRIM(obj%DATE) )
-     IF (obj%TIME_ispresent) CALL xml_addAttribute(xp, 'TIME', TRIM(obj%TIME) )
+     CALL xml_addAttribute(xp, 'DATE', TRIM(obj%DATE) )
+     CALL xml_addAttribute(xp, 'TIME', TRIM(obj%TIME) )
         CALL xml_AddCharacters(xp, TRIM(obj%created))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_created
@@ -460,7 +460,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%ntyp_ispresent) CALL xml_addAttribute(xp, 'ntyp', obj%ntyp )
+     CALL xml_addAttribute(xp, 'ntyp', obj%ntyp )
      IF (obj%pseudo_dir_ispresent) CALL xml_addAttribute(xp, 'pseudo_dir', TRIM(obj%pseudo_dir) )
      DO i = 1, obj%ndim_species
         CALL qes_write_species(xp, obj%species(i) )
@@ -479,7 +479,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%name_ispresent) CALL xml_addAttribute(xp, 'name', TRIM(obj%name) )
+     CALL xml_addAttribute(xp, 'name', TRIM(obj%name) )
      IF (obj%mass_ispresent) THEN
         CALL xml_NewElement(xp, "mass")
            CALL xml_addCharacters(xp, obj%mass, fmt='s16')
@@ -517,7 +517,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%nat_ispresent) CALL xml_addAttribute(xp, 'nat', obj%nat )
+     CALL xml_addAttribute(xp, 'nat', obj%nat )
      IF (obj%alat_ispresent) CALL xml_addAttribute(xp, 'alat', obj%alat )
      IF (obj%bravais_index_ispresent) CALL xml_addAttribute(xp, 'bravais_index', obj%bravais_index )
      IF (obj%atomic_positions_ispresent) THEN
@@ -561,7 +561,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%name_ispresent) CALL xml_addAttribute(xp, 'name', TRIM(obj%name) )
+     CALL xml_addAttribute(xp, 'name', TRIM(obj%name) )
      IF (obj%position_ispresent) CALL xml_addAttribute(xp, 'position', TRIM(obj%position) )
      IF (obj%index_ispresent) CALL xml_addAttribute(xp, 'index', obj%index )
         CALL xml_AddCharacters(xp, obj%atom, fmt='s16')
@@ -579,7 +579,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%space_group_ispresent) CALL xml_addAttribute(xp, 'space_group', obj%space_group )
+     CALL xml_addAttribute(xp, 'space_group', obj%space_group )
      IF (obj%more_options_ispresent) CALL xml_addAttribute(xp, 'more_options', TRIM(obj%more_options) )
      DO i = 1, obj%ndim_atom
         CALL qes_write_atom(xp, obj%atom(i) )
@@ -680,9 +680,9 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%nqx1_ispresent) CALL xml_addAttribute(xp, 'nqx1', obj%nqx1 )
-     IF (obj%nqx2_ispresent) CALL xml_addAttribute(xp, 'nqx2', obj%nqx2 )
-     IF (obj%nqx3_ispresent) CALL xml_addAttribute(xp, 'nqx3', obj%nqx3 )
+     CALL xml_addAttribute(xp, 'nqx1', obj%nqx1 )
+     CALL xml_addAttribute(xp, 'nqx2', obj%nqx2 )
+     CALL xml_addAttribute(xp, 'nqx3', obj%nqx3 )
         CALL xml_AddCharacters(xp, TRIM(obj%qpoint_grid))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_qpoint_grid
@@ -757,7 +757,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%specie_ispresent) CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
+     CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
      IF (obj%label_ispresent) CALL xml_addAttribute(xp, 'label', TRIM(obj%label) )
         CALL xml_AddCharacters(xp, obj%HubbardCommon, fmt='s16')
      CALL xml_EndElement(xp, TRIM(obj%tagname))
@@ -774,8 +774,8 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%specie_ispresent) CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
-     IF (obj%label_ispresent) CALL xml_addAttribute(xp, 'label', TRIM(obj%label) )
+     CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
+     CALL xml_addAttribute(xp, 'label', TRIM(obj%label) )
         CALL xml_AddCharacters(xp, obj%HubbardJ, fmt='s16')
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_HubbardJ
@@ -791,10 +791,10 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%size_ispresent) CALL xml_addAttribute(xp, 'size', obj%size )
-     IF (obj%specie_ispresent) CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
-     IF (obj%label_ispresent) CALL xml_addAttribute(xp, 'label', TRIM(obj%label) )
-     IF (obj%spin_ispresent) CALL xml_addAttribute(xp, 'spin', obj%spin )
+     CALL xml_addAttribute(xp, 'size', obj%size )
+     CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
+     CALL xml_addAttribute(xp, 'label', TRIM(obj%label) )
+     CALL xml_addAttribute(xp, 'spin', obj%spin )
      CALL xml_addNewLine(xp)
      DO i = 1, obj%size, 5
         CALL xml_AddCharacters(xp, obj%starting_ns(i:MIN(i+5-1,obj%size)), fmt='s16')
@@ -814,13 +814,13 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%rank_ispresent) CALL xml_addAttribute(xp, 'rank', obj%rank )
-     IF (obj%dims_ispresent) CALL xml_addAttribute(xp, 'dims', obj%dims )
-     IF (obj%order_ispresent) CALL xml_addAttribute(xp, 'order', TRIM(obj%order) )
-     IF (obj%specie_ispresent) CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
-     IF (obj%label_ispresent) CALL xml_addAttribute(xp, 'label', TRIM(obj%label) )
-     IF (obj%spin_ispresent) CALL xml_addAttribute(xp, 'spin', obj%spin )
-     IF (obj%index_ispresent) CALL xml_addAttribute(xp, 'index', obj%index )
+     CALL xml_addAttribute(xp, 'rank', obj%rank )
+     CALL xml_addAttribute(xp, 'dims', obj%dims )
+     CALL xml_addAttribute(xp, 'order', TRIM(obj%order) )
+     CALL xml_addAttribute(xp, 'specie', TRIM(obj%specie) )
+     CALL xml_addAttribute(xp, 'label', TRIM(obj%label) )
+     CALL xml_addAttribute(xp, 'spin', obj%spin )
+     CALL xml_addAttribute(xp, 'index', obj%index )
        CALL xml_addNewLine(xp)
         DO i = 1, obj%dims(2)
            CALL xml_AddCharacters(xp, obj%Hubbard_ns((i-1)*obj%dims(1)+1: i*obj%dims(1)), fmt ='s16')
@@ -958,7 +958,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%degauss_ispresent) CALL xml_addAttribute(xp, 'degauss', obj%degauss )
+     CALL xml_addAttribute(xp, 'degauss', obj%degauss )
         CALL xml_AddCharacters(xp, TRIM(obj%smearing))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_smearing
@@ -1072,9 +1072,9 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%nr1_ispresent) CALL xml_addAttribute(xp, 'nr1', obj%nr1 )
-     IF (obj%nr2_ispresent) CALL xml_addAttribute(xp, 'nr2', obj%nr2 )
-     IF (obj%nr3_ispresent) CALL xml_addAttribute(xp, 'nr3', obj%nr3 )
+     CALL xml_addAttribute(xp, 'nr1', obj%nr1 )
+     CALL xml_addAttribute(xp, 'nr2', obj%nr2 )
+     CALL xml_addAttribute(xp, 'nr3', obj%nr3 )
         CALL xml_AddCharacters(xp, TRIM(obj%basisSetItem))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_basisSetItem
@@ -1197,12 +1197,12 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%nk1_ispresent) CALL xml_addAttribute(xp, 'nk1', obj%nk1 )
-     IF (obj%nk2_ispresent) CALL xml_addAttribute(xp, 'nk2', obj%nk2 )
-     IF (obj%nk3_ispresent) CALL xml_addAttribute(xp, 'nk3', obj%nk3 )
-     IF (obj%k1_ispresent) CALL xml_addAttribute(xp, 'k1', obj%k1 )
-     IF (obj%k2_ispresent) CALL xml_addAttribute(xp, 'k2', obj%k2 )
-     IF (obj%k3_ispresent) CALL xml_addAttribute(xp, 'k3', obj%k3 )
+     CALL xml_addAttribute(xp, 'nk1', obj%nk1 )
+     CALL xml_addAttribute(xp, 'nk2', obj%nk2 )
+     CALL xml_addAttribute(xp, 'nk3', obj%nk3 )
+     CALL xml_addAttribute(xp, 'k1', obj%k1 )
+     CALL xml_addAttribute(xp, 'k2', obj%k2 )
+     CALL xml_addAttribute(xp, 'k3', obj%k3 )
         CALL xml_AddCharacters(xp, TRIM(obj%monkhorst_pack))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_monkhorst_pack
@@ -1680,9 +1680,9 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%size_ispresent) CALL xml_addAttribute(xp, 'size', obj%size )
-     IF (obj%ispin_ispresent) CALL xml_addAttribute(xp, 'ispin', obj%ispin )
-     IF (obj%spin_factor_ispresent) CALL xml_addAttribute(xp, 'spin_factor', obj%spin_factor )
+     CALL xml_addAttribute(xp, 'size', obj%size )
+     CALL xml_addAttribute(xp, 'ispin', obj%ispin )
+     CALL xml_addAttribute(xp, 'spin_factor', obj%spin_factor )
      CALL xml_addNewLine(xp)
      DO i = 1, obj%size, 5
         CALL xml_AddCharacters(xp, obj%inputOccupations(i:MIN(i+5-1,obj%size)), fmt='s16')
@@ -2029,8 +2029,8 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%size_ispresent) CALL xml_addAttribute(xp, 'size', obj%size )
-     IF (obj%nat_ispresent) CALL xml_addAttribute(xp, 'nat', obj%nat )
+     CALL xml_addAttribute(xp, 'size', obj%size )
+     CALL xml_addAttribute(xp, 'nat', obj%nat )
      CALL xml_addNewLine(xp)
      DO i = 1, obj%size, 8
         CALL xml_AddCharacters(xp, obj%equivalent_atoms(i:MIN(i+8-1, obj%size)))
@@ -2272,8 +2272,8 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%DATE_ispresent) CALL xml_addAttribute(xp, 'DATE', TRIM(obj%DATE) )
-     IF (obj%TIME_ispresent) CALL xml_addAttribute(xp, 'TIME', TRIM(obj%TIME) )
+     CALL xml_addAttribute(xp, 'DATE', TRIM(obj%DATE) )
+     CALL xml_addAttribute(xp, 'TIME', TRIM(obj%TIME) )
         CALL xml_AddCharacters(xp, TRIM(obj%closed))
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_closed
@@ -2289,7 +2289,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%size_ispresent) CALL xml_addAttribute(xp, 'size', obj%size )
+     CALL xml_addAttribute(xp, 'size', obj%size )
      CALL xml_addNewLine(xp)
      DO i = 1, obj%size, 5
         CALL xml_AddCharacters(xp, obj%vector(i:MIN(i+5-1,obj%size)), fmt='s16')
@@ -2309,7 +2309,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%size_ispresent) CALL xml_addAttribute(xp, 'size', obj%size )
+     CALL xml_addAttribute(xp, 'size', obj%size )
      CALL xml_addNewLine(xp)
      DO i = 1, obj%size, 8
         CALL xml_AddCharacters(xp, obj%integerVector(i:MIN(i+8-1, obj%size)))
@@ -2329,9 +2329,9 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%rank_ispresent) CALL xml_addAttribute(xp, 'rank', obj%rank )
-     IF (obj%dims_ispresent) CALL xml_addAttribute(xp, 'dims', obj%dims )
-     IF (obj%order_ispresent) CALL xml_addAttribute(xp, 'order', TRIM(obj%order) )
+     CALL xml_addAttribute(xp, 'rank', obj%rank )
+     CALL xml_addAttribute(xp, 'dims', obj%dims )
+     CALL xml_addAttribute(xp, 'order', TRIM(obj%order) )
        CALL xml_addNewLine(xp)
         DO i = 1, obj%dims(2)
            CALL xml_AddCharacters(xp, obj%matrix((i-1)*obj%dims(1)+1: i*obj%dims(1)), fmt ='s16')
@@ -2351,9 +2351,9 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%rank_ispresent) CALL xml_addAttribute(xp, 'rank', obj%rank )
-     IF (obj%dims_ispresent) CALL xml_addAttribute(xp, 'dims', obj%dims )
-     IF (obj%order_ispresent) CALL xml_addAttribute(xp, 'order', TRIM(obj%order) )
+     CALL xml_addAttribute(xp, 'rank', obj%rank )
+     CALL xml_addAttribute(xp, 'dims', obj%dims )
+     CALL xml_addAttribute(xp, 'order', TRIM(obj%order) )
         CALL xml_addNewLine(xp)
         DO i = 1, obj%dims(2)
            CALL xml_AddCharacters(xp, obj%integerMatrix((i-1)*obj%dims(1)+1: i*obj%dims(1)) )
@@ -2373,7 +2373,7 @@ MODULE qes_write_module
      IF ( .NOT. obj%lwrite ) RETURN 
      ! 
      CALL xml_NewElement(xp, TRIM(obj%tagname))
-     IF (obj%Units_ispresent) CALL xml_addAttribute(xp, 'Units', TRIM(obj%Units) )
+     CALL xml_addAttribute(xp, 'Units', TRIM(obj%Units) )
         CALL xml_AddCharacters(xp, obj%scalarQuantity, fmt='s16')
      CALL xml_EndElement(xp, TRIM(obj%tagname))
    END SUBROUTINE qes_write_scalarQuantity

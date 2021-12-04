@@ -118,7 +118,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "Units")) THEN
       CALL extractDataAttribute(xml_node, "Units", obj%Units)
       obj%Units_ispresent = .TRUE.
@@ -296,8 +296,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%espresso )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_espresso
@@ -390,8 +388,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%general_info )
     !
     obj%lwrite = .TRUE.
     !
@@ -557,8 +553,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%parallel_info )
     !
     obj%lwrite = .TRUE.
     !
@@ -937,8 +931,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%input )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_input
@@ -957,7 +949,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "n_step")) THEN
       CALL extractDataAttribute(xml_node, "n_step", obj%n_step)
     ELSE
@@ -1112,8 +1104,6 @@ MODULE qes_read_module
        obj%FCP_tot_charge_ispresent = .FALSE.
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%step )
     !
     obj%lwrite = .TRUE.
     !
@@ -1435,8 +1425,6 @@ MODULE qes_read_module
        obj%FCP_tot_charge_ispresent = .FALSE.
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%output )
     !
     obj%lwrite = .TRUE.
     !
@@ -1871,8 +1859,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%control_variables )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_control_variables
@@ -1891,7 +1877,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "NAME")) THEN
       CALL extractDataAttribute(xml_node, "NAME", obj%NAME)
     ELSE
@@ -1904,7 +1890,7 @@ MODULE qes_read_module
                       "required attribute NAME not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "VERSION")) THEN
       CALL extractDataAttribute(xml_node, "VERSION", obj%VERSION)
     ELSE
@@ -1940,7 +1926,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "NAME")) THEN
       CALL extractDataAttribute(xml_node, "NAME", obj%NAME)
     ELSE
@@ -1953,7 +1939,7 @@ MODULE qes_read_module
                       "required attribute NAME not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "VERSION")) THEN
       CALL extractDataAttribute(xml_node, "VERSION", obj%VERSION)
     ELSE
@@ -1989,7 +1975,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "DATE")) THEN
       CALL extractDataAttribute(xml_node, "DATE", obj%DATE)
     ELSE
@@ -2002,7 +1988,7 @@ MODULE qes_read_module
                       "required attribute DATE not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "TIME")) THEN
       CALL extractDataAttribute(xml_node, "TIME", obj%TIME)
     ELSE
@@ -2038,7 +2024,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "ntyp")) THEN
       CALL extractDataAttribute(xml_node, "ntyp", obj%ntyp)
     ELSE
@@ -2051,7 +2037,7 @@ MODULE qes_read_module
                       "required attribute ntyp not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "pseudo_dir")) THEN
       CALL extractDataAttribute(xml_node, "pseudo_dir", obj%pseudo_dir)
       obj%pseudo_dir_ispresent = .TRUE.
@@ -2080,8 +2066,6 @@ MODULE qes_read_module
     END DO
     !
     !
-    CALL extractDataContent(xml_node, obj%atomic_species )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_atomic_species
@@ -2100,7 +2084,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "name")) THEN
       CALL extractDataAttribute(xml_node, "name", obj%name)
     ELSE
@@ -2252,8 +2236,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%species )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_species
@@ -2272,7 +2254,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "nat")) THEN
       CALL extractDataAttribute(xml_node, "nat", obj%nat)
     ELSE
@@ -2285,14 +2267,14 @@ MODULE qes_read_module
                       "required attribute nat not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "alat")) THEN
       CALL extractDataAttribute(xml_node, "alat", obj%alat)
       obj%alat_ispresent = .TRUE.
     ELSE
       obj%alat_ispresent = .FALSE.
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "bravais_index")) THEN
       CALL extractDataAttribute(xml_node, "bravais_index", obj%bravais_index)
       obj%bravais_index_ispresent = .TRUE.
@@ -2378,8 +2360,6 @@ MODULE qes_read_module
        CALL qes_read_cell(tmp_node, obj%cell, ierr )
     !
     !
-    CALL extractDataContent(xml_node, obj%atomic_structure )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_atomic_structure
@@ -2420,8 +2400,6 @@ MODULE qes_read_module
     END DO
     !
     !
-    CALL extractDataContent(xml_node, obj%atomic_positions )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_atomic_positions
@@ -2440,7 +2418,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "name")) THEN
       CALL extractDataAttribute(xml_node, "name", obj%name)
     ELSE
@@ -2453,14 +2431,14 @@ MODULE qes_read_module
                       "required attribute name not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "position")) THEN
       CALL extractDataAttribute(xml_node, "position", obj%position)
       obj%position_ispresent = .TRUE.
     ELSE
       obj%position_ispresent = .FALSE.
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "index")) THEN
       CALL extractDataAttribute(xml_node, "index", obj%index)
       obj%index_ispresent = .TRUE.
@@ -2490,7 +2468,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "space_group")) THEN
       CALL extractDataAttribute(xml_node, "space_group", obj%space_group)
     ELSE
@@ -2503,7 +2481,7 @@ MODULE qes_read_module
                       "required attribute space_group not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "more_options")) THEN
       CALL extractDataAttribute(xml_node, "more_options", obj%more_options)
       obj%more_options_ispresent = .TRUE.
@@ -2531,8 +2509,6 @@ MODULE qes_read_module
         CALL qes_read_atom(tmp_node, obj%atom(index), ierr )
     END DO
     !
-    !
-    CALL extractDataContent(xml_node, obj%wyckoff_positions )
     !
     obj%lwrite = .TRUE.
     !
@@ -2626,8 +2602,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%cell )
     !
     obj%lwrite = .TRUE.
     !
@@ -2733,8 +2707,6 @@ MODULE qes_read_module
        obj%vdW_ispresent = .FALSE.
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%dft )
     !
     obj%lwrite = .TRUE.
     !
@@ -2917,8 +2889,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%hybrid )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_hybrid
@@ -2937,7 +2907,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "nqx1")) THEN
       CALL extractDataAttribute(xml_node, "nqx1", obj%nqx1)
     ELSE
@@ -2950,7 +2920,7 @@ MODULE qes_read_module
                       "required attribute nqx1 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "nqx2")) THEN
       CALL extractDataAttribute(xml_node, "nqx2", obj%nqx2)
     ELSE
@@ -2963,7 +2933,7 @@ MODULE qes_read_module
                       "required attribute nqx2 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "nqx3")) THEN
       CALL extractDataAttribute(xml_node, "nqx3", obj%nqx3)
     ELSE
@@ -3170,8 +3140,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%dftU )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_dftU
@@ -3190,7 +3158,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3203,7 +3171,7 @@ MODULE qes_read_module
                       "required attribute specie not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "label")) THEN
       CALL extractDataAttribute(xml_node, "label", obj%label)
       obj%label_ispresent = .TRUE.
@@ -3233,7 +3201,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3246,7 +3214,7 @@ MODULE qes_read_module
                       "required attribute specie not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "label")) THEN
       CALL extractDataAttribute(xml_node, "label", obj%label)
     ELSE
@@ -3282,7 +3250,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "size")) THEN
       CALL extractDataAttribute(xml_node, "size", obj%size)
     ELSE
@@ -3295,7 +3263,7 @@ MODULE qes_read_module
                       "required attribute size not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3308,7 +3276,7 @@ MODULE qes_read_module
                       "required attribute specie not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "label")) THEN
       CALL extractDataAttribute(xml_node, "label", obj%label)
     ELSE
@@ -3321,7 +3289,7 @@ MODULE qes_read_module
                       "required attribute label not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "spin")) THEN
       CALL extractDataAttribute(xml_node, "spin", obj%spin)
     ELSE
@@ -3359,33 +3327,20 @@ MODULE qes_read_module
     INTEGER :: i, length
     !
     obj%tagname = getTagName(xml_node)
-    !
-    IF (hasAttribute(xml_node, "rank")) THEN
-      CALL extractDataAttribute(xml_node, "rank", obj%rank)
+    ! 
+    IF (hasAttribute(xml_node, "rank")) THEN 
+       CALL extractDataAttribute(xml_node, "rank", obj%rank) 
     ELSE
-      IF ( PRESENT(ierr) ) THEN
-         CALL infomsg ( "qes_read: Hubbard_nsType",&
-                        "required attribute rank not found" )
-         ierr = ierr + 1
-      ELSE
-         CALL errore ("qes_read: Hubbard_nsType",&
-                      "required attribute rank not found", 10 )
-      END IF
-    END IF
-    !
-    IF (hasAttribute(xml_node, "dims")) THEN
-      CALL extractDataAttribute(xml_node, "dims", obj%dims)
-    ELSE
-      IF ( PRESENT(ierr) ) THEN
-         CALL infomsg ( "qes_read: Hubbard_nsType",&
-                        "required attribute dims not found" )
-         ierr = ierr + 1
-      ELSE
-         CALL errore ("qes_read: Hubbard_nsType",&
-                      "required attribute dims not found", 10 )
-      END IF
-    END IF
-    !
+       CALL errore ("qes_read: Hubbard_nsType",&
+                    "required attribute rank not found, can't read further, stopping", 10) 
+    END IF 
+    ALLOCATE (obj%dims(obj%rank))
+    IF (hasAttribute(xml_node, "dims")) THEN 
+      CALL extractDataAttribute(xml_node, "dims", obj%dims) 
+    ELSE 
+      CALL errore ("qes_read: Hubbard_nsType",&
+                      "required attribute dims not found, can't read further, stopping", 10 )
+    END IF 
     IF (hasAttribute(xml_node, "order")) THEN
       CALL extractDataAttribute(xml_node, "order", obj%order)
     ELSE
@@ -3398,7 +3353,7 @@ MODULE qes_read_module
                       "required attribute order not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "specie")) THEN
       CALL extractDataAttribute(xml_node, "specie", obj%specie)
     ELSE
@@ -3411,7 +3366,7 @@ MODULE qes_read_module
                       "required attribute specie not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "label")) THEN
       CALL extractDataAttribute(xml_node, "label", obj%label)
     ELSE
@@ -3424,7 +3379,7 @@ MODULE qes_read_module
                       "required attribute label not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "spin")) THEN
       CALL extractDataAttribute(xml_node, "spin", obj%spin)
     ELSE
@@ -3437,7 +3392,7 @@ MODULE qes_read_module
                       "required attribute spin not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "index")) THEN
       CALL extractDataAttribute(xml_node, "index", obj%index)
     ELSE
@@ -3717,8 +3672,6 @@ MODULE qes_read_module
     END DO
     !
     !
-    CALL extractDataContent(xml_node, obj%vdW )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_vdW
@@ -3811,8 +3764,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%spin )
     !
     obj%lwrite = .TRUE.
     !
@@ -3979,8 +3930,6 @@ MODULE qes_read_module
     END DO
     !
     !
-    CALL extractDataContent(xml_node, obj%bands )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_bands
@@ -3999,7 +3948,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "degauss")) THEN
       CALL extractDataAttribute(xml_node, "degauss", obj%degauss)
     ELSE
@@ -4035,7 +3984,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "spin")) THEN
       CALL extractDataAttribute(xml_node, "spin", obj%spin)
       obj%spin_ispresent = .TRUE.
@@ -4207,8 +4156,6 @@ MODULE qes_read_module
        obj%fft_box_ispresent = .FALSE.
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%basis )
     !
     obj%lwrite = .TRUE.
     !
@@ -4459,8 +4406,6 @@ MODULE qes_read_module
        CALL qes_read_reciprocal_lattice(tmp_node, obj%reciprocal_lattice, ierr )
     !
     !
-    CALL extractDataContent(xml_node, obj%basis_set )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_basis_set
@@ -4479,7 +4424,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "nr1")) THEN
       CALL extractDataAttribute(xml_node, "nr1", obj%nr1)
     ELSE
@@ -4492,7 +4437,7 @@ MODULE qes_read_module
                       "required attribute nr1 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "nr2")) THEN
       CALL extractDataAttribute(xml_node, "nr2", obj%nr2)
     ELSE
@@ -4505,7 +4450,7 @@ MODULE qes_read_module
                       "required attribute nr2 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "nr3")) THEN
       CALL extractDataAttribute(xml_node, "nr3", obj%nr3)
     ELSE
@@ -4615,8 +4560,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%reciprocal_lattice )
     !
     obj%lwrite = .TRUE.
     !
@@ -4959,8 +4902,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%electron_control )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_electron_control
@@ -5046,8 +4987,6 @@ MODULE qes_read_module
     END DO
     !
     !
-    CALL extractDataContent(xml_node, obj%k_points_IBZ )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_k_points_IBZ
@@ -5066,7 +5005,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "nk1")) THEN
       CALL extractDataAttribute(xml_node, "nk1", obj%nk1)
     ELSE
@@ -5079,7 +5018,7 @@ MODULE qes_read_module
                       "required attribute nk1 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "nk2")) THEN
       CALL extractDataAttribute(xml_node, "nk2", obj%nk2)
     ELSE
@@ -5092,7 +5031,7 @@ MODULE qes_read_module
                       "required attribute nk2 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "nk3")) THEN
       CALL extractDataAttribute(xml_node, "nk3", obj%nk3)
     ELSE
@@ -5105,7 +5044,7 @@ MODULE qes_read_module
                       "required attribute nk3 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "k1")) THEN
       CALL extractDataAttribute(xml_node, "k1", obj%k1)
     ELSE
@@ -5118,7 +5057,7 @@ MODULE qes_read_module
                       "required attribute k1 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "k2")) THEN
       CALL extractDataAttribute(xml_node, "k2", obj%k2)
     ELSE
@@ -5131,7 +5070,7 @@ MODULE qes_read_module
                       "required attribute k2 not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "k3")) THEN
       CALL extractDataAttribute(xml_node, "k3", obj%k3)
     ELSE
@@ -5167,14 +5106,14 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "weight")) THEN
       CALL extractDataAttribute(xml_node, "weight", obj%weight)
       obj%weight_ispresent = .TRUE.
     ELSE
       obj%weight_ispresent = .FALSE.
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "label")) THEN
       CALL extractDataAttribute(xml_node, "label", obj%label)
       obj%label_ispresent = .TRUE.
@@ -5355,8 +5294,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%ion_control )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_ion_control
@@ -5521,8 +5458,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%bfgs )
     !
     obj%lwrite = .TRUE.
     !
@@ -5736,8 +5671,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%md )
     !
     obj%lwrite = .TRUE.
     !
@@ -5968,8 +5901,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%cell_control )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_cell_control
@@ -6135,8 +6066,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%symmetry_flags )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_symmetry_flags
@@ -6258,8 +6187,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%boundary_conditions )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_boundary_conditions
@@ -6377,8 +6304,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%esm )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_esm
@@ -6471,8 +6396,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%ekin_functional )
     !
     obj%lwrite = .TRUE.
     !
@@ -6570,8 +6493,6 @@ MODULE qes_read_module
        obj%target_magnetization_ispresent = .FALSE.
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%spin_constraints )
     !
     obj%lwrite = .TRUE.
     !
@@ -6862,8 +6783,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%electric_field )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_electric_field
@@ -7077,8 +6996,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%gate_settings )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_gate_settings
@@ -7166,8 +7083,6 @@ MODULE qes_read_module
         CALL qes_read_atomic_constraint(tmp_node, obj%atomic_constraint(index), ierr )
     END DO
     !
-    !
-    CALL extractDataContent(xml_node, obj%atomic_constraints )
     !
     obj%lwrite = .TRUE.
     !
@@ -7262,8 +7177,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%atomic_constraint )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_atomic_constraint
@@ -7282,7 +7195,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "size")) THEN
       CALL extractDataAttribute(xml_node, "size", obj%size)
     ELSE
@@ -7295,7 +7208,7 @@ MODULE qes_read_module
                       "required attribute size not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "ispin")) THEN
       CALL extractDataAttribute(xml_node, "ispin", obj%ispin)
     ELSE
@@ -7308,7 +7221,7 @@ MODULE qes_read_module
                       "required attribute ispin not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "spin_factor")) THEN
       CALL extractDataAttribute(xml_node, "spin_factor", obj%spin_factor)
     ELSE
@@ -7428,8 +7341,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%outputElectricField )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_outputElectricField
@@ -7520,8 +7431,6 @@ MODULE qes_read_module
         CALL qes_read_electronicPolarization(tmp_node, obj%electronicPolarization(index), ierr )
     END DO
     !
-    !
-    CALL extractDataContent(xml_node, obj%BerryPhaseOutput )
     !
     obj%lwrite = .TRUE.
     !
@@ -7664,8 +7573,6 @@ MODULE qes_read_module
        CALL qes_read_scalarQuantity(tmp_node, obj%totalLength, ierr )
     !
     !
-    CALL extractDataContent(xml_node, obj%dipoleOutput )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_dipoleOutput
@@ -7734,8 +7641,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%finiteFieldOut )
     !
     obj%lwrite = .TRUE.
     !
@@ -7822,8 +7727,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%polarization )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_polarization
@@ -7900,8 +7803,6 @@ MODULE qes_read_module
     IF (ASSOCIATED(tmp_node))&
        CALL qes_read_phase(tmp_node, obj%phase, ierr )
     !
-    !
-    CALL extractDataContent(xml_node, obj%ionicPolarization )
     !
     obj%lwrite = .TRUE.
     !
@@ -7984,8 +7885,6 @@ MODULE qes_read_module
        CALL qes_read_phase(tmp_node, obj%phase, ierr )
     !
     !
-    CALL extractDataContent(xml_node, obj%electronicPolarization )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_electronicPolarization
@@ -8004,21 +7903,21 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "ionic")) THEN
       CALL extractDataAttribute(xml_node, "ionic", obj%ionic)
       obj%ionic_ispresent = .TRUE.
     ELSE
       obj%ionic_ispresent = .FALSE.
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "electronic")) THEN
       CALL extractDataAttribute(xml_node, "electronic", obj%electronic)
       obj%electronic_ispresent = .TRUE.
     ELSE
       obj%electronic_ispresent = .FALSE.
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "modulus")) THEN
       CALL extractDataAttribute(xml_node, "modulus", obj%modulus)
       obj%modulus_ispresent = .TRUE.
@@ -8147,8 +8046,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%gateInfo )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_gateInfo
@@ -8205,8 +8102,6 @@ MODULE qes_read_module
        obj%opt_conv_ispresent = .FALSE.
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%convergence_info )
     !
     obj%lwrite = .TRUE.
     !
@@ -8277,8 +8172,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%scf_conv )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_scf_conv
@@ -8347,8 +8240,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%opt_conv )
     !
     obj%lwrite = .TRUE.
     !
@@ -8442,8 +8333,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%algorithmic_info )
     !
     obj%lwrite = .TRUE.
     !
@@ -8565,8 +8454,6 @@ MODULE qes_read_module
     END DO
     !
     !
-    CALL extractDataContent(xml_node, obj%symmetries )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_symmetries
@@ -8668,8 +8555,6 @@ MODULE qes_read_module
     END IF
     !
     !
-    CALL extractDataContent(xml_node, obj%symmetry )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_symmetry
@@ -8688,7 +8573,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "size")) THEN
       CALL extractDataAttribute(xml_node, "size", obj%size)
     ELSE
@@ -8701,7 +8586,7 @@ MODULE qes_read_module
                       "required attribute size not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "nat")) THEN
       CALL extractDataAttribute(xml_node, "nat", obj%nat)
     ELSE
@@ -8738,21 +8623,21 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "name")) THEN
       CALL extractDataAttribute(xml_node, "name", obj%name)
       obj%name_ispresent = .TRUE.
     ELSE
       obj%name_ispresent = .FALSE.
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "class")) THEN
       CALL extractDataAttribute(xml_node, "class", obj%class)
       obj%class_ispresent = .TRUE.
     ELSE
       obj%class_ispresent = .FALSE.
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "time_reversal")) THEN
       CALL extractDataAttribute(xml_node, "time_reversal", obj%time_reversal)
       obj%time_reversal_ispresent = .TRUE.
@@ -8808,8 +8693,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%outputPBC )
     !
     obj%lwrite = .TRUE.
     !
@@ -8975,8 +8858,6 @@ MODULE qes_read_module
        END IF
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%magnetization )
     !
     obj%lwrite = .TRUE.
     !
@@ -9274,8 +9155,6 @@ MODULE qes_read_module
        obj%gatefield_contr_ispresent = .FALSE.
     END IF
     !
-    !
-    CALL extractDataContent(xml_node, obj%total_energy )
     !
     obj%lwrite = .TRUE.
     !
@@ -9705,8 +9584,6 @@ MODULE qes_read_module
     END DO
     !
     !
-    CALL extractDataContent(xml_node, obj%band_structure )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_band_structure
@@ -9800,8 +9677,6 @@ MODULE qes_read_module
        CALL qes_read_vector(tmp_node, obj%occupations, ierr )
     !
     !
-    CALL extractDataContent(xml_node, obj%ks_energies )
-    !
     obj%lwrite = .TRUE.
     !
   END SUBROUTINE qes_read_ks_energies
@@ -9820,7 +9695,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "DATE")) THEN
       CALL extractDataAttribute(xml_node, "DATE", obj%DATE)
     ELSE
@@ -9833,7 +9708,7 @@ MODULE qes_read_module
                       "required attribute DATE not found", 10 )
       END IF
     END IF
-    !
+    ! 
     IF (hasAttribute(xml_node, "TIME")) THEN
       CALL extractDataAttribute(xml_node, "TIME", obj%TIME)
     ELSE
@@ -9869,7 +9744,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "size")) THEN
       CALL extractDataAttribute(xml_node, "size", obj%size)
     ELSE
@@ -9906,7 +9781,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "size")) THEN
       CALL extractDataAttribute(xml_node, "size", obj%size)
     ELSE
@@ -9944,33 +9819,20 @@ MODULE qes_read_module
     INTEGER :: i, length
     !
     obj%tagname = getTagName(xml_node)
-    !
-    IF (hasAttribute(xml_node, "rank")) THEN
-      CALL extractDataAttribute(xml_node, "rank", obj%rank)
+    ! 
+    IF (hasAttribute(xml_node, "rank")) THEN 
+       CALL extractDataAttribute(xml_node, "rank", obj%rank) 
     ELSE
-      IF ( PRESENT(ierr) ) THEN
-         CALL infomsg ( "qes_read: matrixType",&
-                        "required attribute rank not found" )
-         ierr = ierr + 1
-      ELSE
-         CALL errore ("qes_read: matrixType",&
-                      "required attribute rank not found", 10 )
-      END IF
-    END IF
-    !
-    IF (hasAttribute(xml_node, "dims")) THEN
-      CALL extractDataAttribute(xml_node, "dims", obj%dims)
-    ELSE
-      IF ( PRESENT(ierr) ) THEN
-         CALL infomsg ( "qes_read: matrixType",&
-                        "required attribute dims not found" )
-         ierr = ierr + 1
-      ELSE
-         CALL errore ("qes_read: matrixType",&
-                      "required attribute dims not found", 10 )
-      END IF
-    END IF
-    !
+       CALL errore ("qes_read: matrixType",&
+                    "required attribute rank not found, can't read further, stopping", 10) 
+    END IF 
+    ALLOCATE (obj%dims(obj%rank))
+    IF (hasAttribute(xml_node, "dims")) THEN 
+      CALL extractDataAttribute(xml_node, "dims", obj%dims) 
+    ELSE 
+      CALL errore ("qes_read: matrixType",&
+                      "required attribute dims not found, can't read further, stopping", 10 )
+    END IF 
     IF (hasAttribute(xml_node, "order")) THEN
       CALL extractDataAttribute(xml_node, "order", obj%order)
     ELSE
@@ -10012,33 +9874,20 @@ MODULE qes_read_module
     INTEGER :: i, length
     !
     obj%tagname = getTagName(xml_node)
-    !
-    IF (hasAttribute(xml_node, "rank")) THEN
-      CALL extractDataAttribute(xml_node, "rank", obj%rank)
+    ! 
+    IF (hasAttribute(xml_node, "rank")) THEN 
+       CALL extractDataAttribute(xml_node, "rank", obj%rank) 
     ELSE
-      IF ( PRESENT(ierr) ) THEN
-         CALL infomsg ( "qes_read: integerMatrixType",&
-                        "required attribute rank not found" )
-         ierr = ierr + 1
-      ELSE
-         CALL errore ("qes_read: integerMatrixType",&
-                      "required attribute rank not found", 10 )
-      END IF
-    END IF
-    !
-    IF (hasAttribute(xml_node, "dims")) THEN
-      CALL extractDataAttribute(xml_node, "dims", obj%dims)
-    ELSE
-      IF ( PRESENT(ierr) ) THEN
-         CALL infomsg ( "qes_read: integerMatrixType",&
-                        "required attribute dims not found" )
-         ierr = ierr + 1
-      ELSE
-         CALL errore ("qes_read: integerMatrixType",&
-                      "required attribute dims not found", 10 )
-      END IF
-    END IF
-    !
+       CALL errore ("qes_read: integerMatrixType",&
+                    "required attribute rank not found, can't read further, stopping", 10) 
+    END IF 
+    ALLOCATE (obj%dims(obj%rank))
+    IF (hasAttribute(xml_node, "dims")) THEN 
+      CALL extractDataAttribute(xml_node, "dims", obj%dims) 
+    ELSE 
+      CALL errore ("qes_read: integerMatrixType",&
+                      "required attribute dims not found, can't read further, stopping", 10 )
+    END IF 
     IF (hasAttribute(xml_node, "order")) THEN
       CALL extractDataAttribute(xml_node, "order", obj%order)
     ELSE
@@ -10079,7 +9928,7 @@ MODULE qes_read_module
     INTEGER :: tmp_node_list_size, index, iostat_
     !
     obj%tagname = getTagName(xml_node)
-    !
+    ! 
     IF (hasAttribute(xml_node, "Units")) THEN
       CALL extractDataAttribute(xml_node, "Units", obj%Units)
     ELSE
