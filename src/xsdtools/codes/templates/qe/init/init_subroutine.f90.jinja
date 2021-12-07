@@ -16,7 +16,7 @@
     {{ type.base_type|init_fortran_type }}, INTENT(IN) :: {{ type|type_name }}
 {%- endif %}
 {%- if type.has_complex_content() %}
-{%- for element in type.content_type.iter_elements() %}
+{%- for element in type.content.iter_elements() %}
   {%- if (element|is_qes_type) %}
     {%- if element.type.is_simple() %}
     {{ element.type|init_fortran_type }},{{ element|optional }}{{ element|dimension }}INTENT(IN) :: {{ element|name }}
@@ -46,7 +46,7 @@
 {%- endfor %}
     !
 {%- if type.has_complex_content() %}
-{%- for element in type.content_type.iter_elements() %}
+{%- for element in type.content.iter_elements() %}
   {%- if element.min_occurs == 0 %}
     IF ( PRESENT({{ element|name }})) THEN
       obj%{{ element|name }}_ispresent = .TRUE.

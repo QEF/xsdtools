@@ -57,7 +57,7 @@
     !
 {#- Insert children #}
 {%- if type.has_complex_content() %}
-{%- for element in type.content_type.iter_elements() %}
+{%- for element in type.content.iter_elements() %}
     tmp_node_list => getElementsByTagname(xml_node, "{{ element.local_name }}")
     tmp_node_list_size = getLength(tmp_node_list)
     !

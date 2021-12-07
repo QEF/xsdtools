@@ -505,7 +505,7 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
         unordered = {x: [] for x in xsd_types if x.is_complex() and not x.has_simple_content()}
 
         for xsd_type in unordered:
-            for e in xsd_type.content_type.iter_elements():
+            for e in xsd_type.content.iter_elements():
                 if e.type in unordered:
                     unordered[xsd_type].append(e.type)
 
@@ -568,4 +568,4 @@ class AbstractGenerator(ABC, metaclass=GeneratorMeta):
     def multi_sequence(xsd_type):
         if xsd_type.has_simple_content():
             return False
-        return any(e.is_multiple() for e in xsd_type.content_type.iter_elements())
+        return any(e.is_multiple() for e in xsd_type.content.iter_elements())

@@ -94,7 +94,7 @@ class QEFortranGenerator(FortranGenerator):
     def has_multi_sequence(xsd_type):
         if xsd_type.has_simple_content():
             return False
-        return any(e.is_multiple() for e in xsd_type.content_type.iter_elements())
+        return any(e.is_multiple() for e in xsd_type.content.iter_elements())
 
     @filter_method
     def init_fortran_type(self, xsd_type):
@@ -130,7 +130,7 @@ class QEFortranGenerator(FortranGenerator):
                     line_tail.append(attribute.local_name)
 
         if not xsd_type.has_simple_content():
-            for element in xsd_type.content_type.iter_elements():
+            for element in xsd_type.content.iter_elements():
                 if element.min_occurs != 0:
                     line_head.append(element.tag)
                 else:

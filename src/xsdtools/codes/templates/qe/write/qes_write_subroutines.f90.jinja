@@ -32,7 +32,7 @@
 {%- endif %}
 {#- Insert children #}
 {%- if type.has_complex_content() %}
-{%- for element in type.content_type.iter_elements() %}
+{%- for element in type.content.iter_elements() %}
    {%- if element.min_occurs == 0 %}
      IF (obj%{{ element|name }}_ispresent) THEN
       {%- if element.max_occurs == 1 %}

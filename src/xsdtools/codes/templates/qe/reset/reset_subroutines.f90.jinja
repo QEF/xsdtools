@@ -13,7 +13,7 @@
     !
 {#- Insert children #}
 {%- if type.has_complex_content() %}
-{%- for element in type.content_type.iter_elements() %}
+{%- for element in type.content.iter_elements() %}
   {%- if element.min_occurs == 0 and element.max_occurs == 1 %}
     {%- if ( element.type|is_qes_type ) and element.type.is_complex() %}
     IF (obj%{{ element.local_name }}_ispresent) &

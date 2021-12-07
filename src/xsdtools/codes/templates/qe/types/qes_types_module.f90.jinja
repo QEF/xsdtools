@@ -35,7 +35,7 @@ MODULE qes_types_module
     {{ type.base_type|fortran_type }} :: {{ type|type_name }}
 {%- endif %}
 {%- if type.has_complex_content() %}
-{%- for element in type.content_type.iter_elements() %}
+{%- for element in type.content.iter_elements() %}
 {%- if element.min_occurs == 0 %}
     LOGICAL  :: {{ element.local_name }}_ispresent = .FALSE.
 {%- endif %}
