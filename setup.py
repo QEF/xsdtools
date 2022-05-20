@@ -14,14 +14,14 @@ with open("README.rst") as readme:
 
 setup(
     name='xsdtools',
-    version='0.2.0a2',
+    version='0.3.0a1',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
     entry_points={
         'console_scripts': ['xsdtools=xsdtools.__main__:main']
     },
-    install_requires=['xmlschema~=1.2', 'jinja2'],
+    install_requires=['xmlschema>=1.8', 'jinja2'],
     author='Davide Brunato et al.',
     url='https://github.com/QEF/xsdtools',
     license='BSD 3-Clause',
@@ -38,6 +38,8 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Software Development :: Code Generators',
         'Topic :: Text Processing :: Markup :: XML',
