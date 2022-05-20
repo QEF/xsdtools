@@ -11,8 +11,12 @@ MODULE qes_write_module
   !
   ! Quantum Espresso XSD namespace: {{ schema.target_namespace }}
   !
+#if defined (__outfoxed) 
+  USE  wxml 
+#else 
+  USE FoX_wxml 
+#endif 
   USE qes_types_module
-  USE FoX_wxml
   !
   IMPLICIT NONE
   !
