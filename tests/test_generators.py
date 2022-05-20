@@ -7,12 +7,14 @@
 #
 import unittest
 from pathlib import Path
-import jinja2
-import xmlschema
 import datetime
 
-from xsdtools import *
-from xsdtools.helpers import xsd_qname
+import jinja2
+from xmlschema import XMLSchema
+from xmlschema.extras.codegen import AbstractGenerator, xsd_qname, filter_method, PythonGenerator
+
+# noinspection PyUnresolvedReferences
+from xsdtools import CGenerator, FortranGenerator, JSONSchemaGenerator
 
 
 XSD_TEST = """
@@ -42,7 +44,7 @@ XSD_TEST = """
 class DemoGenerator(AbstractGenerator):
     formal_language = 'Demo'
 
-    default_paths = ['templates/filters/']
+    searchpaths = ['templates/filters/']
 
     builtin_types = {
         'string': 'str',
@@ -70,18 +72,16 @@ class DemoGenerator(AbstractGenerator):
         return str(obj)
 
 
-@DemoGenerator.register_filter
-def function_filter(obj):
-    return str(obj)
-
-
 class TestAbstractGenerator(unittest.TestCase):
 
     generator_class = DemoGenerator
 
+    schema: XMLSchema
+    searchpath: Path
+
     @classmethod
     def setUpClass(cls):
-        cls.schema = xmlschema.XMLSchema(XSD_TEST)
+        cls.schema = XMLSchema(XSD_TEST)
         cls.searchpath = Path(__file__).absolute().parent.joinpath('templates/filters/')
         cls.generator = cls.generator_class(cls.schema, str(cls.searchpath))
 
@@ -112,7 +112,6 @@ class TestAbstractGenerator(unittest.TestCase):
             self.assertEqual(demo_gen.filters['instance_filter'](dt), '1999-12-31 23:59:59')
             self.assertEqual(demo_gen.filters['static_filter'](dt), '1999-12-31 23:59:59')
             self.assertEqual(demo_gen.filters['class_filter'](dt), '1999-12-31 23:59:59')
-            self.assertEqual(demo_gen.filters['function_filter'](dt), '1999-12-31 23:59:59')
         else:
             with self.assertRaises(KeyError):
                 self.generator.filters['instance_filter'](dt)

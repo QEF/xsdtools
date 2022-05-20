@@ -5,7 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .abstract_generator import AbstractGenerator
+from xmlschema.extras.codegen import AbstractGenerator
 
 
 class CGenerator(AbstractGenerator):
@@ -14,7 +14,7 @@ class CGenerator(AbstractGenerator):
     """
     formal_language = 'C'
 
-    default_paths = ['templates/c/']
+    searchpaths = ['templates/c/']
 
     builtin_types = {
         'string': 'str',

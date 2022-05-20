@@ -5,7 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .abstract_generator import AbstractGenerator
+from xmlschema.extras.codegen import AbstractGenerator
 
 
 class FortranGenerator(AbstractGenerator):
@@ -14,7 +14,7 @@ class FortranGenerator(AbstractGenerator):
     """
     formal_language = 'Fortran'
 
-    default_paths = ['templates/fortran/']
+    searchpaths = ['templates/fortran/']
 
     builtin_types = {
         'string': 'CHARACTER(len=256)',

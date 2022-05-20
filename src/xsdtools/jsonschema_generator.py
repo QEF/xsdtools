@@ -5,7 +5,7 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .abstract_generator import AbstractGenerator
+from xmlschema.extras.codegen import AbstractGenerator
 
 
 class JSONSchemaGenerator(AbstractGenerator):
@@ -14,7 +14,7 @@ class JSONSchemaGenerator(AbstractGenerator):
     """
     formal_language = 'JSON Schema'
 
-    default_paths = ['templates/json-schema/']
+    searchpaths = ['templates/json-schema/']
 
     builtin_types = {
         'string': 'string',

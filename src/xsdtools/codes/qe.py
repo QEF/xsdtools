@@ -17,7 +17,7 @@ class QEFortranGenerator(FortranGenerator):
     """
     A Fortran code generator for Quantum ESPRESSO.
     """
-    default_paths = ['templates/qe/']
+    searchpaths = ['templates/qe/']
 
     schema_types = {
         "d2vectorType": "REAL(DP), DIMENSION(2)",
@@ -34,13 +34,13 @@ class QEFortranGenerator(FortranGenerator):
         "cell_dimensionsType": "REAL(DP), DIMENSION(6)",
     }
 
-    def __init__(self, schema, searchpath=None, filters=None, tests=None, types_map=None):
+    def __init__(self, schema, searchpath=None, types_map=None):
         if types_map is None:
             types_map = self.schema_types
         else:
             types_map = self.schema_types.copy().update(**types_map)
 
-        super(QEFortranGenerator, self).__init__(schema, searchpath, filters, tests, types_map)
+        super(QEFortranGenerator, self).__init__(schema, searchpath, types_map)
         assert self.schema.target_namespace == QE_NAMESPACE
 
     @staticmethod
