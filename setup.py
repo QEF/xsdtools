@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': ['xsdtools=xsdtools.__main__:main']
     },
-    install_requires=['xmlschema>=1.8', 'jinja2'],
+    install_requires=['xmlschema>=1.11.1', 'jinja2'],
     author='Davide Brunato et al.',
     url='https://github.com/QEF/xsdtools',
     license='BSD 3-Clause',

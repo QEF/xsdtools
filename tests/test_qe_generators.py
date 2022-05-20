@@ -10,10 +10,12 @@ from pathlib import Path
 import jinja2
 import xmlschema
 
+# noinspection PyUnresolvedReferences
 from xsdtools import QEFortranGenerator
 
 
 class TestQEFortranGenerator(unittest.TestCase):
+    xsd_file: Path
 
     @classmethod
     def setUpClass(cls):
@@ -47,7 +49,7 @@ class TestQEFortranGenerator(unittest.TestCase):
 
     def test_initialization(self):
         codegen = QEFortranGenerator(str(self.xsd_file))
-        self.assertIsInstance(codegen.schema, xmlschema.XMLSchema)
+        self.assertIsInstance(codegen.schema, xmlschema.XMLSchema11)
         self.assertIsInstance(codegen._env, jinja2.Environment)
 
     def test_get_template(self):
