@@ -162,12 +162,11 @@ class QEFortranGenerator(FortranGenerator):
         else:
             lines.append(line)
         return '\n'.join(lines)
-    
+
     @filter_method
     def attributes_list(self, xsd_type):
-      remove=[]
-      if xsd_type.is_derived(self.schema.types['matrixType']) \
-        or xsd_type.is_derived(self.schema.types['integerMatrixType']):
-          remove+=['rank','dims']
-      return (_ for _ in xsd_type.attributes.values() if not _.local_name in remove) 
-        
+        remove = []
+        if xsd_type.is_derived(self.schema.types['matrixType']) \
+                or xsd_type.is_derived(self.schema.types['integerMatrixType']):
+            remove += ['rank', 'dims']
+        return (_ for _ in xsd_type.attributes.values() if _.local_name not in remove)
