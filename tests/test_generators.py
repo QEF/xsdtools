@@ -14,7 +14,7 @@ from xmlschema import XMLSchema
 from xmlschema.extras.codegen import AbstractGenerator, xsd_qname, filter_method, PythonGenerator
 
 # noinspection PyUnresolvedReferences
-from xsdtools import CGenerator, FortranGenerator, JSONSchemaGenerator
+from xsdtools import CGenerator, FortranGenerator
 
 
 XSD_TEST = """
@@ -222,17 +222,4 @@ class TestPythonGenerator(TestAbstractGenerator):
     def test_language_type_filter(self):
         self.assertListEqual(
             self.generator.render('python_type_filter_test.jinja'), ['str']
-        )
-
-
-class TestJSONSchemaGenerator(TestAbstractGenerator):
-
-    generator_class = JSONSchemaGenerator
-
-    def test_formal_language(self):
-        self.assertEqual(self.generator_class.formal_language, 'JSON Schema')
-
-    def test_language_type_filter(self):
-        self.assertListEqual(
-            self.generator.render('json_schema_type_filter_test.jinja'), ['string']
         )

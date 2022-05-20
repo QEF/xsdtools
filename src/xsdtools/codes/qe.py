@@ -7,7 +7,7 @@
 #
 import re
 
-from ..helpers import filter_method
+from xmlschema.extras.codegen import filter_method
 from ..fortran_generator import FortranGenerator
 
 QE_NAMESPACE = "http://www.quantum-espresso.org/ns/qes/qes-1.0"

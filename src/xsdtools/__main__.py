@@ -17,9 +17,8 @@ from xmlschema import XMLSchema, XMLSchema11
 from xmlschema.cli import xsd_version_number, get_loglevel
 from xmlschema.exceptions import XMLSchemaValueError
 
-from xsdtools import CGenerator, FortranGenerator, \
-    PythonGenerator, JSONSchemaGenerator, QEFortranGenerator
-from xsdtools.helpers import is_shell_wildcard
+from xmlschema.extras.codegen import PythonGenerator, is_shell_wildcard
+from xsdtools import CGenerator, FortranGenerator, QEFortranGenerator
 
 
 PROGRAM_NAME = os.path.basename(sys.argv[0])
@@ -28,7 +27,6 @@ GENERATORS_MAP = {
     'C': CGenerator,
     'Fortran': FortranGenerator,
     'Python': PythonGenerator,
-    'JSON': JSONSchemaGenerator,
     'QE': QEFortranGenerator,
 }
 
@@ -109,8 +107,8 @@ def main():
 
 
 if __name__ == '__main__':
-    if sys.version_info < (3, 5, 0):
-        sys.stderr.write("You need python 3.5 or later to run this program\n")
+    if sys.version_info < (3, 7, 0):
+        sys.stderr.write("You need python 3.7 or later to run this program\n")
         sys.exit(1)
 
     main()

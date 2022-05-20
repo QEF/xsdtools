@@ -37,16 +37,6 @@ class TestQEFortranGenerator(unittest.TestCase):
                     k + 1, k + 6, '\n'.join(expected_lines[k:k + 5])
                 ))
 
-    @unittest.skip('Developing...')
-    def test_codegen_class(self):
-        default_filters = [
-            'local_name', 'qname', 'tag_name', 'type_name', 'namespace',
-            'sorted_types', 'complex_types', 'sorted_complex_types',
-            'read_function_name', 'bcast_function_name', 'init_function_name',
-            'write_function_name', 'reset_function_name', 'init_argument_line',
-        ]
-        self.assertListEqual(list(QEFortranGenerator.default_filters), default_filters)
-
     def test_initialization(self):
         codegen = QEFortranGenerator(str(self.xsd_file))
         self.assertIsInstance(codegen.schema, xmlschema.XMLSchema11)

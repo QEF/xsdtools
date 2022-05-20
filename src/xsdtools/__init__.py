@@ -5,14 +5,11 @@
 # See the file 'LICENSE' in the root directory of the present distribution,
 # or https://opensource.org/licenses/BSD-3-Clause
 #
-from .helpers import filter_method, test_method
-from .abstract_generator import AbstractGenerator
+from xmlschema.extras.codegen import filter_method, test_method, AbstractGenerator, PythonGenerator
+
 from .c_generator import CGenerator
 from .fortran_generator import FortranGenerator
-from .jsonschema_generator import JSONSchemaGenerator
-from .python_generator import PythonGenerator
 from .codes import QEFortranGenerator
 
-__all__ = ['filter_method', 'test_method', 'AbstractGenerator', 'CGenerator',
-           'FortranGenerator', 'PythonGenerator', 'JSONSchemaGenerator',
-           'QEFortranGenerator']
+__all__ = ['filter_method', 'test_method', 'AbstractGenerator', 'PythonGenerator',
+           'CGenerator', 'FortranGenerator', 'QEFortranGenerator']

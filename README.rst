@@ -4,17 +4,13 @@ xsdtools
 
 .. introduction-start
 
-This package implements code generators for XSD schemas. The generator engine
-uses XSD schemas and Jinja2 templates to produce code and structures.
+This package implements XSD schema-based code generators for Quantum ESPRESSO
+simulation suite. The generator engine uses XSD schemas and Jinja2 templates
+to produce code and structures.
 
 The generator requires Python 3.7+ for working and is based on the libraries
-`xmlschema <https://github.com/brunato/xmlschema>`_ for processing XSD schemas
-and `Jinja2 <https://github.com/pallets/jinja>`_ for processing templates.
-
-The package can be used as a library in your Python code or by a console command
-in generic shell scripts. Thought as experimental code for generating Fortran
-interfaces for the XML schema-based data of Quantum ESPRESSO simulation suite,
-it's opened to contributions on developing other languages or other template set.
+`xmlschema <https://github.com/brunato/xmlschema>`_ and
+`Jinja2 <https://github.com/pallets/jinja>`_.
 
 
 Installation
@@ -57,6 +53,12 @@ You can provide your own templates through *searchpath* argument::
   codegen = xsdtools.FortranGenerator('schema.xsd', searchpath='./templates')
   codegen.render_to_files('my_template.jinja', output_dir='./output')
     
+Code generator classes
+======================
+
+* `xsdtools.CGenerator`
+* `xsdtools.FortranGenerator`
+* `xsdtools.QEFortranGenerator`
 
 License
 =======
