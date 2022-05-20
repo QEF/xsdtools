@@ -40,9 +40,9 @@ MODULE qes_init_module
   {%- for type in schema.complex_types %}
     {%- if type.local_name in ['matrixType', 'integerMatrixType'] %}
 {%include "init/init_matrix_subroutines.f90.jinja" %}
-    {%- elif type is extension('matrixType', 'integerMatrixType') %}
+    {%- elif type is extension('qes:matrixType', 'qes:integerMatrixType') %}
 {%include "init/init_matrix_extension.f90.jinja" %}
-    {%- elif type is extension('vectorType', 'integerVectorType') %}
+    {%- elif type is extension('qes:vectorType', 'qes:integerVectorType') %}
 {%include "init/init_vector_subroutines.f90.jinja" %}
     {%- else %}
 {% include "init/init_subroutine.f90.jinja" %}

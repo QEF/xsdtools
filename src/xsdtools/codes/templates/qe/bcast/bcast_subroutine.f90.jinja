@@ -5,10 +5,10 @@
     !
     TYPE({{ type|type_name('_type') }}), INTENT(INOUT) :: obj
     INTEGER, INTENT(IN) :: ionode_id, comm
-    {%- if type is extension("matrixType", "integerMatrixType") %}
+    {%- if type is extension("qes:matrixType", "qes:integerMatrixType") %}
     INTEGER :: length
     {%- endif %}
-    {%- if type is extension("matrixType", "integerMatrixType") or type is multi_sequence %}
+    {%- if type is extension("qes:matrixType", "qes:integerMatrixType") or type is multi_sequence %}
     INTEGER :: i
     {%- endif %}
     !
@@ -17,12 +17,12 @@
     CALL mp_bcast(obj%lread, ionode_id, comm)
     !
 {#- Include attributes #}
-{%- if type is extension("matrixType", "integerMatrixType") %}
+{%- if type is extension("qes:matrixType", "qes:integerMatrixType") %}
     CALL mp_bcast(obj%rank, ionode_id, comm)
     IF (.NOT.ionode) ALLOCATE(obj%dims(obj%rank))
     CALL mp_bcast(obj%dims, ionode_id, comm)
     CALL mp_bcast(obj%order, ionode_id, comm)
-{%- elif type is extension("vectorType", "integerVectorType") %}
+{%- elif type is extension("qes:vectorType", "qes:integerVectorType") %}
     CALL mp_bcast(obj%size, ionode_id, comm)
 {%- else %}
   {%- for attribute in type.attributes.values() %}
@@ -82,10 +82,10 @@
 {%- endif %}
 {#- Insert extension #}
 {%- if type.is_extension() %}
-{%- if type is extension("vectorType", "integerVectorType") %}
+{%- if type is extension("qes:vectorType", "qes:integerVectorType") %}
     IF (.NOT.ionode) ALLOCATE(obj%{{ type|type_name }}(obj%size))
     CALL mp_bcast(obj%{{ type|type_name }}, ionode_id, comm)
-{%- elif type is extension("matrixType", "integerMatrixType") %}
+{%- elif type is extension("qes:matrixType", "qes:integerMatrixType") %}
     IF (.NOT. ionode) THEN
       length = 1
       DO i=1, obj%rank
@@ -94,7 +94,7 @@
       ALLOCATE (obj%{{ type|type_name }}(length) )
     ENDIF
     CALL mp_bcast(obj%{{ type|type_name }}, ionode_id, comm)
-{%- elif type is extension("doubleListType") %}
+{%- elif type is extension("qes:doubleListType") %}
     !CALL mp_bcast(obj%?????, ionode_id, comm) NEVER HAPPENED
 {%- else %}
     CALL mp_bcast(obj%{{ type|type_name }}, ionode_id, comm)

@@ -51,13 +51,13 @@
 {%- endfor %}
 {%- endif %}
 {#- Deallocate arrays #}
-{%- if type is extension('matrixType', 'integerMatrixType', 'vectorType', 'integerVectorType') %}
+{%- if type is extension('qes:matrixType', 'qes:integerMatrixType', 'qes:vectorType', 'qes:integerVectorType') %}
     IF (ALLOCATED(obj%{{ type|type_name }})) THEN
       DEALLOCATE(obj%{{ type|type_name }})
     ENDIF
 {%- endif %}
 {#- Insert attributes #}
-{%- if type is extension('matrixType','integerMatrixType') %}
+{%- if type is extension('qes:matrixType', 'qes:integerMatrixType') %}
     IF (ALLOCATED(obj%dims)) THEN
       DEALLOCATE(obj%dims)
     ENDIF
